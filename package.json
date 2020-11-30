@@ -1,7 +1,7 @@
 {
   "name": "vite-plugin-md",
   "description": "Markdown for Vite",
-  "version": "0.0.0",
+  "version": "0.1.1",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -23,7 +23,7 @@
     "example:build": "npm -C example run build",
     "build": "tsup src/index.ts --dts --format cjs,esm",
     "prepublishOnly": "npm run build",
-    "release": "npx bumpp && npm publish && git push"
+    "release": "npx bumpp --commit --tag && npm publish && git push"
   },
   "peerDependencies": {
     "@vue/compiler-sfc": "^3.0.2"

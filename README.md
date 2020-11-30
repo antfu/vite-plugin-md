@@ -23,9 +23,13 @@ export default {
 }
 ```
 
-And import it as normal Vue components
+And import it as normal a Vue component
 
-```html
+```vue
+<template>
+  <HelloWorld />
+</template>
+
 <script>
 import HelloWorld from './README.md'
 
@@ -82,7 +86,7 @@ export default {
 }
 ```
 
-Then put markdowns under `/pages/xx.md`, then you can access the page via route `/xx`.
+Put your markdown under `./src/pages/xx.md`, then you can access the page via route `/xx`.
 
 ## License
 
