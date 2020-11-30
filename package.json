@@ -1,0 +1,46 @@
+{
+  "name": "vite-plugin-md",
+  "description": "Markdown for Vite",
+  "version": "0.0.0",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "license": "MIT",
+  "funding": "https://github.com/sponsors/antfu",
+  "author": "Anthony Fu <anthonyfu117@hotmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/antfu/vite-plugin-md"
+  },
+  "homepage": "https://github.com/antfu/vite-plugin-md",
+  "bugs": "https://github.com/antfu/vite-plugin-md/issues",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "npm run build -- --watch",
+    "example:dev": "npm -C example run dev",
+    "example:build": "npm -C example run build",
+    "build": "tsup src/index.ts --dts --format cjs,esm",
+    "prepublishOnly": "npm run build",
+    "release": "npx bumpp && npm publish && git push"
+  },
+  "peerDependencies": {
+    "@vue/compiler-sfc": "^3.0.2"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^0.4.3",
+    "@types/markdown-it": "^10.0.3",
+    "@typescript-eslint/eslint-plugin": "^4.9.0",
+    "@vue/compiler-sfc": "^3.0.3",
+    "eslint": "^7.14.0",
+    "rollup": "^2.34.0",
+    "standard-version": "^9.0.0",
+    "tsup": "^3.10.1",
+    "typescript": "^4.1.2",
+    "vite": "^1.0.0-rc.13"
+  },
+  "dependencies": {
+    "markdown-it": "^12.0.2"
+  }
+}
