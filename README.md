@@ -2,6 +2,9 @@
 
 Markdown for Vite
 
+- Use Markdown as Vue components
+- Use Vue components in Markdown
+
 ## Install
 
 Install
@@ -25,6 +28,8 @@ export default {
 
 And import it as normal a Vue component
 
+## Import Markdown as Vue components
+
 ```vue
 <template>
   <HelloWorld />
@@ -41,13 +46,9 @@ export default {
 </script>
 ```
 
-## Use Vue Component inside Markdown
+## Use Vue Components inside Markdown
 
 You can even use Vue inside your markdown, for example
-
-```html
-<Counter :init='5'/>
-```
 
 <Counter :init='5'/>
 
@@ -67,7 +68,7 @@ app.mount()
 
 See integrations port if you don't want to explicitly register every component.
 
-## Config
+## Options
 
 `vite-plugin-md` uses [`markdown-it`](https://github.com/markdown-it/markdown-it) under the hood, see [`markdown-it`'s docs](https://markdown-it.github.io/markdown-it/) for more details
 
@@ -93,6 +94,8 @@ export default {
 ## Example
 
 See the [/example](./example).
+
+Or the pre-configured starter template [Vitesse](https://github.com/antfu/vitesse).
 
 ## Integrations
 
