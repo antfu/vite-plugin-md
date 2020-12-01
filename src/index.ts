@@ -14,6 +14,8 @@ function VitePluginMarkdown(options: Options = {}): Plugin {
     markdownItOptions: {},
     markdownItUses: [],
     wrapperClasses: 'markdown-body',
+    wrapperComponent: null,
+    transforms: {},
   }, options)
 
   const markdown = new MarkdownIt({
@@ -37,13 +39,26 @@ function VitePluginMarkdown(options: Options = {}): Plugin {
         test({ path }) {
           return path.endsWith('.md')
         },
-        transform({ code, isBuild, path }) {
-          const md = `<div class="${wrapperClasses}">${markdown.render(code, {})}</div>`
+        transform(ctx) {
+          const { isBuild, path } = ctx
+          let md = ctx.code
+
+          if (resolved.transforms.before)
+            md = resolved.transforms.before({ ...ctx, code: md })
+
+          let sfc = markdown.render(md, {})
+          if (resolved.wrapperClasses)
+            sfc = `<div class="${wrapperClasses}">${sfc}</div>`
+          if (resolved.wrapperComponent)
+            sfc = `<${resolved.wrapperComponent}>${sfc}</${resolved.wrapperComponent}>`
+
+          if (resolved.transforms.after)
+            sfc = resolved.transforms.after({ ...ctx, code: sfc })
 
           let { code: result } = compileTemplate({
             filename: path,
             id: path,
-            source: md,
+            source: sfc,
             transformAssetUrls: false,
           })
 

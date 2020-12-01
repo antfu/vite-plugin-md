@@ -1,4 +1,5 @@
 import type MarkdownIt from 'markdown-it'
+import { TransformContext } from 'vite/dist/node/transform'
 
 export interface Options {
   /**
@@ -15,6 +16,19 @@ export interface Options {
    * @default 'markdown-body'
    */
   wrapperClasses?: string | string[]
+  /**
+   * Component name to wrapper with
+   *
+   * @default undefined
+   */
+  wrapperComponent?: string | undefined | null
+  /**
+   * Custom tranformations apply before and after the markdown transformation.
+   */
+  transforms?: {
+    before?: (ctx: TransformContext) => string
+    after?: (ctx: TransformContext) => string
+  }
 }
 
 export type ResolvedOptions = Required<Options>
