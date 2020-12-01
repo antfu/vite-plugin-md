@@ -65,6 +65,7 @@ app.component('Counter', Counter) // <--
 app.mount()
 ```
 
+See integrations port if you don't want to explicitly register every component.
 
 ## Config
 
@@ -98,8 +99,8 @@ See the [/example](./example).
 ### Work with [vite-plugin-voie](https://github.com/vamplate/vite-plugin-voie)
 
 ```ts
-import Voie from 'vite-plugin-voie'
 import Markdown from 'vite-plugin-md'
+import Voie from 'vite-plugin-voie'
 
 export default {
   plugins: [
@@ -112,6 +113,32 @@ export default {
 ```
 
 Put your markdown under `./src/pages/xx.md`, then you can access the page via route `/xx`.
+
+
+### Work with [vite-plugin-components](https://github.com/antfu/vite-plugin-components)
+
+`vite-plugin-components` allows you to do on-demand components auto importing without worrying about registration.
+
+```ts
+import Markdown from 'vite-plugin-md'
+import ViteComponents from 'vite-plugin-components'
+
+export default {
+  plugins: [
+    Markdown(),
+    // should be placed after `Markdown()`
+    ViteComponents({
+      // allow auto load markdown components under `./src/components/`
+      extensions: ['vue', 'md'],
+
+      // allow auto import and register components used in markdown
+      customLoaderMatcher: ({ path }) => path.endsWith('.md'),
+    })
+  ],
+}
+```
+
+Components under `./src/components` can be directly used in markdown components, and markdown components can also be put under `./src/components` to be auto imported.
 
 ## License
 
