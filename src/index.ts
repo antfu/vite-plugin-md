@@ -12,6 +12,7 @@ function toArray<T>(n: T | T[]): T[] {
 function VitePluginMarkdown(options: Options = {}): Plugin {
   const resolved: ResolvedOptions = Object.assign({
     markdownItOptions: {},
+    markdownItUses: [],
     wrapperClasses: 'markdown-body',
   }, options)
 
@@ -20,6 +21,12 @@ function VitePluginMarkdown(options: Options = {}): Plugin {
     linkify: true,
     typographer: true,
     ...resolved.markdownItOptions,
+  })
+
+  resolved.markdownItUses.forEach((e) => {
+    const [plugin, options] = toArray(e)
+
+    markdown.use(plugin, options)
   })
 
   const wrapperClasses = toArray(resolved.wrapperClasses).filter(i => i).join(' ')

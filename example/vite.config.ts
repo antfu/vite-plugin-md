@@ -1,9 +1,14 @@
 import { UserConfig } from 'vite'
-import MD from 'vite-plugin-md'
+import Markdown from 'vite-plugin-md'
+import prism from 'markdown-it-prism'
 
 const config: UserConfig = {
   plugins: [
-    MD(),
+    Markdown({
+      markdownItUses: [
+        prism,
+      ],
+    }),
   ],
 }
 

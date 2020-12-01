@@ -30,7 +30,7 @@ And import it as normal a Vue component
 
 ## Import Markdown as Vue components
 
-```vue
+```html
 <template>
   <HelloWorld />
 </template>
@@ -49,6 +49,10 @@ export default {
 ## Use Vue Components inside Markdown
 
 You can even use Vue inside your markdown, for example
+
+```html
+<Counter :init='5'/>
+```
 
 <Counter :init='5'/>
 

@@ -31,12 +31,16 @@ importers:
     devDependencies:
       '@vue/compiler-sfc': 3.0.3_vue@3.0.3
       cross-env: 7.0.2
+      markdown-it-prism: 2.1.3
+      prismjs: 1.22.0
       typescript: 4.1.2
       vite: 1.0.0-rc.13
       vite-plugin-md: 'link:..'
     specifiers:
       '@vue/compiler-sfc': ^3.0.2
       cross-env: ^7.0.2
+      markdown-it-prism: ^2.1.3
+      prismjs: ^1.22.0
       typescript: ^4.0.5
       vite: ^1.0.0-rc.9
       vite-plugin-md: 'workspace:*'
@@ -1072,6 +1076,15 @@ packages:
       node: '>=6'
     resolution:
       integrity: sha512-PC+AmIuK04E6aeSs/pUccSujsTzBhu4HzC2dL+CfJB/Jcc2qTRbEwZQDfIUpt2Xl8BodYBEq8w4fc0kU2I9DjQ==
+  /clipboard/2.0.6:
+    dependencies:
+      good-listener: 1.2.2
+      select: 1.1.2
+      tiny-emitter: 2.1.0
+    dev: true
+    optional: true
+    resolution:
+      integrity: sha512-g5zbiixBRk/wyKakSwCKd7vQXDjFnAMGHoEyBogG/bw9kTD9GvdAvaoRR1ALcEzt3pVKxZR0pViekPMIS0QyGg==
   /cliui/6.0.0:
     dependencies:
       string-width: 4.2.0
@@ -1507,6 +1520,11 @@ packages:
       node: '>= 0.4'
     resolution:
       integrity: sha512-3MqfYKj2lLzdMSf8ZIZE/V+Zuy+BgD6f164e8K2w7dgnpKArBDerGYpM46IYYcjnkdPNMjPk9A6VFB8+3SKlXQ==
+  /delegate/3.2.0:
+    dev: true
+    optional: true
+    resolution:
+      integrity: sha512-IofjkYBZaZivn0V8nnsMJGBr4jVLxHDheKSW88PyxS5QC4Vo9ZbZVvhzlSxY87fVq3STR6r+4cGepyHkcWOQSw==
   /delegates/1.0.0:
     dev: true
     resolution:
@@ -2388,6 +2406,13 @@ packages:
       node: '>=10'
     resolution:
       integrity: sha512-iH9RmgwCmUJHi2z5o2l3eTtGBtXek1OYlHrbcxOYugyHLmAsZrPj43OtHThd62Buh/Vv6VyCBD2bdyWcGNQqoQ==
+  /good-listener/1.2.2:
+    dependencies:
+      delegate: 3.2.0
+    dev: true
+    optional: true
+    resolution:
+      integrity: sha1-1TswzfkxPf+33JoNR3CWqm0UXFA=
   /graceful-fs/4.2.4:
     dev: true
     resolution:
@@ -3223,6 +3248,14 @@ packages:
       node: '>=8'
     resolution:
       integrity: sha512-glc9y00wgtwcDmp7GaE/0b0OnxpNJsVf3ael/An6Fe2Q51LLwN1er6sdomLRzz5h0+yMpiYLhWYF5R7HeqVd4g==
+  /markdown-it-prism/2.1.3:
+    dependencies:
+      prismjs: 1.22.0
+    dev: true
+    engines:
+      node: '>=6.0.0'
+    resolution:
+      integrity: sha512-iK7dlsQawpOWlWa/p+jPWNFcn5E0Ace4G49uGatppIYck4PAvrNTb74cb0GUF0km3rZcy6Wz1nFrzXbmMcxNdQ==
   /markdown-it/12.0.2:
     dependencies:
       argparse: 2.0.1
@@ -3976,6 +4009,12 @@ packages:
       node: '>= 0.8.0'
     resolution:
       integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==
+  /prismjs/1.22.0:
+    dev: true
+    optionalDependencies:
+      clipboard: 2.0.6
+    resolution:
+      integrity: sha512-lLJ/Wt9yy0AiSYBf212kK3mM5L8ycwlyTlSxHBAneXLR0nzFMlZ5y7riFPF3E33zXOF2IH95xdY5jIyZbM9z/w==
   /process-nextick-args/2.0.1:
     dev: true
     resolution:
@@ -4369,6 +4408,11 @@ packages:
     dev: true
     resolution:
       integrity: sha512-rx+x8AMzKb5Q5lQ95Zoi6ZbJqwCLkqi3XuJXp5P3rT8OEc6sZCJG5AE5dU3lsgRr/F4Bs31jSlVN+j5KrsGu9A==
+  /select/1.1.2:
+    dev: true
+    optional: true
+    resolution:
+      integrity: sha1-DnNQrN7ICxEIUoeG7B1EGNEbOW0=
   /selfsigned/1.10.8:
     dependencies:
       node-forge: 0.10.0
@@ -4793,6 +4837,11 @@ packages:
     dev: true
     resolution:
       integrity: sha512-iOqSav00cVxEEICeD7TjLB1sueEL+81Wpzp2bY17uZjZN0pWZPuo4suZ/61VujxmqSGFfgOcNuTZ85QJwNZQpw==
+  /tiny-emitter/2.1.0:
+    dev: true
+    optional: true
+    resolution:
+      integrity: sha512-NB6Dk1A9xgQPMoGqC5CVXn123gWyte215ONT5Pp5a0yt4nlEoO1ZWeCwpncaekPHXO60i47ihFnZPiRPjRMq4Q==
   /to-fast-properties/2.0.0:
     engines:
       node: '>=4'
