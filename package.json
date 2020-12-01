@@ -19,8 +19,8 @@
   ],
   "scripts": {
     "dev": "npm run build -- --watch",
-    "example:dev": "npm -C example run dev",
-    "example:build": "npm -C example run build",
+    "example:dev": "cp README.md example/README.md && npm -C example run dev",
+    "example:build": "cp README.md example/README.md && npm -C example run build",
     "build": "tsup src/index.ts --dts --format cjs,esm",
     "prepublishOnly": "npm run build",
     "release": "npx bumpp --commit --tag && npm publish && git push"

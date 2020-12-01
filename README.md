@@ -38,8 +38,33 @@ export default {
     HelloWorld,
   },
 }
-</script>  
+</script>
 ```
+
+## Use Vue Component inside Markdown
+
+You can even use Vue inside your markdown, for example
+
+```html
+<Counter :init='5'/>
+```
+
+<Counter :init='5'/>
+
+Note you need to register the components globally to use them in Markdown
+
+```ts
+import { createApp } from 'vue'
+import App from './App.vue'
+import Counter from './Counter.vue'
+
+const app = createApp(App)
+
+app.component('Counter', Counter) // <--
+
+app.mount()
+```
+
 
 ## Config
 
