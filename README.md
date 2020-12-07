@@ -94,7 +94,7 @@ export default {
       markdownItSetup(md) {
         // for example
         md.use(require('markdown-it-anchor'))
-        md.use(require('markdown-it-prisma'))
+        md.use(require('markdown-it-prism'))
       },
       // Class names for the wrapper div
       wrapperClasses: 'markdown-body'
