@@ -13,6 +13,7 @@ function VitePluginMarkdown(options: Options = {}): Plugin {
   const resolved: ResolvedOptions = Object.assign({
     markdownItOptions: {},
     markdownItUses: [],
+    markdownItSetup: () => {},
     wrapperClasses: 'markdown-body',
     wrapperComponent: null,
     transforms: {},
@@ -30,6 +31,8 @@ function VitePluginMarkdown(options: Options = {}): Plugin {
 
     markdown.use(plugin, options)
   })
+
+  resolved.markdownItSetup(markdown)
 
   const wrapperClasses = toArray(resolved.wrapperClasses).filter(i => i).join(' ')
 

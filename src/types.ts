@@ -11,6 +11,10 @@ export interface Options {
    */
   markdownItUses?: (MarkdownIt.PluginSimple | [MarkdownIt.PluginSimple | MarkdownIt.PluginWithOptions<any>, any] | any)[]
   /**
+   * A function providing the Markdown It instance gets the ability to apply custom settings/plugins
+   */
+  markdownItSetup?: (MarkdownIt: MarkdownIt) => void
+  /**
    * Class names for wrapper div
    *
    * @default 'markdown-body'

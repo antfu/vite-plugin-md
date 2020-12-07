@@ -89,11 +89,21 @@ export default {
         html: true,
         linkify: true,
         typographer: true,
-      }
+      },
+      // A function providing the Markdown It instance gets the ability to apply custom settings/plugins
+      markdownItSetup(md) {
+        // for example
+        md.use(require('markdown-it-anchor'))
+        md.use(require('markdown-it-prisma'))
+      },
+      // Class names for the wrapper div
+      wrapperClasses: 'markdown-body'
     })
   ],
 }
 ```
+
+See [the tsdoc](./src/types.ts) for more advanced options
 
 ## Example
 
