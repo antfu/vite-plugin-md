@@ -72,6 +72,31 @@ app.mount()
 
 Use [`vite-plugin-components`](#work-with-vite-plugin-components) for auto components registration.
 
+## Frontmatter
+
+Frontmatter will be parsed and inject into Vue's instance data `frontmatter` field. 
+
+For example:
+
+```md
+---
+title: My Cool App
+---
+
+# Hello World
+
+This is {{frontmatter.title}}
+```
+
+Will be rendered as
+
+```html
+<h1>Hello World</h1>
+<p>This is My Cool App</p>
+```
+
+It will also be passed to the wrapper component's props if you have set `wrapperComponent` option.
+
 ## Options
 
 `vite-plugin-md` uses [`markdown-it`](https://github.com/markdown-it/markdown-it) under the hood, see [`markdown-it`'s docs](https://markdown-it.github.io/markdown-it/) for more details

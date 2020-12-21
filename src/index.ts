@@ -1,6 +1,7 @@
 import type { Plugin } from 'vite'
 import MarkdownIt from 'markdown-it'
 import { compileTemplate } from '@vue/compiler-sfc'
+import matter from 'gray-matter'
 import { Options, ResolvedOptions } from './types'
 
 function toArray<T>(n: T | T[]): T[] {
@@ -44,16 +45,17 @@ function VitePluginMarkdown(options: Options = {}): Plugin {
         },
         transform(ctx) {
           const { isBuild, path } = ctx
-          let md = ctx.code
+          let raw = ctx.code
 
           if (resolved.transforms.before)
-            md = resolved.transforms.before({ ...ctx, code: md })
+            raw = resolved.transforms.before({ ...ctx, code: raw })
 
+          const { content: md, data: frontmatter } = matter(raw)
           let sfc = markdown.render(md, {})
           if (resolved.wrapperClasses)
             sfc = `<div class="${wrapperClasses}">${sfc}</div>`
           if (resolved.wrapperComponent)
-            sfc = `<${resolved.wrapperComponent}>${sfc}</${resolved.wrapperComponent}>`
+            sfc = `<${resolved.wrapperComponent} :frontmatter="frontmatter">${sfc}</${resolved.wrapperComponent}>`
 
           if (resolved.transforms.after)
             sfc = resolved.transforms.after({ ...ctx, code: sfc })
@@ -66,7 +68,9 @@ function VitePluginMarkdown(options: Options = {}): Plugin {
           })
 
           result = result.replace('export function render', 'function render')
-          result += '\nconst __script = { render };'
+          result += `\nconst __matter = ${JSON.stringify(frontmatter)};`
+          result += '\nconst data = () => ({ frontmatter: __matter });'
+          result += '\nconst __script = { render, data };'
 
           if (!isBuild)
             result += `\n__script.__hmrId = ${JSON.stringify(path)};`

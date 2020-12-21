@@ -41,6 +41,7 @@
     "vite": "^1.0.0-rc.13"
   },
   "dependencies": {
+    "gray-matter": "^4.0.2",
     "markdown-it": "^12.0.2"
   }
 }
