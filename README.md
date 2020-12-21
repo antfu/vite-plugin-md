@@ -26,7 +26,7 @@ export default {
 }
 ```
 
-And import it as normal a Vue component
+And import it as a normal Vue component
 
 ## Import Markdown as Vue components
 
@@ -70,7 +70,7 @@ app.component('Counter', Counter) // <--
 app.mount()
 ```
 
-See integrations port if you don't want to explicitly register every component.
+Use [`vite-plugin-components`](#work-with-vite-plugin-components) for auto components registration.
 
 ## Options
 
