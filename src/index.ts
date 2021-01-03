@@ -1,13 +1,22 @@
-import type { Plugin } from 'vite'
+import type { Plugin, ResolvedConfig } from 'vite'
 import MarkdownIt from 'markdown-it'
-import { compileTemplate } from '@vue/compiler-sfc'
 import matter from 'gray-matter'
+import { compileTemplate } from '@vue/compiler-sfc'
 import { Options, ResolvedOptions } from './types'
 
 function toArray<T>(n: T | T[]): T[] {
   if (!Array.isArray(n))
     return [n]
   return n
+}
+
+export function parseId(id: string) {
+  const index = id.indexOf('?')
+  if (index < 0)
+    return id
+
+  else
+    return id.slice(0, index)
 }
 
 function VitePluginMarkdown(options: Options = {}): Plugin {
@@ -36,51 +45,52 @@ function VitePluginMarkdown(options: Options = {}): Plugin {
   resolved.markdownItSetup(markdown)
 
   const wrapperClasses = toArray(resolved.wrapperClasses).filter(i => i).join(' ')
+  let config: ResolvedConfig | undefined
 
   return {
-    transforms: [
-      {
-        test({ path }) {
-          return path.endsWith('.md')
-        },
-        transform(ctx) {
-          const { isBuild, path } = ctx
-          let raw = ctx.code
+    name: 'vite-plugin-md',
+    enforce: 'pre',
+    configResolved(_config) {
+      config = _config
+    },
+    transform(raw, id) {
+      const path = parseId(id)
 
-          if (resolved.transforms.before)
-            raw = resolved.transforms.before({ ...ctx, code: raw })
+      if (!path.endsWith('.md'))
+        return raw
 
-          const { content: md, data: frontmatter } = matter(raw)
-          let sfc = markdown.render(md, {})
-          if (resolved.wrapperClasses)
-            sfc = `<div class="${wrapperClasses}">${sfc}</div>`
-          if (resolved.wrapperComponent)
-            sfc = `<${resolved.wrapperComponent} :frontmatter="frontmatter">${sfc}</${resolved.wrapperComponent}>`
+      if (resolved.transforms.before)
+        raw = resolved.transforms.before(raw, id)
 
-          if (resolved.transforms.after)
-            sfc = resolved.transforms.after({ ...ctx, code: sfc })
+      const { content: md, data: frontmatter } = matter(raw)
+      let sfc = markdown.render(md, {})
+      if (resolved.wrapperClasses)
+        sfc = `<div class="${wrapperClasses}">${sfc}</div>`
+      if (resolved.wrapperComponent)
+        sfc = `<${resolved.wrapperComponent} :frontmatter="frontmatter">${sfc}</${resolved.wrapperComponent}>`
 
-          let { code: result } = compileTemplate({
-            filename: path,
-            id: path,
-            source: sfc,
-            transformAssetUrls: false,
-          })
+      if (resolved.transforms.after)
+        sfc = resolved.transforms.after(sfc, id)
 
-          result = result.replace('export function render', 'function render')
-          result += `\nconst __matter = ${JSON.stringify(frontmatter)};`
-          result += '\nconst data = () => ({ frontmatter: __matter });'
-          result += '\nconst __script = { render, data };'
+      let { code: result } = compileTemplate({
+        filename: path,
+        id: path,
+        source: sfc,
+        transformAssetUrls: false,
+      })
 
-          if (!isBuild)
-            result += `\n__script.__hmrId = ${JSON.stringify(path)};`
+      result = result.replace('export function render', 'function render')
+      result += `\nconst __matter = ${JSON.stringify(frontmatter)};`
+      result += '\nconst data = () => ({ frontmatter: __matter });'
+      result += '\nconst __script = { render, data };'
 
-          result += '\nexport default __script;'
+      if (!config?.isProduction)
+        result += `\n__script.__hmrId = ${JSON.stringify(path)};`
 
-          return result
-        },
-      },
-    ],
+      result += '\nexport default __script;'
+
+      return result
+    },
   }
 }
 

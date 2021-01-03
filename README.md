@@ -5,6 +5,8 @@ Markdown for Vite
 - Use Markdown as Vue components
 - Use Vue components in Markdown
 
+> ℹ️ **0.2.x is for Vite 2 and 0.1.x is for Vite 1**
+
 ## Install
 
 Install
@@ -17,10 +19,12 @@ Add it to `vite.config.js`
 
 ```ts
 // vite.config.js
+import Vue from '@vitejs/plugin-vue'
 import Markdown from 'vite-plugin-md'
 
 export default {
   plugins: [
+    Vue(),
     Markdown()
   ],
 }
@@ -174,7 +178,7 @@ export default {
       extensions: ['vue', 'md'],
 
       // allow auto import and register components used in markdown
-      customLoaderMatcher: ({ path }) => path.endsWith('.md'),
+      customLoaderMatcher: path => path.endsWith('.md'),
     })
   ],
 }

@@ -5,15 +5,16 @@
     "build": "cross-env DEBUG=vite-plugin-md:* vite build"
   },
   "dependencies": {
-    "vue": "^3.0.2"
+    "vue": "^3.0.5"
   },
   "devDependencies": {
-    "@vue/compiler-sfc": "^3.0.2",
-    "cross-env": "^7.0.2",
-    "markdown-it-prism": "^2.1.3",
-    "prismjs": "^1.22.0",
-    "typescript": "^4.0.5",
-    "vite": "^1.0.0-rc.9",
+    "@vitejs/plugin-vue": "^1.0.3",
+    "@vue/compiler-sfc": "^3.0.5",
+    "cross-env": "^7.0.3",
+    "markdown-it-prism": "^2.1.4",
+    "prismjs": "^1.23.0",
+    "typescript": "^4.1.3",
+    "vite": "^2.0.0-beta.3",
     "vite-plugin-md": "workspace:*"
   }
 }

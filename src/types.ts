@@ -1,5 +1,4 @@
 import type MarkdownIt from 'markdown-it'
-import { TransformContext } from 'vite/dist/node/transform'
 
 export interface Options {
   /**
@@ -30,8 +29,8 @@ export interface Options {
    * Custom tranformations apply before and after the markdown transformation.
    */
   transforms?: {
-    before?: (ctx: TransformContext) => string
-    after?: (ctx: TransformContext) => string
+    before?: (code: string, id: string) => string
+    after?: (code: string, id: string) => string
   }
 }
 
