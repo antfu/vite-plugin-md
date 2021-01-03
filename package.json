@@ -23,7 +23,7 @@
     "example:build": "cp README.md example/README.md && npm -C example run build",
     "build": "tsup src/index.ts --dts --format cjs,esm",
     "prepublishOnly": "npm run build",
-    "release": "npx bumpp --commit --tag && npm publish && git push"
+    "release": "npx bumpp --commit --tag --push && npm publish"
   },
   "peerDependencies": {
     "vite": "2",
