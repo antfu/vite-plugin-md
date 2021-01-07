@@ -26,7 +26,7 @@
     "release": "npx bumpp --commit --tag --push && npm publish"
   },
   "peerDependencies": {
-    "vite": "2",
+    "vite": "^2.0.0-beta.1",
     "@vue/compiler-sfc": "^3.0.5"
   },
   "devDependencies": {
