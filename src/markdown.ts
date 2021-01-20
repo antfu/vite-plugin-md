@@ -42,6 +42,8 @@ export function createMarkdown(options: ResolvedOptions) {
 
     if (wrapperClasses)
       html = `<div class="${wrapperClasses}">${html}</div>`
+    else
+      html = `<div>${html}</div>`
     if (wrapperComponent)
       html = `<${wrapperComponent} :frontmatter="frontmatter">${html}</${wrapperComponent}>`
     if (transforms.after)
