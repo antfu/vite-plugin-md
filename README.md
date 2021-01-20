@@ -248,6 +248,22 @@ export default {
 
 Components under `./src/components` can be directly used in markdown components, and markdown components can also be put under `./src/components` to be auto imported.
 
+## TypeScript Shim
+
+```ts
+import { defineComponent } from 'vue'
+
+declare module '*.vue' {
+  const Component: ReturnType<typeof defineComponent>
+  export default Component
+}
+
+declare module '*.md' {
+  const Component: ReturnType<typeof defineComponent>
+  export default Component
+}
+```
+
 ## License
 
 MIT License © 2020 [Anthony Fu](https://github.com/antfu)
