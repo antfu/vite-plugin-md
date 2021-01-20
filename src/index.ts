@@ -1,26 +1,14 @@
-import type { Plugin } from 'vite'
+import type { Plugin, ResolvedConfig } from 'vite'
 import MarkdownIt from 'markdown-it'
-import matter from 'gray-matter'
-import { compileTemplate } from '@vue/compiler-sfc'
 import { Options, ResolvedOptions } from './types'
-
-function toArray<T>(n: T | T[]): T[] {
-  if (!Array.isArray(n))
-    return [n]
-  return n
-}
+import { markdownToVue } from './markdownToVue'
+import { toArray } from './utils'
+import { resolveOptions } from './options'
 
 function VitePluginMarkdown(userOptions: Options = {}): Plugin {
-  const options: ResolvedOptions = Object.assign({
-    headEnabled: false,
-    headField: '',
-    markdownItOptions: {},
-    markdownItUses: [],
-    markdownItSetup: () => {},
-    wrapperClasses: 'markdown-body',
-    wrapperComponent: null,
-    transforms: {},
-  }, userOptions)
+  const options = resolveOptions(userOptions)
+  let viteConfig: ResolvedConfig
+  let vuePlugin: Plugin
 
   const markdown = new MarkdownIt({
     html: true,
@@ -37,8 +25,6 @@ function VitePluginMarkdown(userOptions: Options = {}): Plugin {
 
   options.markdownItSetup(markdown)
 
-  const wrapperClasses = toArray(options.wrapperClasses).filter(i => i).join(' ')
-
   return {
     name: 'vite-plugin-md',
     enforce: 'pre',
@@ -46,40 +32,24 @@ function VitePluginMarkdown(userOptions: Options = {}): Plugin {
       if (!id.endsWith('.md'))
         return null
 
-      if (options.transforms.before)
-        raw = options.transforms.before(raw, id)
-
-      const { content: md, data: frontmatter } = matter(raw)
-      let sfc = markdown.render(md, {})
-      if (options.wrapperClasses)
-        sfc = `<div class="${wrapperClasses}">${sfc}</div>`
-      if (options.wrapperComponent)
-        sfc = `<${options.wrapperComponent} :frontmatter="frontmatter">${sfc}</${options.wrapperComponent}>`
-
-      if (options.transforms.after)
-        sfc = options.transforms.after(sfc, id)
-
-      let { code: result } = compileTemplate({
-        filename: id,
-        id,
-        source: sfc,
-        transformAssetUrls: false,
-      })
-
-      result = result.replace('export function render', 'function render')
-      result += `\nconst __matter = ${JSON.stringify(frontmatter)};`
-      if (options.headEnabled) {
-        const headGetter = options.headField === '' ? '__matter' : `__matter["${options.headField}"]`
-        result = `import { useHead } from "@vueuse/head"\n${result}`
-        result += `\nconst setup = () => { useHead(${headGetter} || {}); return { frontmatter: __matter }};`
+      return markdownToVue(options, raw, id, markdown)
+    },
+    configResolved(config) {
+      viteConfig = config
+      vuePlugin = config.plugins.find(p => p.name === 'vite:vue')!
+      if (!vuePlugin)
+        throw new Error('[vite-plugin-md] no vue plugin found, do you forget to install it?')
+    },
+    async handleHotUpdate(ctx) {
+      // hot reload .md files as .vue files
+      if (ctx.file.endsWith('.md')) {
+        return vuePlugin.handleHotUpdate!({
+          ...ctx,
+          read: async() => {
+            return markdownToVue(options, await ctx.read(), ctx.file, markdown)
+          },
+        })
       }
-      else {
-        result += '\nconst setup = () => ({ frontmatter: __matter });'
-      }
-      result += '\nconst __script = { render, setup };'
-      result += '\nexport default __script;'
-
-      return result
     },
   }
 }

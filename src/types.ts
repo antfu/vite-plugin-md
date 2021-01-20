@@ -48,4 +48,6 @@ export interface Options {
   }
 }
 
-export type ResolvedOptions = Required<Options>
+export interface ResolvedOptions extends Required<Options> {
+  wrapperClasses: string
+}

@@ -5,7 +5,9 @@ import prism from 'markdown-it-prism'
 
 const config: UserConfig = {
   plugins: [
-    Vue(),
+    Vue({
+      include: [/\.vue$/, /\.md$/],
+    }),
     Markdown({
       headEnabled: true,
       markdownItUses: [

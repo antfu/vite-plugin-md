@@ -24,7 +24,9 @@ import Markdown from 'vite-plugin-md'
 
 export default {
   plugins: [
-    Vue(),
+    Vue({
+      include: [/\.vue$/, /\.md$/], // <--
+    }),
     Markdown()
   ],
 }
@@ -116,7 +118,9 @@ import Markdown from 'vite-plugin-md'
 
 export default {
   plugins: [
-    Vue(),
+    Vue({
+      include: [/\.vue$/, /\.md$/],
+    }),
     Markdown({
       headEnabled: true // <--
     })
