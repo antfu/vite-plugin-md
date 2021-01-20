@@ -1,4 +1,4 @@
-import type { Plugin, ResolvedConfig } from 'vite'
+import type { Plugin } from 'vite'
 import MarkdownIt from 'markdown-it'
 import matter from 'gray-matter'
 import { compileTemplate } from '@vue/compiler-sfc'
@@ -8,15 +8,6 @@ function toArray<T>(n: T | T[]): T[] {
   if (!Array.isArray(n))
     return [n]
   return n
-}
-
-export function parseId(id: string) {
-  const index = id.indexOf('?')
-  if (index < 0)
-    return id
-
-  else
-    return id.slice(0, index)
 }
 
 function VitePluginMarkdown(userOptions: Options = {}): Plugin {
@@ -47,19 +38,13 @@ function VitePluginMarkdown(userOptions: Options = {}): Plugin {
   options.markdownItSetup(markdown)
 
   const wrapperClasses = toArray(options.wrapperClasses).filter(i => i).join(' ')
-  let config: ResolvedConfig | undefined
 
   return {
     name: 'vite-plugin-md',
     enforce: 'pre',
-    configResolved(_config) {
-      config = _config
-    },
     transform(raw, id) {
-      const path = parseId(id)
-
-      if (!path.endsWith('.md'))
-        return raw
+      if (!id.endsWith('.md'))
+        return null
 
       if (options.transforms.before)
         raw = options.transforms.before(raw, id)
@@ -75,8 +60,8 @@ function VitePluginMarkdown(userOptions: Options = {}): Plugin {
         sfc = options.transforms.after(sfc, id)
 
       let { code: result } = compileTemplate({
-        filename: path,
-        id: path,
+        filename: id,
+        id,
         source: sfc,
         transformAssetUrls: false,
       })
@@ -92,10 +77,6 @@ function VitePluginMarkdown(userOptions: Options = {}): Plugin {
         result += '\nconst setup = () => ({ frontmatter: __matter });'
       }
       result += '\nconst __script = { render, setup };'
-
-      if (!config?.isProduction)
-        result += `\n__script.__hmrId = ${JSON.stringify(path)};`
-
       result += '\nexport default __script;'
 
       return result
