@@ -62,7 +62,7 @@ You can even use Vue components inside your markdown, for example
 
 <Counter :init='5'/>
 
-Note you need to register the components globally to use them in Markdown
+Note you can either register the components globally, or use the `<script setup>` tag to register them locally.
 
 ```ts
 import { createApp } from 'vue'
@@ -71,12 +71,21 @@ import Counter from './Counter.vue'
 
 const app = createApp(App)
 
+// register global
 app.component('Counter', Counter) // <--
 
 app.mount()
 ```
 
-Use [`vite-plugin-components`](#work-with-vite-plugin-components) for auto components registration.
+```html
+<script setup>
+import { Counter } from './Counter.vue
+</script>
+
+<Counter :init='5'/>
+```
+
+Or you can use [`vite-plugin-components`](#work-with-vite-plugin-components) for auto components registration.
 
 ## Frontmatter
 

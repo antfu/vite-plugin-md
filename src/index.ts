@@ -7,14 +7,12 @@ function VitePluginMarkdown(userOptions: Options = {}): Plugin {
   const options = resolveOptions(userOptions)
   const markdownToVue = createMarkdown(options)
 
-  let viteConfig: ResolvedConfig
   let vuePlugin: Plugin
 
   return {
     name: 'vite-plugin-md',
     enforce: 'pre',
     configResolved(config) {
-      viteConfig = config
       vuePlugin = config.plugins.find(p => p.name === 'vite:vue')!
       if (!vuePlugin)
         throw new Error('[vite-plugin-md] no vue plugin found, do you forget to install it?')

@@ -3,6 +3,18 @@ import matter from 'gray-matter'
 import { ResolvedOptions } from './types'
 import { toArray } from './utils'
 
+const scriptSetupRE = /<\s*script[^>]*\bsetup\b[^>]*>([\s\S]*)<\/script>/mg
+
+function extractScriptSetup(html: string) {
+  const scripts: string[] = []
+  html = html.replace(scriptSetupRE, (_, script) => {
+    scripts.push(script)
+    return ''
+  })
+
+  return { html, scripts }
+}
+
 export function createMarkdown(options: ResolvedOptions) {
   const markdown = new MarkdownIt({
     html: true,
@@ -32,9 +44,11 @@ export function createMarkdown(options: ResolvedOptions) {
       html = `<div class="${wrapperClasses}">${html}</div>`
     if (wrapperComponent)
       html = `<${wrapperComponent} :frontmatter="frontmatter">${html}</${wrapperComponent}>`
-
     if (transforms.after)
       html = transforms.after(html, id)
+
+    const hoistScripts = extractScriptSetup(html)
+    html = hoistScripts.html
 
     const scriptLines: string[] = []
 
@@ -44,6 +58,8 @@ export function createMarkdown(options: ResolvedOptions) {
       const headGetter = headField === '' ? 'frontmatter' : `frontmatter["${headField}"]`
       scriptLines.push(`useHead(${headGetter})`)
     }
+
+    scriptLines.push(...hoistScripts.scripts)
 
     const sfc = `<template>${html}</template>\n<script setup>${scriptLines.join('\n')}</script>`
 
