@@ -2,6 +2,20 @@ import type MarkdownIt from 'markdown-it'
 
 export interface Options {
   /**
+   * Enable head support, need to install @vueuse/head and register to App in main.js
+   *
+   * @default false
+   */
+  headEnabled?: boolean
+  /**
+   * The head field in frontmatter used to be used for @vueuse/head
+   *
+   * When an empty string is passed, it will use the root properties of the frontmatter
+   *
+   * @default ''
+   */
+  headField?: string
+  /**
    * Options passed to Markdown It
    */
   markdownItOptions?: MarkdownIt.Options

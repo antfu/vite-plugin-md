@@ -19,32 +19,34 @@ export function parseId(id: string) {
     return id.slice(0, index)
 }
 
-function VitePluginMarkdown(options: Options = {}): Plugin {
-  const resolved: ResolvedOptions = Object.assign({
+function VitePluginMarkdown(userOptions: Options = {}): Plugin {
+  const options: ResolvedOptions = Object.assign({
+    headEnabled: false,
+    headField: '',
     markdownItOptions: {},
     markdownItUses: [],
     markdownItSetup: () => {},
     wrapperClasses: 'markdown-body',
     wrapperComponent: null,
     transforms: {},
-  }, options)
+  }, userOptions)
 
   const markdown = new MarkdownIt({
     html: true,
     linkify: true,
     typographer: true,
-    ...resolved.markdownItOptions,
+    ...options.markdownItOptions,
   })
 
-  resolved.markdownItUses.forEach((e) => {
+  options.markdownItUses.forEach((e) => {
     const [plugin, options] = toArray(e)
 
     markdown.use(plugin, options)
   })
 
-  resolved.markdownItSetup(markdown)
+  options.markdownItSetup(markdown)
 
-  const wrapperClasses = toArray(resolved.wrapperClasses).filter(i => i).join(' ')
+  const wrapperClasses = toArray(options.wrapperClasses).filter(i => i).join(' ')
   let config: ResolvedConfig | undefined
 
   return {
@@ -59,18 +61,18 @@ function VitePluginMarkdown(options: Options = {}): Plugin {
       if (!path.endsWith('.md'))
         return raw
 
-      if (resolved.transforms.before)
-        raw = resolved.transforms.before(raw, id)
+      if (options.transforms.before)
+        raw = options.transforms.before(raw, id)
 
       const { content: md, data: frontmatter } = matter(raw)
       let sfc = markdown.render(md, {})
-      if (resolved.wrapperClasses)
+      if (options.wrapperClasses)
         sfc = `<div class="${wrapperClasses}">${sfc}</div>`
-      if (resolved.wrapperComponent)
-        sfc = `<${resolved.wrapperComponent} :frontmatter="frontmatter">${sfc}</${resolved.wrapperComponent}>`
+      if (options.wrapperComponent)
+        sfc = `<${options.wrapperComponent} :frontmatter="frontmatter">${sfc}</${options.wrapperComponent}>`
 
-      if (resolved.transforms.after)
-        sfc = resolved.transforms.after(sfc, id)
+      if (options.transforms.after)
+        sfc = options.transforms.after(sfc, id)
 
       let { code: result } = compileTemplate({
         filename: path,
@@ -81,8 +83,15 @@ function VitePluginMarkdown(options: Options = {}): Plugin {
 
       result = result.replace('export function render', 'function render')
       result += `\nconst __matter = ${JSON.stringify(frontmatter)};`
-      result += '\nconst data = () => ({ frontmatter: __matter });'
-      result += '\nconst __script = { render, data };'
+      if (options.headEnabled) {
+        const headGetter = options.headField === '' ? '__matter' : `__matter["${options.headField}"]`
+        result = `import { useHead } from "@vueuse/head"\n${result}`
+        result += `\nconst setup = () => { useHead(${headGetter} || {}); return { frontmatter: __matter }};`
+      }
+      else {
+        result += '\nconst setup = () => ({ frontmatter: __matter });'
+      }
+      result += '\nconst __script = { render, setup };'
 
       if (!config?.isProduction)
         result += `\n__script.__hmrId = ${JSON.stringify(path)};`

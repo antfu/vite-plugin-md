@@ -1,6 +1,8 @@
 ---
 title: Hello
-slug: home
+meta:
+  - name: description
+    content: Hello World
 ---
 
 <h1>Hello world!</h1>

@@ -1,5 +1,5 @@
 <template>
-  <ComponentA style="padding: 20px 40px" />
+  <!-- <ComponentA style="padding: 20px 40px" /> -->
   <ComponentB style="padding: 20px 40px" />
 </template>
 

@@ -84,12 +84,12 @@ For example:
 
 ```md
 ---
-title: My Cool App
+name: My Cool App
 ---
 
 # Hello World
 
-This is {{frontmatter.title}}
+This is {{frontmatter.name}}
 ```
 
 Will be rendered as
@@ -100,6 +100,53 @@ Will be rendered as
 ```
 
 It will also be passed to the wrapper component's props if you have set `wrapperComponent` option.
+
+## Document head and meta
+
+To manage document head and meta, you would need to install [`@vueuse/head`](https://github.com/vueuse/head) and do some setup.
+
+```bash
+npm i @vueuse/head
+```
+
+```js
+// vite.config.js
+import Vue from '@vitejs/plugin-vue'
+import Markdown from 'vite-plugin-md'
+
+export default {
+  plugins: [
+    Vue(),
+    Markdown({
+      headEnabled: true // <--
+    })
+  ]
+}
+```
+
+```js
+// src/main.js
+import { createApp } from 'vue'
+import { createHead } from '@vueuse/head' // <--
+
+const app = createApp(App)
+
+const head = createHead() // <--
+app.use(head) // <--
+```
+
+Then you can use frontmatter to control the head. For example:
+
+```yaml
+---
+title: My Cool App
+meta:
+  - name: description
+    content: Hello World
+---
+```
+
+For more options available, please refer to [`@vueuse/head`'s docs](https://github.com/vueuse/head).
 
 ## Options
 

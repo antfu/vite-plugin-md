@@ -7,6 +7,7 @@ const config: UserConfig = {
   plugins: [
     Vue(),
     Markdown({
+      headEnabled: true,
       markdownItUses: [
         prism,
       ],

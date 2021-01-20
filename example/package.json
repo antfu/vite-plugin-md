@@ -5,6 +5,7 @@
     "build": "cross-env DEBUG=vite-plugin-md:* vite build"
   },
   "dependencies": {
+    "@vueuse/head": "^0.2.1",
     "vue": "^3.0.5"
   },
   "devDependencies": {
