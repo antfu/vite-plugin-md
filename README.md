@@ -54,7 +54,7 @@ export default {
 
 ## Use Vue Components inside Markdown
 
-You can even use Vue inside your markdown, for example
+You can even use Vue components inside your markdown, for example
 
 ```html
 <Counter :init='5'/>
