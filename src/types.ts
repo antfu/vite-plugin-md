@@ -1,3 +1,4 @@
+/* eslint-disable no-use-before-define */
 import type MarkdownIt from 'markdown-it'
 
 export interface Options {
@@ -15,6 +16,12 @@ export interface Options {
    * @default ''
    */
   headField?: string
+
+  /**
+   * Custom function to process the frontmatter
+   */
+  frontmatterPreprocess?: (frontmatter: any, options: ResolvedOptions) => any
+
   /**
    * Options passed to Markdown It
    */

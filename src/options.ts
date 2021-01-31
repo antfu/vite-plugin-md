@@ -1,3 +1,4 @@
+import { preprocessHead } from './head'
 import { Options, ResolvedOptions } from './types'
 import { toArray } from './utils'
 
@@ -11,6 +12,7 @@ export function resolveOptions(userOptions: Options): ResolvedOptions {
     wrapperClasses: 'markdown-body',
     wrapperComponent: null,
     transforms: {},
+    frontmatterPreprocess: preprocessHead,
   }, userOptions) as ResolvedOptions
 
   options.wrapperClasses = toArray(options.wrapperClasses).filter(i => i).join(' ')

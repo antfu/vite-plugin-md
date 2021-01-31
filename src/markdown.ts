@@ -32,12 +32,14 @@ export function createMarkdown(options: ResolvedOptions) {
   options.markdownItSetup(markdown)
 
   return (id: string, raw: string) => {
-    const { wrapperClasses, wrapperComponent, transforms, headEnabled, headField } = options
+    const { wrapperClasses, wrapperComponent, transforms, headEnabled, headField, frontmatterPreprocess } = options
 
     if (transforms.before)
       raw = transforms.before(raw, id)
 
-    const { content: md, data: frontmatter } = matter(raw)
+    const { content: md, data } = matter(raw)
+    const frontmatter = frontmatterPreprocess(data, options)
+
     let html = markdown.render(md, {})
 
     if (wrapperClasses)
