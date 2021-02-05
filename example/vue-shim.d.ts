@@ -1,11 +1,12 @@
-import { defineComponent } from 'vue'
-
+/* eslint-disable import/no-duplicates */
 declare module '*.vue' {
-  const Component: ReturnType<typeof defineComponent>
+  import { ComponentOptions } from 'vue'
+  const Component: ComponentOptions
   export default Component
 }
 
 declare module '*.md' {
-  const Component: ReturnType<typeof defineComponent>
+  import { ComponentOptions } from 'vue'
+  const Component: ComponentOptions
   export default Component
 }

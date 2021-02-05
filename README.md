@@ -251,15 +251,15 @@ Components under `./src/components` can be directly used in markdown components,
 ## TypeScript Shim
 
 ```ts
-import { defineComponent } from 'vue'
-
 declare module '*.vue' {
-  const Component: ReturnType<typeof defineComponent>
+  import { ComponentOptions } from 'vue'
+  const Component: ComponentOptions
   export default Component
 }
 
 declare module '*.md' {
-  const Component: ReturnType<typeof defineComponent>
+  import { ComponentOptions } from 'vue'
+  const Component: ComponentOptions
   export default Component
 }
 ```
