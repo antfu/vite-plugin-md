@@ -3,6 +3,7 @@ title: Hello
 meta:
   - name: description
     content: Hello World
+test: test
 ---
 
 <h1>Hello world!</h1>

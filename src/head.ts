@@ -17,7 +17,7 @@ export function preprocessHead(frontmatter: any, options: ResolvedOptions) {
 
   const head = options.headField ? frontmatter[options.headField] || {} : frontmatter
 
-  const meta = Array.from(head.meta || [])
+  const meta = head.meta = head.meta || []
 
   if (head.title) {
     if (!meta.find((i: any) => i.property === 'og:title'))
