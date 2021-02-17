@@ -17,23 +17,31 @@
   "files": [
     "dist"
   ],
+  "keywords": [
+    "vite",
+    "vite-plugin",
+    "markdown-it"
+  ],
   "scripts": {
     "dev": "npm run build -- --watch",
     "example:dev": "cp README.md example/README.md && npm -C example run dev",
     "example:build": "cp README.md example/README.md && npm -C example run build",
     "build": "tsup src/index.ts --dts --format cjs,esm",
     "prepublishOnly": "npm run build",
-    "release": "npx bumpp --commit --tag --push && npm publish"
+    "release": "git-ensure --no-behind -b main --clean && bumpp --commit --tag --push"
   },
   "peerDependencies": {
     "vite": "^2.0.0-beta.1"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^0.4.3",
+    "@antfu/ni": "^0.5.4",
     "@types/markdown-it": "^12.0.1",
     "@typescript-eslint/eslint-plugin": "^4.15.1",
     "@vue/compiler-sfc": "^3.0.5",
+    "bumpp": "^6.0.6",
     "eslint": "^7.20.0",
+    "git-ensure": "^0.0.6",
     "rollup": "^2.39.0",
     "standard-version": "^9.1.0",
     "tsup": "^3.12.1",
