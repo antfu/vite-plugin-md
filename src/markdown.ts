@@ -4,7 +4,6 @@ import { ResolvedOptions } from './types'
 import { toArray } from './utils'
 
 const scriptSetupRE = /<\s*script[^>]*\bsetup\b[^>]*>([\s\S]*)<\/script>/mg
-const routeBlockRE = /<\s*route\b[^>]*>[\s\S]*<\/route>/mg
 
 function extractScriptSetup(html: string) {
   const scripts: string[] = []
@@ -16,8 +15,11 @@ function extractScriptSetup(html: string) {
   return { html, scripts }
 }
 
-function removeRouteBlock(html: string) {
-  return html.replace(routeBlockRE, '')
+function removeCustomBlock(html: string, options: ResolvedOptions) {
+  for (const block of options.customSfcBlocks) {
+    html = html.replace(new RegExp(`<\s*${block}[^>]*\\b[^>]*>[\\s\\S]*<\\/${block}>`, 'mg'), '')
+  }
+  return html
 }
 
 export function createMarkdown(options: ResolvedOptions) {
@@ -58,7 +60,7 @@ export function createMarkdown(options: ResolvedOptions) {
 
     const hoistScripts = extractScriptSetup(html)
     html = hoistScripts.html
-    html = removeRouteBlock(html)
+    html = removeCustomBlock(html, options)
 
     const scriptLines: string[] = []
 

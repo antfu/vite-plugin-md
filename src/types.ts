@@ -18,6 +18,13 @@ export interface Options {
   headField?: string
 
   /**
+   * Remove custom SFC block
+   *
+   * @default ['route', 'i18n']
+   */
+  customSfcBlocks?: string[]
+
+  /**
    * Custom function to process the frontmatter
    */
   frontmatterPreprocess?: (frontmatter: any, options: ResolvedOptions) => any
