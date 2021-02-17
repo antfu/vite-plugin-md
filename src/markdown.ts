@@ -4,6 +4,7 @@ import { ResolvedOptions } from './types'
 import { toArray } from './utils'
 
 const scriptSetupRE = /<\s*script[^>]*\bsetup\b[^>]*>([\s\S]*)<\/script>/mg
+const routeBlockRE = /<\s*route\b[^>]*>[\s\S]*<\/route>/mg
 
 function extractScriptSetup(html: string) {
   const scripts: string[] = []
@@ -13,6 +14,10 @@ function extractScriptSetup(html: string) {
   })
 
   return { html, scripts }
+}
+
+function removeRouteBlock(html: string) {
+  return html.replace(routeBlockRE, '')
 }
 
 export function createMarkdown(options: ResolvedOptions) {
@@ -32,13 +37,13 @@ export function createMarkdown(options: ResolvedOptions) {
   options.markdownItSetup(markdown)
 
   return (id: string, raw: string) => {
-    const { wrapperClasses, wrapperComponent, transforms, headEnabled, headField, frontmatterPreprocess } = options
+    const { wrapperClasses, wrapperComponent, transforms, headEnabled, frontmatterPreprocess } = options
 
     if (transforms.before)
       raw = transforms.before(raw, id)
 
     const { content: md, data } = matter(raw)
-    const frontmatter = frontmatterPreprocess(data, options)
+    const { head, frontmatter } = frontmatterPreprocess(data, options)
 
     let html = markdown.render(md, {})
 
@@ -53,19 +58,20 @@ export function createMarkdown(options: ResolvedOptions) {
 
     const hoistScripts = extractScriptSetup(html)
     html = hoistScripts.html
+    html = removeRouteBlock(html)
 
     const scriptLines: string[] = []
 
     scriptLines.push(`const frontmatter = ${JSON.stringify(frontmatter)}`)
-    if (headEnabled) {
+    if (headEnabled && head) {
+      scriptLines.push(`const head = ${JSON.stringify(head)}`)
       scriptLines.unshift('import { useHead } from "@vueuse/head"')
-      const headGetter = headField === '' ? 'frontmatter' : `frontmatter["${headField}"]`
-      scriptLines.push(`useHead(${headGetter})`)
+      scriptLines.push('useHead(head)')
     }
 
     scriptLines.push(...hoistScripts.scripts)
 
-    const sfc = `<template>${html}</template>\n<script setup>${scriptLines.join('\n')}</script>`
+    const sfc = `<template>${html}</template>\n<script setup>\n${scriptLines.join('\n')}\n</script>\n`
 
     return sfc
   }

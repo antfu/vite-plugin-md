@@ -1,12 +1,23 @@
 import { ResolvedOptions } from './types'
 
+const headProperties = [
+  'title',
+  'meta',
+  'link',
+  'base',
+  'style',
+  'script',
+  'htmlAttrs',
+  'bodyAttrs',
+]
+
 export function preprocessHead(frontmatter: any, options: ResolvedOptions) {
   if (!options.headEnabled)
     return frontmatter
 
-  const head = options.headField ? frontmatter.head || {} : frontmatter
+  const head = options.headField ? frontmatter[options.headField] || {} : frontmatter
 
-  const meta = head.meta = head.meta || []
+  const meta = Array.from(head.meta || [])
 
   if (head.title) {
     if (!meta.find((i: any) => i.property === 'og:title'))
@@ -29,5 +40,12 @@ export function preprocessHead(frontmatter: any, options: ResolvedOptions) {
       meta.push({ name: 'twitter:card', content: 'summary_large_image' })
   }
 
-  return frontmatter
+  const result: any = {}
+
+  for (const [key, value] of Object.entries(head)) {
+    if (headProperties.includes(key))
+      result[key] = value
+  }
+
+  return Object.entries(result).length === 0 ? null : result
 }

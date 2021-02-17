@@ -12,7 +12,10 @@ export function resolveOptions(userOptions: Options): ResolvedOptions {
     wrapperClasses: 'markdown-body',
     wrapperComponent: null,
     transforms: {},
-    frontmatterPreprocess: preprocessHead,
+    frontmatterPreprocess: (frontmatter: any, options: ResolvedOptions) => {
+      const head = preprocessHead(frontmatter, options)
+      return { head, frontmatter }
+    },
   }, userOptions) as ResolvedOptions
 
   options.wrapperClasses = toArray(options.wrapperClasses).filter(i => i).join(' ')

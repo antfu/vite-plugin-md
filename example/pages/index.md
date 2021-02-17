@@ -10,9 +10,17 @@ meta:
 Front matter: {{ frontmatter }}
 
 <script setup>
-import Counter2 from './Counter2.vue'
+import Counter2 from '../Counter2.vue'
 </script>
 
 <Counter />
 <br>
 <Counter2 />
+
+<route>
+{
+  meta: {
+    layout: 'home'
+  }
+}
+</route>
