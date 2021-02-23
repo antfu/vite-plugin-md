@@ -1,80 +1,90 @@
-import MarkdownIt from 'markdown-it'
-import matter from 'gray-matter'
-import { ResolvedOptions } from './types'
-import { toArray } from './utils'
+import MarkdownIt from "markdown-it";
+import matter from "gray-matter";
+import { ResolvedOptions } from "./types";
+import { toArray } from "./utils";
+import { generateSourceMap } from "./sourcemap";
 
-const scriptSetupRE = /<\s*script[^>]*\bsetup\b[^>]*>([\s\S]*)<\/script>/mg
+const scriptSetupRE = /<\s*script[^>]*\bsetup\b[^>]*>([\s\S]*)<\/script>/gm;
 
 function extractScriptSetup(html: string) {
-  const scripts: string[] = []
-  html = html.replace(scriptSetupRE, (_, script) => {
-    scripts.push(script)
-    return ''
-  })
+	const scripts: string[] = [];
+	html = html.replace(scriptSetupRE, (_, script) => {
+		scripts.push(script);
+		return "";
+	});
 
-  return { html, scripts }
+	return { html, scripts };
 }
 
 function removeCustomBlock(html: string, options: ResolvedOptions) {
-  for (const block of options.customSfcBlocks) {
-    html = html.replace(new RegExp(`<\s*${block}[^>]*\\b[^>]*>[\\s\\S]*<\\/${block}>`, 'mg'), '')
-  }
-  return html
+	for (const block of options.customSfcBlocks) {
+		html = html.replace(
+			new RegExp(`<\s*${block}[^>]*\\b[^>]*>[\\s\\S]*<\\/${block}>`, "mg"),
+			""
+		);
+	}
+	return html;
 }
 
 export function createMarkdown(options: ResolvedOptions) {
-  const markdown = new MarkdownIt({
-    html: true,
-    linkify: true,
-    typographer: true,
-    ...options.markdownItOptions,
-  })
+	const markdown = new MarkdownIt({
+		html: true,
+		linkify: true,
+		typographer: true,
+		...options.markdownItOptions,
+	});
 
-  options.markdownItUses.forEach((e) => {
-    const [plugin, options] = toArray(e)
+	options.markdownItUses.forEach((e) => {
+		const [plugin, options] = toArray(e);
 
-    markdown.use(plugin, options)
-  })
+		markdown.use(plugin, options);
+	});
 
-  options.markdownItSetup(markdown)
+	options.markdownItSetup(markdown);
 
-  return (id: string, raw: string) => {
-    const { wrapperClasses, wrapperComponent, transforms, headEnabled, frontmatterPreprocess } = options
+	return (id: string, raw: string) => {
+		const {
+			wrapperClasses,
+			wrapperComponent,
+			transforms,
+			headEnabled,
+			frontmatterPreprocess,
+		} = options;
 
-    if (transforms.before)
-      raw = transforms.before(raw, id)
+		if (transforms.before) raw = transforms.before(raw, id);
 
-    const { content: md, data } = matter(raw)
-    const { head, frontmatter } = frontmatterPreprocess(data, options)
+		const { content: md, data } = matter(raw);
+		const { head, frontmatter } = frontmatterPreprocess(data, options);
 
-    let html = markdown.render(md, {})
+		let html = markdown.render(md, {});
+		const mdAst = markdown.parse(raw, {});
 
-    if (wrapperClasses)
-      html = `<div class="${wrapperClasses}">${html}</div>`
-    else
-      html = `<div>${html}</div>`
-    if (wrapperComponent)
-      html = `<${wrapperComponent} :frontmatter="frontmatter">${html}</${wrapperComponent}>`
-    if (transforms.after)
-      html = transforms.after(html, id)
+		if (wrapperClasses) html = `<div class="${wrapperClasses}">${html}</div>`;
+		else html = `<div>${html}</div>`;
+		if (wrapperComponent)
+			html = `<${wrapperComponent} :frontmatter="frontmatter">${html}</${wrapperComponent}>`;
+		if (transforms.after) html = transforms.after(html, id);
 
-    const hoistScripts = extractScriptSetup(html)
-    html = hoistScripts.html
-    html = removeCustomBlock(html, options)
+		const hoistScripts = extractScriptSetup(html);
 
-    const scriptLines: string[] = []
+		html = hoistScripts.html;
+		html = removeCustomBlock(html, options);
 
-    scriptLines.push(`const frontmatter = ${JSON.stringify(frontmatter)}`)
-    if (headEnabled && head) {
-      scriptLines.push(`const head = ${JSON.stringify(head)}`)
-      scriptLines.unshift('import { useHead } from "@vueuse/head"')
-      scriptLines.push('useHead(head)')
-    }
+		const scriptLines: string[] = [];
 
-    scriptLines.push(...hoistScripts.scripts)
+		scriptLines.push(`const frontmatter = ${JSON.stringify(frontmatter)}`);
+		if (headEnabled && head) {
+			scriptLines.push(`const head = ${JSON.stringify(head)}`);
+			scriptLines.unshift('import { useHead } from "@vueuse/head"');
+			scriptLines.push("useHead(head)");
+		}
 
-    const sfc = `<template>${html}</template>\n<script setup>\n${scriptLines.join('\n')}\n</script>\n`
+		scriptLines.push(...hoistScripts.scripts);
 
-    return sfc
-  }
+		const sfc = `<template>${html}</template>\n<script setup>\n${scriptLines.join(
+			"\n"
+		)}\n</script>\n`;
+
+		return { code: sfc, map: generateSourceMap(id, raw, sfc) };
+	};
 }
