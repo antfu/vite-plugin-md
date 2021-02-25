@@ -26,7 +26,7 @@
     "dev": "npm run build -- --watch",
     "example:dev": "cp README.md example/README.md && npm -C example run dev",
     "example:build": "cp README.md example/README.md && npm -C example run build",
-    "build": "tsup src/index.ts --dts --external @vue/compiler-sfc --format cjs,esm",
+    "build": "tsup src/index.ts --dts  --format cjs,esm",
     "prepublishOnly": "npm run build",
     "release": "git-ensure --no-behind -b main --clean && bumpp --commit --tag --push"
   },

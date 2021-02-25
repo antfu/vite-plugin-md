@@ -68,7 +68,7 @@ export function generateSourceMap(
       prevGE = line
       const generatedLine = index + 1
 
-      console.log(line, generatedLine, originalLine)
+      //   console.log(line, generatedLine, originalLine)
 
       for (let i = 0, len = line.length; i < len; i++) {
         if (!/\s/.test(line[i])) {
