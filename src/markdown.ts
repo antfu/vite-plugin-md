@@ -57,6 +57,7 @@ export function createMarkdown(options: ResolvedOptions) {
     const { head, frontmatter } = frontmatterPreprocess(data, options)
 
     let html = markdown.render(md, {})
+    html = `\n${html}`
 
     if (wrapperClasses) html = `<div class="${wrapperClasses}">${html}</div>`
     else html = `<div>${html}</div>`
@@ -93,6 +94,6 @@ export function createMarkdown(options: ResolvedOptions) {
       )}\n${scriptTags[1]}\n`
     }
 
-    return { code: sfc, map: generateSourceMap(id, raw, sfc) }
+    return { code: sfc, map: generateSourceMap(id, raw, sfc, markdown) }
   }
 }
