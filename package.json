@@ -30,26 +30,27 @@
     "prepublishOnly": "npm run build",
     "release": "git-ensure --no-behind -b main --clean && bumpp --commit --tag --push"
   },
+  "dependencies": {
+    "gray-matter": "^4.0.2",
+    "markdown-it": "^12.0.4"
+  },
   "peerDependencies": {
-    "vite": "^2.0.0-beta.1"
+    "vite": "^2.0.0-beta.1",
+    "@vue/compiler-sfc": "^3.0.5"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^0.4.3",
     "@antfu/ni": "^0.5.4",
     "@types/markdown-it": "^12.0.1",
-    "@typescript-eslint/eslint-plugin": "^4.15.1",
-    "@vue/compiler-sfc": "^3.0.5",
+    "@typescript-eslint/eslint-plugin": "^4.15.2",
+    "@vue/compiler-sfc": "^3.0.6",
     "bumpp": "^6.0.6",
     "eslint": "^7.20.0",
-    "git-ensure": "^0.0.6",
-    "rollup": "^2.39.0",
-    "standard-version": "^9.1.0",
-    "tsup": "^3.12.1",
-    "typescript": "^4.1.5",
-    "vite": "^2.0.0"
-  },
-  "dependencies": {
-    "gray-matter": "^4.0.2",
-    "markdown-it": "^12.0.4"
+    "git-ensure": "^0.1.0",
+    "rollup": "^2.39.1",
+    "standard-version": "^9.1.1",
+    "tsup": "^4.3.1",
+    "typescript": "^4.2.2",
+    "vite": "^2.0.3"
   }
 }
