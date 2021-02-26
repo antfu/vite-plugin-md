@@ -14,8 +14,11 @@ function VitePluginMarkdown(userOptions: Options = {}): Plugin {
     enforce: 'pre',
     configResolved(config) {
       vuePlugin = config.plugins.find(p => p.name === 'vite:vue')!
-      if (!vuePlugin)
-        throw new Error('[vite-plugin-md] no vue plugin found, do you forget to install it?')
+      if (!vuePlugin) {
+        throw new Error(
+          '[vite-plugin-md] no vue plugin found, do you forget to install it?',
+        )
+      }
     },
     transform(raw, id) {
       if (id.endsWith('.md'))
@@ -27,7 +30,8 @@ function VitePluginMarkdown(userOptions: Options = {}): Plugin {
         return vuePlugin.handleHotUpdate!({
           ...ctx,
           async read() {
-            return markdownToVue(ctx.file, await ctx.read())
+            const { code } = markdownToVue(ctx.file, await ctx.read())
+            return code
           },
         })
       }

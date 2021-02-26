@@ -2,22 +2,26 @@ import MarkdownIt from 'markdown-it'
 import matter from 'gray-matter'
 import { ResolvedOptions } from './types'
 import { toArray } from './utils'
+import { extractScriptTag, generateSourceMap } from './sourcemap'
 
-const scriptSetupRE = /<\s*script[^>]*\bsetup\b[^>]*>([\s\S]*)<\/script>/mg
-
+const scriptSetupRE = /<\s*script[^>]*\bsetup\b[^>]*>([\s\S]*)<\/script>/gm
+// test whether using html comment on script tag
+const htmlCommentRE = /(<!--|-->)/g
 function extractScriptSetup(html: string) {
   const scripts: string[] = []
-  html = html.replace(scriptSetupRE, (_, script) => {
-    scripts.push(script)
+  html = html.replace(scriptSetupRE, (_, script: string) => {
+    scripts.push(script.replaceAll(htmlCommentRE, ''))
     return ''
   })
-
   return { html, scripts }
 }
 
 function removeCustomBlock(html: string, options: ResolvedOptions) {
   for (const block of options.customSfcBlocks) {
-    html = html.replace(new RegExp(`<\s*${block}[^>]*\\b[^>]*>[\\s\\S]*<\\/${block}>`, 'mg'), '')
+    html = html.replace(
+      new RegExp(`<\\s*${block}[^>]*\\b[^>]*>[\\s\\S]*<\\/${block}>`, 'mg'),
+      '',
+    )
   }
   return html
 }
@@ -39,26 +43,31 @@ export function createMarkdown(options: ResolvedOptions) {
   options.markdownItSetup(markdown)
 
   return (id: string, raw: string) => {
-    const { wrapperClasses, wrapperComponent, transforms, headEnabled, frontmatterPreprocess } = options
+    const {
+      wrapperClasses,
+      wrapperComponent,
+      transforms,
+      headEnabled,
+      frontmatterPreprocess,
+    } = options
 
-    if (transforms.before)
-      raw = transforms.before(raw, id)
+    if (transforms.before) raw = transforms.before(raw, id)
 
     const { content: md, data } = matter(raw)
     const { head, frontmatter } = frontmatterPreprocess(data, options)
 
     let html = markdown.render(md, {})
+    html = `\n${html}`
 
-    if (wrapperClasses)
-      html = `<div class="${wrapperClasses}">${html}</div>`
-    else
-      html = `<div>${html}</div>`
+    if (wrapperClasses) html = `<div class="${wrapperClasses}">${html}</div>`
+    else html = `<div>${html}</div>`
     if (wrapperComponent)
       html = `<${wrapperComponent} :frontmatter="frontmatter">${html}</${wrapperComponent}>`
-    if (transforms.after)
-      html = transforms.after(html, id)
+    if (transforms.after) html = transforms.after(html, id)
 
     const hoistScripts = extractScriptSetup(html)
+    const scriptTags = extractScriptTag(md)
+
     html = hoistScripts.html
     html = removeCustomBlock(html, options)
 
@@ -73,8 +82,18 @@ export function createMarkdown(options: ResolvedOptions) {
 
     scriptLines.push(...hoistScripts.scripts)
 
-    const sfc = `<template>${html}</template>\n<script setup>\n${scriptLines.join('\n')}\n</script>\n`
+    let sfc = ''
+    if (scriptTags.length > 2) {
+      sfc = `<template>${html}</template>\n<script setup>\n${scriptLines.join(
+        '\n',
+      )}\n</script>\n`
+    }
+    else {
+      sfc = `<template>${html}</template>\n${scriptTags[0]}\n${scriptLines.join(
+        '\n',
+      )}\n${scriptTags[1]}\n`
+    }
 
-    return sfc
+    return { code: sfc, map: generateSourceMap(id, raw, sfc, markdown) }
   }
 }
