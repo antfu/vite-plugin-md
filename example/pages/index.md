@@ -6,9 +6,15 @@ meta:
 test: test
 ---
 
-<h1>Hello world!</h1>
+# Hello world!
 
 Front matter: {{ frontmatter }}
+
+<style>
+h1 {
+  color: cadetblue;
+}
+</style>
 
 <script setup>
 import Counter2 from '../Counter2.vue'

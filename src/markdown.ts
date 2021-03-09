@@ -15,11 +15,16 @@ function extractScriptSetup(html: string) {
   return { html, scripts }
 }
 
-function removeCustomBlock(html: string, options: ResolvedOptions) {
-  for (const block of options.customSfcBlocks) {
-    html = html.replace(new RegExp(`<\s*${block}[^>]*\\b[^>]*>[\\s\\S]*<\\/${block}>`, 'mg'), '')
+function extractCustomBlock(html: string, options: ResolvedOptions) {
+  const blocks: string[] = []
+  for (const tag of options.customSfcBlocks) {
+    html = html.replace(new RegExp(`<${tag}[^>]*\\b[^>]*>[\\s\\S]*<\\/${tag}>`, 'mg'), (code) => {
+      blocks.push(code)
+      return ''
+    })
   }
-  return html
+
+  return { html, blocks }
 }
 
 export function createMarkdown(options: ResolvedOptions) {
@@ -60,7 +65,8 @@ export function createMarkdown(options: ResolvedOptions) {
 
     const hoistScripts = extractScriptSetup(html)
     html = hoistScripts.html
-    html = removeCustomBlock(html, options)
+    const customBlocks = extractCustomBlock(html, options)
+    html = customBlocks.html
 
     const scriptLines: string[] = []
 
@@ -73,7 +79,7 @@ export function createMarkdown(options: ResolvedOptions) {
 
     scriptLines.push(...hoistScripts.scripts)
 
-    const sfc = `<template>${html}</template>\n<script setup>\n${scriptLines.join('\n')}\n</script>\n`
+    const sfc = `<template>${html}</template>\n<script setup>\n${scriptLines.join('\n')}\n</script>\n${customBlocks.blocks.join('\n')}\n`
 
     return sfc
   }
