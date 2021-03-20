@@ -24,6 +24,8 @@ import Counter2 from '../Counter2.vue'
 <br>
 <Counter2 />
 
+<router-link to="/">Home</router-link>
+
 <route>
 {
   meta: {
