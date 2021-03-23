@@ -35,22 +35,20 @@
     "markdown-it": "^12.0.4"
   },
   "peerDependencies": {
-    "vite": "^2.0.0-beta.1",
-    "@vue/compiler-sfc": "^3.0.5"
+    "vite": "^2.0.0-beta.1"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^0.4.3",
-    "@antfu/ni": "^0.5.4",
+    "@antfu/eslint-config": "^0.6.2",
+    "@antfu/ni": "^0.5.5",
     "@types/markdown-it": "^12.0.1",
-    "@typescript-eslint/eslint-plugin": "^4.15.2",
-    "@vue/compiler-sfc": "^3.0.6",
+    "@typescript-eslint/eslint-plugin": "^4.19.0",
     "bumpp": "^6.0.6",
-    "eslint": "^7.20.0",
+    "eslint": "^7.22.0",
     "git-ensure": "^0.1.0",
-    "rollup": "^2.39.1",
+    "rollup": "^2.42.3",
     "standard-version": "^9.1.1",
-    "tsup": "^4.3.1",
-    "typescript": "^4.2.2",
-    "vite": "^2.0.3"
+    "tsup": "^4.8.19",
+    "typescript": "^4.2.3",
+    "vite": "^2.1.2"
   }
 }
