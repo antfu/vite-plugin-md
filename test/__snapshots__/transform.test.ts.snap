@@ -1,0 +1,41 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`transform basic 1`] = `
+"<template><div class=\\"markdown-body\\"><h1>Hello</h1>
+<ul>
+<li>A</li>
+<li>B</li>
+<li>C</li>
+</ul>
+</div></template>
+<script setup>
+const frontmatter = {\\"title\\":\\"Hey\\"}
+</script>
+
+"
+`;
+
+exports[`transform script setup 1`] = `
+"<template><div class=\\"markdown-body\\"><h1>Hello</h1>
+
+</div></template>
+<script setup>
+const frontmatter = {}
+
+import Foo from './Foo.vue'
+
+</script>
+
+"
+`;
+
+exports[`transform style 1`] = `
+"<template><div class=\\"markdown-body\\"><h1>Hello</h1>
+
+</div></template>
+<script setup>
+const frontmatter = {}
+</script>
+<style>h1 { color: red }</style>
+"
+`;
