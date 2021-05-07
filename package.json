@@ -31,24 +31,24 @@
     "release": "git-ensure --no-behind -b main --clean && bumpp --commit --tag --push"
   },
   "dependencies": {
-    "gray-matter": "^4.0.2",
-    "markdown-it": "^12.0.4"
+    "gray-matter": "^4.0.3",
+    "markdown-it": "^12.0.6"
   },
   "peerDependencies": {
-    "vite": "^2.0.0-beta.1"
+    "vite": "^2.0.0"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^0.6.2",
-    "@antfu/ni": "^0.5.5",
+    "@antfu/eslint-config": "^0.6.4",
+    "@antfu/ni": "^0.7.0",
     "@types/markdown-it": "^12.0.1",
-    "@typescript-eslint/eslint-plugin": "^4.19.0",
+    "@typescript-eslint/eslint-plugin": "^4.22.1",
     "bumpp": "^6.0.6",
-    "eslint": "^7.22.0",
+    "eslint": "^7.25.0",
     "git-ensure": "^0.1.0",
-    "rollup": "^2.42.3",
-    "standard-version": "^9.1.1",
-    "tsup": "^4.8.19",
-    "typescript": "^4.2.3",
-    "vite": "^2.1.2"
+    "rollup": "^2.47.0",
+    "standard-version": "^9.3.0",
+    "tsup": "^4.10.1",
+    "typescript": "^4.2.4",
+    "vite": "^2.2.4"
   }
 }
