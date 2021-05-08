@@ -11,8 +11,15 @@ function VitePluginMarkdown(userOptions: Options = {}): Plugin {
     name: 'vite-plugin-md',
     enforce: 'pre',
     transform(raw, id) {
-      if (id.endsWith('.md'))
-        return markdownToVue(id, raw)
+      if (id.endsWith('.md')) {
+        try {
+          return markdownToVue(id, raw)
+        }
+        catch (e) {
+          this.error(e)
+          return null
+        }
+      }
     },
     async handleHotUpdate(ctx) {
       if (ctx.file.endsWith('.md')) {
