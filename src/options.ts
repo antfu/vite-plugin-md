@@ -6,6 +6,7 @@ export function resolveOptions(userOptions: Options): ResolvedOptions {
   const options = Object.assign({
     headEnabled: false,
     headField: '',
+    frontmatter: true,
     customSfcBlocks: ['route', 'i18n', 'style'],
     markdownItOptions: {},
     markdownItUses: [],

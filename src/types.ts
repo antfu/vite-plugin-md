@@ -18,6 +18,13 @@ export interface Options {
   headField?: string
 
   /**
+   * Parse for frontmatters
+   *
+   * @default true
+   */
+  frontmatter?: boolean
+
+  /**
    * Remove custom SFC block
    *
    * @default ['route', 'i18n']
@@ -27,7 +34,7 @@ export interface Options {
   /**
    * Custom function to process the frontmatter
    */
-  frontmatterPreprocess?: (frontmatter: any, options: ResolvedOptions) => any
+  frontmatterPreprocess?: (frontmatter: Record<string, unknown>, options: ResolvedOptions) => any
 
   /**
    * Options passed to Markdown It

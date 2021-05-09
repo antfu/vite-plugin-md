@@ -49,8 +49,9 @@ export function createMarkdown(options: ResolvedOptions) {
     if (transforms.before)
       raw = transforms.before(raw, id)
 
-    const { content: md, data } = matter(raw)
-    const { head, frontmatter } = frontmatterPreprocess(data, options)
+    const { content: md, data } = options.frontmatter
+      ? matter(raw)
+      : { content: raw, data: null }
 
     let html = markdown.render(md, {})
 
@@ -59,7 +60,7 @@ export function createMarkdown(options: ResolvedOptions) {
     else
       html = `<div>${html}</div>`
     if (wrapperComponent)
-      html = `<${wrapperComponent} :frontmatter="frontmatter">${html}</${wrapperComponent}>`
+      html = `<${wrapperComponent}${options.frontmatter ? ' :frontmatter="frontmatter"' : ''}>${html}</${wrapperComponent}>`
     if (transforms.after)
       html = transforms.after(html, id)
 
@@ -70,11 +71,14 @@ export function createMarkdown(options: ResolvedOptions) {
 
     const scriptLines: string[] = []
 
-    scriptLines.push(`const frontmatter = ${JSON.stringify(frontmatter)}`)
-    if (headEnabled && head) {
-      scriptLines.push(`const head = ${JSON.stringify(head)}`)
-      scriptLines.unshift('import { useHead } from "@vueuse/head"')
-      scriptLines.push('useHead(head)')
+    if (options.frontmatter) {
+      const { head, frontmatter } = frontmatterPreprocess(data || {}, options)
+      scriptLines.push(`const frontmatter = ${JSON.stringify(frontmatter)}`)
+      if (headEnabled && head) {
+        scriptLines.push(`const head = ${JSON.stringify(head)}`)
+        scriptLines.unshift('import { useHead } from "@vueuse/head"')
+        scriptLines.push('useHead(head)')
+      }
     }
 
     scriptLines.push(...hoistScripts.scripts)
