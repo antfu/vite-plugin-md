@@ -17,7 +17,7 @@ function VitePluginMarkdown(userOptions: Options = {}): Plugin {
         }
         catch (e) {
           this.error(e)
-          return null
+          return ''
         }
       }
     },
