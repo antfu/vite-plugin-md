@@ -38,4 +38,25 @@ import Foo from './Foo.vue'
 `
     expect(markdownToVue('', md)).toMatchSnapshot()
   })
+
+  it('exposes frontmatter', () => {
+    const md = `---
+title: Hey
+---
+
+# Hello`
+    expect(markdownToVue('', md)).toMatchSnapshot()
+  })
+
+  it('couldn\'t expose frontmatter', () => {
+    const md = `---
+title: Hey
+---
+
+<script setup>
+defineExpose({ test: 'test'})
+</script>
+`
+    expect(markdownToVue('', md)).toMatchSnapshot()
+  })
 })

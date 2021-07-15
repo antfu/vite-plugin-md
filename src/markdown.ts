@@ -4,6 +4,7 @@ import { ResolvedOptions } from './types'
 import { toArray } from './utils'
 
 const scriptSetupRE = /<\s*script[^>]*\bsetup\b[^>]*>([\s\S]*)<\/script>/mg
+const defineExposeRE = /defineExpose\s*\(/mg
 
 function extractScriptSetup(html: string) {
   const scripts: string[] = []
@@ -74,6 +75,10 @@ export function createMarkdown(options: ResolvedOptions) {
     if (options.frontmatter) {
       const { head, frontmatter } = frontmatterPreprocess(data || {}, options)
       scriptLines.push(`const frontmatter = ${JSON.stringify(frontmatter)}`)
+
+      if (options.exposeFrontmatter && !defineExposeRE.test(hoistScripts.scripts.join('')))
+        scriptLines.push('defineExpose({ frontmatter })')
+
       if (headEnabled && head) {
         scriptLines.push(`const head = ${JSON.stringify(head)}`)
         scriptLines.unshift('import { useHead } from "@vueuse/head"')

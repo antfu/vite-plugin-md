@@ -10,6 +10,31 @@ exports[`transform basic 1`] = `
 </div></template>
 <script setup>
 const frontmatter = {\\"title\\":\\"Hey\\"}
+defineExpose({ frontmatter })
+</script>
+
+"
+`;
+
+exports[`transform couldn't expose frontmatter 1`] = `
+"<template><div class=\\"markdown-body\\">
+</div></template>
+<script setup>
+const frontmatter = {\\"title\\":\\"Hey\\"}
+
+defineExpose({ test: 'test'})
+
+</script>
+
+"
+`;
+
+exports[`transform exposes frontmatter 1`] = `
+"<template><div class=\\"markdown-body\\"><h1>Hello</h1>
+</div></template>
+<script setup>
+const frontmatter = {\\"title\\":\\"Hey\\"}
+defineExpose({ frontmatter })
 </script>
 
 "
@@ -21,6 +46,7 @@ exports[`transform script setup 1`] = `
 </div></template>
 <script setup>
 const frontmatter = {}
+defineExpose({ frontmatter })
 
 import Foo from './Foo.vue'
 
@@ -35,6 +61,7 @@ exports[`transform style 1`] = `
 </div></template>
 <script setup>
 const frontmatter = {}
+defineExpose({ frontmatter })
 </script>
 <style>h1 { color: red }</style>
 "
