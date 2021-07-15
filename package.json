@@ -37,24 +37,24 @@
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
-    "markdown-it": "^12.0.6"
+    "markdown-it": "^12.1.0"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^0.6.4",
+    "@antfu/eslint-config": "^0.7.0",
     "@antfu/ni": "^0.7.0",
-    "@types/jest": "^26.0.23",
-    "@types/markdown-it": "^12.0.1",
-    "@typescript-eslint/eslint-plugin": "^4.22.1",
+    "@types/jest": "^26.0.24",
+    "@types/markdown-it": "^12.0.3",
+    "@typescript-eslint/eslint-plugin": "^4.28.3",
     "bumpp": "^6.0.6",
-    "eslint": "^7.25.0",
+    "eslint": "^7.30.0",
     "eslint-plugin-jest": "^24.3.6",
     "git-ensure": "^0.1.0",
     "jest": "^26.6.3",
-    "rollup": "^2.47.0",
-    "standard-version": "^9.3.0",
+    "rollup": "^2.53.2",
+    "standard-version": "^9.3.1",
     "ts-jest": "^26.5.6",
-    "tsup": "^4.10.1",
-    "typescript": "^4.2.4",
-    "vite": "^2.2.4"
+    "tsup": "^4.12.5",
+    "typescript": "^4.3.5",
+    "vite": "^2.4.2"
   }
 }
