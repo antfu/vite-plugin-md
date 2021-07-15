@@ -11,6 +11,7 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^1.2.5",
+    "@vue/compiler-sfc": "^3.1.4",
     "cross-env": "^7.0.3",
     "markdown-it-prism": "^2.1.8",
     "prismjs": "^1.24.1",

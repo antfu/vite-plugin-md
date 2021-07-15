@@ -36,6 +36,8 @@ export function createMarkdown(options: ResolvedOptions) {
     ...options.markdownItOptions,
   })
 
+  markdown.linkify.set({ fuzzyLink: false })
+
   options.markdownItUses.forEach((e) => {
     const [plugin, options] = toArray(e)
 
@@ -46,6 +48,8 @@ export function createMarkdown(options: ResolvedOptions) {
 
   return (id: string, raw: string) => {
     const { wrapperClasses, wrapperComponent, transforms, headEnabled, frontmatterPreprocess } = options
+
+    raw = raw.trimLeft()
 
     if (transforms.before)
       raw = transforms.before(raw, id)

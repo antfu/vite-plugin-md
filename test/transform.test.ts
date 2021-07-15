@@ -70,4 +70,17 @@ defineExpose({ test: 'test'})
 `
     expect(markdownToVue('', md)).toMatchSnapshot()
   })
+
+  it('frontmatter interpolation', () => {
+    const md = `
+---
+name: 'My Cool App'
+---
+
+# Hello World
+
+This is {{frontmatter.name}}
+`
+    expect(markdownToVue('', md)).toMatchSnapshot()
+  })
 })
