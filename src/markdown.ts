@@ -74,6 +74,8 @@ export function createMarkdown(options: ResolvedOptions) {
     if (options.frontmatter) {
       const { head, frontmatter } = frontmatterPreprocess(data || {}, options)
       scriptLines.push(`const frontmatter = ${JSON.stringify(frontmatter)}`)
+      if (options.exposeFrontmatter)
+        scriptLines.push(`defineExpose({ frontmatter })`)
       if (headEnabled && head) {
         scriptLines.push(`const head = ${JSON.stringify(head)}`)
         scriptLines.unshift('import { useHead } from "@vueuse/head"')

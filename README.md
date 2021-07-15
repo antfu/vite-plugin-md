@@ -114,6 +114,8 @@ Will be rendered as
 
 It will also be passed to the wrapper component's props if you have set `wrapperComponent` option.
 
+To access frontmatter via a template ref, set `exposeFrontmatter` to true
+
 ## Document head and meta
 
 To manage document head and meta, you would need to install [`@vueuse/head`](https://github.com/vueuse/head) and do some setup.

@@ -7,6 +7,7 @@ export function resolveOptions(userOptions: Options): ResolvedOptions {
     headEnabled: false,
     headField: '',
     frontmatter: true,
+    exposeFrontmatter: false,
     customSfcBlocks: ['route', 'i18n', 'style'],
     markdownItOptions: {},
     markdownItUses: [],

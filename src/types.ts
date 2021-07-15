@@ -37,6 +37,13 @@ export interface Options {
   frontmatterPreprocess?: (frontmatter: Record<string, unknown>, options: ResolvedOptions) => any
 
   /**
+   * Expose frontmatter via expose API
+   *
+   * @default false
+   */
+  exposeFrontmatter?: boolean
+
+  /**
    * Options passed to Markdown It
    */
   markdownItOptions?: MarkdownIt.Options

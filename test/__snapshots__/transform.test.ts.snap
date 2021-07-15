@@ -15,6 +15,17 @@ const frontmatter = {\\"title\\":\\"Hey\\"}
 "
 `;
 
+exports[`transform exposes frontmatter 1`] = `
+"<template><div class=\\"markdown-body\\"><h1>Hello</h1>
+</div></template>
+<script setup>
+const frontmatter = {\\"title\\":\\"Hey\\"}
+defineExpose({ frontmatter })
+</script>
+
+"
+`;
+
 exports[`transform script setup 1`] = `
 "<template><div class=\\"markdown-body\\"><h1>Hello</h1>
 
