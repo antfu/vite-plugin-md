@@ -75,12 +75,10 @@ export function createMarkdown(options: ResolvedOptions) {
     if (options.frontmatter) {
       const { head, frontmatter } = frontmatterPreprocess(data || {}, options)
       scriptLines.push(`const frontmatter = ${JSON.stringify(frontmatter)}`)
-      if (options.exposeFrontmatter) {
-        if (defineExposeRE.test(hoistScripts.scripts.join('')))
-          console.warn(`[vite-plugin-md] frontmatter couldn't be auto exposed, since defineExpose was already called in ${id}.`)
-        else
-          scriptLines.push(`defineExpose({ frontmatter })`)
-      }
+
+      if (options.exposeFrontmatter && !defineExposeRE.test(hoistScripts.scripts.join('')))
+        scriptLines.push('defineExpose({ frontmatter })')
+
       if (headEnabled && head) {
         scriptLines.push(`const head = ${JSON.stringify(head)}`)
         scriptLines.unshift('import { useHead } from "@vueuse/head"')

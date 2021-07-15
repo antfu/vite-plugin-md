@@ -48,7 +48,7 @@ title: Hey
     expect(markdownToVue('', md)).toMatchSnapshot()
   })
 
-  it(`couldn't expose frontmatter`, () => {
+  it('couldn\'t expose frontmatter', () => {
     const md = `---
 title: Hey
 ---
@@ -57,8 +57,6 @@ title: Hey
 defineExpose({ test: 'test'})
 </script>
 `
-    const spy = jest.spyOn(console, 'warn').mockImplementation();
     expect(markdownToVue('', md)).toMatchSnapshot()
-    expect(spy).toBeCalled()
   })
 })
