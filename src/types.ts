@@ -39,7 +39,7 @@ export interface Options {
   /**
    * Expose frontmatter via expose API
    *
-   * @default false
+   * @default true
    */
   exposeFrontmatter?: boolean
 

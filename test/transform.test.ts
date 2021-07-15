@@ -40,13 +40,25 @@ import Foo from './Foo.vue'
   })
 
   it('exposes frontmatter', () => {
-    const options = resolveOptions({ exposeFrontmatter: true })
-    const markdownToVue = createMarkdown(options)
     const md = `---
 title: Hey
 ---
 
 # Hello`
     expect(markdownToVue('', md)).toMatchSnapshot()
+  })
+
+  it(`couldn't expose frontmatter`, () => {
+    const md = `---
+title: Hey
+---
+
+<script setup>
+defineExpose({ test: 'test'})
+</script>
+`
+    const spy = jest.spyOn(console, 'warn').mockImplementation();
+    expect(markdownToVue('', md)).toMatchSnapshot()
+    expect(spy).toBeCalled()
   })
 })

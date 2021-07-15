@@ -11,7 +11,6 @@ const config: UserConfig = {
     }),
     Markdown({
       headEnabled: true,
-      exposeFrontmatter: true,
       markdownItUses: [
         prism,
       ],
