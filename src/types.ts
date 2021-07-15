@@ -44,6 +44,14 @@ export interface Options {
   exposeFrontmatter?: boolean
 
   /**
+   * Add `v-pre` to `<code>` tag to escape curly brackets interpolation
+   *
+   * @see https://github.com/antfu/vite-plugin-md/issues/14
+   * @default true
+   */
+  escapeCodeTagInterpolation?: boolean
+
+  /**
    * Options passed to Markdown It
    */
   markdownItOptions?: MarkdownIt.Options

@@ -29,6 +29,19 @@ defineExpose({ test: 'test'})
 "
 `;
 
+exports[`transform escapeCodeTagInterpolation 1`] = `
+"<template><div class=\\"markdown-body\\"><div>{{hello}}</div>
+<pre><code class=\\"language-ts\\" v-pre>&lt;div&gt;{{hello}}&lt;/div&gt;
+</code></pre>
+</div></template>
+<script setup>
+const frontmatter = {}
+defineExpose({ frontmatter })
+</script>
+
+"
+`;
+
 exports[`transform exposes frontmatter 1`] = `
 "<template><div class=\\"markdown-body\\"><h1>Hello</h1>
 </div></template>

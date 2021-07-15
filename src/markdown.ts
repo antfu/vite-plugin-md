@@ -65,6 +65,11 @@ export function createMarkdown(options: ResolvedOptions) {
     if (transforms.after)
       html = transforms.after(html, id)
 
+    if (options.escapeCodeTagInterpolation) {
+      // escape curly brackets interpolation in <code>, #14
+      html = html.replace(/<code(.*?)>/g, '<code$1 v-pre>')
+    }
+
     const hoistScripts = extractScriptSetup(html)
     html = hoistScripts.html
     const customBlocks = extractCustomBlock(html, options)

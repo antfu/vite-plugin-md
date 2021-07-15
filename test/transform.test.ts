@@ -59,4 +59,15 @@ defineExpose({ test: 'test'})
 `
     expect(markdownToVue('', md)).toMatchSnapshot()
   })
+
+  it('escapeCodeTagInterpolation', () => {
+    const md = `
+<div>{{hello}}</div>
+
+\`\`\`ts
+<div>{{hello}}</div>
+\`\`\`
+`
+    expect(markdownToVue('', md)).toMatchSnapshot()
+  })
 })

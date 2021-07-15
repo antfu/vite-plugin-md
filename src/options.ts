@@ -8,6 +8,7 @@ export function resolveOptions(userOptions: Options): ResolvedOptions {
     headField: '',
     frontmatter: true,
     exposeFrontmatter: true,
+    escapeCodeTagInterpolation: true,
     customSfcBlocks: ['route', 'i18n', 'style'],
     markdownItOptions: {},
     markdownItUses: [],
