@@ -6,6 +6,7 @@ importers:
     specifiers:
       '@antfu/eslint-config': ^0.7.0
       '@antfu/ni': ^0.7.0
+      '@rollup/pluginutils': ^4.1.1
       '@types/jest': ^26.0.24
       '@types/markdown-it': ^12.0.3
       '@typescript-eslint/eslint-plugin': ^4.28.3
@@ -28,6 +29,7 @@ importers:
     devDependencies:
       '@antfu/eslint-config': 0.7.0_eslint@7.30.0+typescript@4.3.5
       '@antfu/ni': 0.7.0
+      '@rollup/pluginutils': 4.1.1
       '@types/jest': 26.0.24
       '@types/markdown-it': 12.0.3
       '@typescript-eslint/eslint-plugin': 4.28.3_eslint@7.30.0+typescript@4.3.5
@@ -815,6 +817,14 @@ packages:
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.11.1
+    dev: true
+
+  /@rollup/pluginutils/4.1.1:
+    resolution: {integrity: sha512-clDjivHqWGXi7u+0d2r2sBi4Ie6VLEAzWMIkvJLnDmxoOhBYOTfzGbOQBA32THHm11/LiJbd01tJUpJsbshSWQ==}
+    engines: {node: '>= 8.0.0'}
+    dependencies:
+      estree-walker: 2.0.2
+      picomatch: 2.3.0
     dev: true
 
   /@sinonjs/commons/1.8.3:

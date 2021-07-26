@@ -1,5 +1,6 @@
 /* eslint-disable no-use-before-define */
 import type MarkdownIt from 'markdown-it'
+import type { FilterPattern } from '@rollup/pluginutils'
 
 export interface Options {
   /**
@@ -82,6 +83,9 @@ export interface Options {
     before?: (code: string, id: string) => string
     after?: (code: string, id: string) => string
   }
+
+  include?: FilterPattern
+  exclude?: FilterPattern
 }
 
 export interface ResolvedOptions extends Required<Options> {
