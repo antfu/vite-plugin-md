@@ -58,7 +58,7 @@ export function createMarkdown(options: ResolvedOptions) {
       ? matter(raw)
       : { content: raw, data: null }
 
-    let html = markdown.render(md, {})
+    let html = markdown.render(md, { id })
 
     if (wrapperClasses)
       html = `<div class="${wrapperClasses}">${html}</div>`
