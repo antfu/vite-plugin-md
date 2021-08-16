@@ -29,6 +29,8 @@ function extractCustomBlock(html: string, options: ResolvedOptions) {
 }
 
 export function createMarkdown(options: ResolvedOptions) {
+  const isVue2 = options.vueVersion.startsWith('2.')
+
   const markdown = new MarkdownIt({
     html: true,
     linkify: true,
@@ -85,10 +87,10 @@ export function createMarkdown(options: ResolvedOptions) {
       const { head, frontmatter } = frontmatterPreprocess(data || {}, options)
       scriptLines.push(`const frontmatter = ${JSON.stringify(frontmatter)}`)
 
-      if (options.exposeFrontmatter && !defineExposeRE.test(hoistScripts.scripts.join('')))
+      if (!isVue2 && options.exposeFrontmatter && !defineExposeRE.test(hoistScripts.scripts.join('')))
         scriptLines.push('defineExpose({ frontmatter })')
 
-      if (headEnabled && head) {
+      if (!isVue2 && headEnabled && head) {
         scriptLines.push(`const head = ${JSON.stringify(head)}`)
         scriptLines.unshift('import { useHead } from "@vueuse/head"')
         scriptLines.push('useHead(head)')
@@ -97,7 +99,11 @@ export function createMarkdown(options: ResolvedOptions) {
 
     scriptLines.push(...hoistScripts.scripts)
 
-    const sfc = `<template>${html}</template>\n<script setup>\n${scriptLines.join('\n')}\n</script>\n${customBlocks.blocks.join('\n')}\n`
+    const scripts = isVue2
+      ? `<script>\n${scriptLines.join('\n')}\nexport default { data() { return { frontmatter } } }\n</script>`
+      : `<script setup>\n${scriptLines.join('\n')}\n</script>`
+
+    const sfc = `<template>${html}</template>\n${scripts}\n${customBlocks.blocks.join('\n')}\n`
 
     return sfc
   }

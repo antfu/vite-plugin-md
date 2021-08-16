@@ -4,6 +4,12 @@ import type { FilterPattern } from '@rollup/pluginutils'
 
 export interface Options {
   /**
+   * Explicitly set the Vue version.
+   *
+   * @default auto detected
+   */
+  vueVersion?: string
+  /**
    * Enable head support, need to install @vueuse/head and register to App in main.js
    *
    * @default false
