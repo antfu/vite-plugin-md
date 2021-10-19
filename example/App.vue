@@ -1,6 +1,6 @@
 <template>
   <router-view v-slot="{ Component }">
-    <component :is="Component" ref="current"/>
+    <component :is="Component" ref="current" />
   </router-view>
   <div v-if="current">
     accessing frontmatter from outside via expose API:

@@ -20,7 +20,7 @@ const config: UserConfig = {
       pagesDir: 'pages',
       extensions: ['vue', 'md'],
     }),
-    Inspect()
+    Inspect(),
   ],
 }
 
