@@ -25,13 +25,13 @@ importers:
       vite: ^2.5.0
     dependencies:
       '@rollup/pluginutils': 4.1.1
+      '@types/markdown-it': 12.2.0
       gray-matter: 4.0.3
       markdown-it: 12.2.0
     devDependencies:
       '@antfu/eslint-config': 0.7.0_eslint@7.32.0+typescript@4.3.5
       '@antfu/ni': 0.7.0
       '@types/jest': 27.0.1
-      '@types/markdown-it': 12.2.0
       '@typescript-eslint/eslint-plugin': 4.29.2_eslint@7.32.0+typescript@4.3.5
       bumpp: 6.0.6
       eslint: 7.32.0
@@ -932,7 +932,6 @@ packages:
 
   /@types/linkify-it/3.0.0:
     resolution: {integrity: sha512-x9OaQQTb1N2hPZ/LWJsqushexDvz7NgzuZxiRmZio44WPuolTZNHDBCrOxCzRVOMwamJRO2dWax5NbygOf1OTQ==}
-    dev: true
 
   /@types/markdown-it/12.2.0:
     resolution: {integrity: sha512-YEpywby5S2wt64C2E3bcpLvtIV8BuCj+4AGtL7tU51V8Vr1qwm+cX9gFfWRyclgLC0UK/7w2heYmhymDi+snzw==}
@@ -940,11 +939,10 @@ packages:
       '@types/linkify-it': 3.0.0
       '@types/mdurl': 1.0.2
       highlight.js: 10.7.3
-    dev: true
+    dev: false
 
   /@types/mdurl/1.0.2:
     resolution: {integrity: sha512-eC4U9MlIcu2q0KQmXszyn5Akca/0jrQmwDRgpAMJai7qBWq4amIQhZyNau4VYGtCeALvW1/NtjzJJ567aZxfKA==}
-    dev: true
 
   /@types/minimist/1.2.1:
     resolution: {integrity: sha512-fZQQafSREFyuZcdWFAExYjBiCL7AUCdgsk80iO0q4yihYYdcIiH28CcuPTGFgLOCC8RlW49GSQxdHwZP+I7CNg==}
@@ -3243,7 +3241,6 @@ packages:
 
   /highlight.js/10.7.3:
     resolution: {integrity: sha512-tzcUFauisWKNHaRkN4Wjl/ZA07gENAjFl3J/c480dprkGTg5EQstgaNFqBfUqCq54kZRIEcreTsAgF/m2quD7A==}
-    dev: true
 
   /hosted-git-info/2.8.8:
     resolution: {integrity: sha512-f/wzC2QaWBs7t9IYqB4T3sR1xviIViXJRJTWBlx2Gf3g0Xi5vI7Yy4koXQ1c9OYDGHN9sBy1DQ2AB8fqZBWhUg==}
