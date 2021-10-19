@@ -6,19 +6,19 @@
   },
   "dependencies": {
     "@vueuse/head": "^0.6.0",
-    "vue": "^3.2.3",
-    "vue-router": "^4.0.11"
+    "vue": "^3.2.20",
+    "vue-router": "^4.0.12"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^1.4.0",
-    "@vue/compiler-sfc": "^3.2.3",
+    "@vitejs/plugin-vue": "^1.9.3",
+    "@vue/compiler-sfc": "^3.2.20",
     "cross-env": "^7.0.3",
-    "markdown-it-prism": "^2.1.8",
-    "prismjs": "^1.24.1",
-    "typescript": "^4.3.5",
-    "vite": "^2.5.0",
-    "vite-plugin-inspect": "^0.1.2",
+    "markdown-it-prism": "^2.2.1",
+    "prismjs": "^1.25.0",
+    "typescript": "^4.4.4",
+    "vite": "^2.6.10",
+    "vite-plugin-inspect": "^0.3.9",
     "vite-plugin-md": "workspace:*",
-    "vite-plugin-pages": "^0.17.3"
+    "vite-plugin-pages": "^0.18.1"
   }
 }

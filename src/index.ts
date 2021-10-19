@@ -22,9 +22,8 @@ function VitePluginMarkdown(userOptions: Options = {}): Plugin {
       try {
         return markdownToVue(id, raw)
       }
-      catch (e) {
+      catch (e: any) {
         this.error(e)
-        return ''
       }
     },
     async handleHotUpdate(ctx) {
