@@ -1,7 +1,7 @@
 import MarkdownIt from 'markdown-it'
 import matter from 'gray-matter'
-import { ResolvedOptions } from './types'
-import { toArray } from './utils'
+import { toArray } from '@antfu/utils'
+import type { ResolvedOptions } from './types'
 
 const scriptSetupRE = /<\s*script[^>]*\bsetup\b[^>]*>([\s\S]*)<\/script>/mg
 const defineExposeRE = /defineExpose\s*\(/mg
