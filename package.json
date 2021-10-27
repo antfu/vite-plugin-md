@@ -17,10 +17,10 @@
   "files": [
     "dist"
   ],
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "exports": "./dist/index.mjs",
-  "types": "dist/index.d.ts",
+  "types": "./dist/index.d.ts",
   "homepage": "https://github.com/antfu/vite-plugin-md",
   "bugs": "https://github.com/antfu/vite-plugin-md/issues",
   "scripts": {
