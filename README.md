@@ -266,4 +266,4 @@ declare module '*.md' {
 
 ## License
 
-MIT License © 2020 [Anthony Fu](https://github.com/antfu)
+MIT License © 2021 [Anthony Fu](https://github.com/antfu)
