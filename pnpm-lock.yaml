@@ -6,6 +6,7 @@ importers:
     specifiers:
       '@antfu/eslint-config': ^0.10.0
       '@antfu/ni': ^0.10.0
+      '@antfu/utils': ^0.3.0
       '@rollup/pluginutils': ^4.1.1
       '@types/jest': ^27.0.2
       '@types/markdown-it': ^12.2.3
@@ -24,6 +25,7 @@ importers:
       typescript: ^4.4.4
       vite: ^2.6.13
     dependencies:
+      '@antfu/utils': 0.3.0
       '@rollup/pluginutils': 4.1.1
       '@types/markdown-it': 12.2.3
       gray-matter: 4.0.3
@@ -176,7 +178,6 @@ packages:
     resolution: {integrity: sha512-UU8TLr/EoXdg7OjMp0h9oDoIAVr+Z/oW9cpOxQQyrsz6Qzd2ms/1CdWx8fl2OQdFpxGmq5Vc4TwfLHId6nAZjA==}
     dependencies:
       '@types/throttle-debounce': 2.1.0
-    dev: true
 
   /@babel/code-frame/7.15.8:
     resolution: {integrity: sha512-2IAnmn8zbvC/jKYhq5Ki9I+DwjlrtMPUCH/CpHvqI4dNnlwHwsxoIhlc8WcYY5LSYknXQtAlFYuHfqAFCvQ4Wg==}
@@ -962,7 +963,6 @@ packages:
 
   /@types/throttle-debounce/2.1.0:
     resolution: {integrity: sha512-5eQEtSCoESnh2FsiLTxE121IiE60hnMqcb435fShf4bpLRjEu1Eoekht23y6zXS9Ts3l+Szu3TARnTsA0GkOkQ==}
-    dev: true
 
   /@types/yargs-parser/20.2.1:
     resolution: {integrity: sha512-7tFImggNeNBVMsn0vLrpn1H1uPrUBdnARPTpZoitY37ZrdJREzf7I16tMrlK3hen349gr1NYh8CmZQa7CTG6Aw==}

@@ -1,4 +1,4 @@
-import { ResolvedOptions } from './types'
+import type { ResolvedOptions } from './types'
 
 const headProperties = [
   'title',

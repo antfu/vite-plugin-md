@@ -17,15 +17,15 @@
   "files": [
     "dist"
   ],
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
     }
   },
-  "types": "dist/index.d.ts",
+  "types": "./dist/index.d.ts",
   "homepage": "https://github.com/antfu/vite-plugin-md",
   "bugs": "https://github.com/antfu/vite-plugin-md/issues",
   "scripts": {
@@ -42,6 +42,7 @@
     "vite": "^2.0.0"
   },
   "dependencies": {
+    "@antfu/utils": "^0.3.0",
     "@rollup/pluginutils": "^4.1.1",
     "@types/markdown-it": "^12.2.3",
     "gray-matter": "^4.0.3",

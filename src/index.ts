@@ -1,8 +1,8 @@
 import type { Plugin } from 'vite'
 import { createFilter } from '@rollup/pluginutils'
-import { Options } from './types'
 import { createMarkdown } from './markdown'
 import { resolveOptions } from './options'
+import type { Options } from './types'
 
 function VitePluginMarkdown(userOptions: Options = {}): Plugin {
   const options = resolveOptions(userOptions)

@@ -1,6 +1,7 @@
+import { toArray } from '@antfu/utils'
 import { preprocessHead } from './head'
 import { Options, ResolvedOptions } from './types'
-import { getVueVersion, toArray } from './utils'
+import { getVueVersion } from './utils'
 
 export function resolveOptions(userOptions: Options): ResolvedOptions {
   const options = Object.assign({
