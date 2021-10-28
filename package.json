@@ -20,8 +20,10 @@
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "exports": {
-    "import": "./dist/index.mjs",
-    "require": "./dist/index.js"
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
   },
   "types": "dist/index.d.ts",
   "homepage": "https://github.com/antfu/vite-plugin-md",
