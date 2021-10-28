@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-md",
-  "version": "0.11.3",
+  "version": "0.11.4",
   "description": "Markdown for Vite",
   "keywords": [
     "vite",
@@ -17,10 +17,15 @@
   "files": [
     "dist"
   ],
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "exports": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "types": "dist/index.d.ts",
   "homepage": "https://github.com/antfu/vite-plugin-md",
   "bugs": "https://github.com/antfu/vite-plugin-md/issues",
   "scripts": {
