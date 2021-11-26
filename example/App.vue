@@ -11,6 +11,6 @@
 
 <script setup lang='ts'>
 import { ref } from 'vue'
-import ComponentA from './README.md'
+import ComponentA from '../README.md'
 const current = ref()
 </script>
