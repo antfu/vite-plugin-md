@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`transform basic 1`] = `
+exports[`transform > basic 1`] = `
 "<template><div class=\\"markdown-body\\"><h1>Hello</h1>
 <ul>
 <li>A</li>
@@ -16,7 +16,7 @@ defineExpose({ frontmatter })
 "
 `;
 
-exports[`transform couldn't expose frontmatter 1`] = `
+exports[`transform > couldn't expose frontmatter 1`] = `
 "<template><div class=\\"markdown-body\\">
 </div></template>
 <script setup>
@@ -29,7 +29,7 @@ defineExpose({ test: 'test'})
 "
 `;
 
-exports[`transform escapeCodeTagInterpolation 1`] = `
+exports[`transform > escapeCodeTagInterpolation 1`] = `
 "<template><div class=\\"markdown-body\\"><div>{{hello}}</div>
 <pre><code class=\\"language-ts\\" v-pre>&lt;div&gt;{{hello}}&lt;/div&gt;
 </code></pre>
@@ -42,7 +42,7 @@ defineExpose({ frontmatter })
 "
 `;
 
-exports[`transform exposes frontmatter 1`] = `
+exports[`transform > exposes frontmatter 1`] = `
 "<template><div class=\\"markdown-body\\"><h1>Hello</h1>
 </div></template>
 <script setup>
@@ -53,7 +53,7 @@ defineExpose({ frontmatter })
 "
 `;
 
-exports[`transform frontmatter interpolation 1`] = `
+exports[`transform > frontmatter interpolation 1`] = `
 "<template><div class=\\"markdown-body\\"><h1>Hello World</h1>
 <p>This is {{frontmatter.name}}</p>
 </div></template>
@@ -65,7 +65,7 @@ defineExpose({ frontmatter })
 "
 `;
 
-exports[`transform script setup 1`] = `
+exports[`transform > script setup 1`] = `
 "<template><div class=\\"markdown-body\\"><h1>Hello</h1>
 
 </div></template>
@@ -80,7 +80,7 @@ import Foo from './Foo.vue'
 "
 `;
 
-exports[`transform style 1`] = `
+exports[`transform > style 1`] = `
 "<template><div class=\\"markdown-body\\"><h1>Hello</h1>
 
 </div></template>

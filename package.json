@@ -33,10 +33,10 @@
     "example:dev": "cp README.md example/README.md && npm -C example run dev",
     "example:build": "cp README.md example/README.md && npm -C example run build",
     "build": "tsup src/index.ts --dts --format cjs,esm",
-    "test": "jest",
-    "test:update": "jest -u",
+    "test": "vitest",
+    "test:update": "vitest -u",
     "prepublishOnly": "npm run build",
-    "release": "git-ensure --no-behind -b main --clean && bumpp --commit --tag --push"
+    "release": "bumpp --commit --tag --push"
   },
   "peerDependencies": {
     "vite": "^2.0.0"
@@ -51,18 +51,14 @@
   "devDependencies": {
     "@antfu/eslint-config": "^0.12.2",
     "@antfu/ni": "^0.12.0",
-    "@types/jest": "^27.0.3",
     "@typescript-eslint/eslint-plugin": "^5.6.0",
     "bumpp": "^7.1.1",
     "eslint": "^8.4.1",
-    "eslint-plugin-jest": "^25.3.0",
-    "git-ensure": "^0.1.0",
     "jest": "^27.4.4",
     "rollup": "^2.61.1",
-    "standard-version": "^9.3.2",
-    "ts-jest": "^27.1.1",
     "tsup": "^5.11.1",
     "typescript": "^4.5.3",
-    "vite": "^2.7.1"
+    "vite": "^2.7.1",
+    "vitest": "^0.0.61"
   }
 }
