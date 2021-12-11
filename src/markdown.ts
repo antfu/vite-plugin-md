@@ -51,7 +51,7 @@ export function createMarkdown(options: ResolvedOptions) {
   return (id: string, raw: string) => {
     const { wrapperClasses, wrapperComponent, transforms, headEnabled, frontmatterPreprocess } = options
 
-    raw = raw.trimLeft()
+    raw = raw.trimStart()
 
     if (transforms.before)
       raw = transforms.before(raw, id)
