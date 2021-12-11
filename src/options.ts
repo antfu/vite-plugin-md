@@ -24,7 +24,7 @@ export function resolveOptions(userOptions: Options): ResolvedOptions {
   }, userOptions) as ResolvedOptions
 
   options.wrapperClasses = toArray(options.wrapperClasses).filter(i => i).join(' ')
-  options.vueVersion ??= getVueVersion()
+  options.vueVersion = options.vueVersion || getVueVersion()
 
   return options
 }
