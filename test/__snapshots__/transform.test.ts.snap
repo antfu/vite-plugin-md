@@ -12,6 +12,9 @@ exports[`transform > basic 1`] = `
 const frontmatter = {\\"title\\":\\"Hey\\"}
 defineExpose({ frontmatter })
 </script>
+<script>
+export const title = \\"Hey\\"
+</script>
 
 "
 `;
@@ -24,6 +27,9 @@ const frontmatter = {\\"title\\":\\"Hey\\"}
 
 defineExpose({ test: 'test'})
 
+</script>
+<script>
+export const title = \\"Hey\\"
 </script>
 
 "
@@ -49,6 +55,9 @@ exports[`transform > exposes frontmatter 1`] = `
 const frontmatter = {\\"title\\":\\"Hey\\"}
 defineExpose({ frontmatter })
 </script>
+<script>
+export const title = \\"Hey\\"
+</script>
 
 "
 `;
@@ -60,6 +69,9 @@ exports[`transform > frontmatter interpolation 1`] = `
 <script setup>
 const frontmatter = {\\"name\\":\\"My Cool App\\"}
 defineExpose({ frontmatter })
+</script>
+<script>
+export const name = \\"My Cool App\\"
 </script>
 
 "
