@@ -82,10 +82,14 @@ export function createMarkdown(options: ResolvedOptions) {
     html = customBlocks.html
 
     const scriptLines: string[] = []
+    let frontmatterExportsLines: string[] = []
 
     if (options.frontmatter) {
       const { head, frontmatter } = frontmatterPreprocess(data || {}, options)
+
       scriptLines.push(`const frontmatter = ${JSON.stringify(frontmatter)}`)
+
+      frontmatterExportsLines = Object.entries(frontmatter).map(([key, value]) => `export const ${key} = ${JSON.stringify(value)}`)
 
       if (!isVue2 && options.exposeFrontmatter && !defineExposeRE.test(hoistScripts.scripts.join('')))
         scriptLines.push('defineExpose({ frontmatter })')
@@ -100,8 +104,8 @@ export function createMarkdown(options: ResolvedOptions) {
     scriptLines.push(...hoistScripts.scripts)
 
     const scripts = isVue2
-      ? `<script>\n${scriptLines.join('\n')}\nexport default { data() { return { frontmatter } } }\n</script>`
-      : `<script setup>\n${scriptLines.join('\n')}\n</script>`
+      ? `<script>\n${scriptLines.join('\n')}\n${frontmatterExportsLines.join('\n')}\nexport default { data() { return { frontmatter } } }\n</script>`
+      : `<script setup>\n${scriptLines.join('\n')}\n</script>${frontmatterExportsLines.length ? `\n<script>\n${frontmatterExportsLines.join('\n')}\n</script>` : ''}`
 
     const sfc = `<template>${html}</template>\n${scripts}\n${customBlocks.blocks.join('\n')}\n`
 
