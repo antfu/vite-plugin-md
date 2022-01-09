@@ -34,6 +34,15 @@ export interface Options {
   frontmatter?: boolean
 
   /**
+   * Parse for excerpt
+   *
+   * If `true`, it will be passed to `frontmatterPreprocess` as `frontmatter.excerpt`, replacing the `excerpt` key in frontmatter, if there's any
+   *
+   * @default false
+   */
+  excerpt?: boolean
+
+  /**
    * Remove custom SFC block
    *
    * @default ['route', 'i18n']
@@ -51,6 +60,13 @@ export interface Options {
    * @default true
    */
   exposeFrontmatter?: boolean
+
+  /**
+   * Expose excerpt via expose API
+   *
+   * @default false
+   */
+  exposeExcerpt?: boolean
 
   /**
    * Add `v-pre` to `<code>` tag to escape curly brackets interpolation
@@ -74,6 +90,12 @@ export interface Options {
    * A function providing the Markdown It instance gets the ability to apply custom settings/plugins
    */
   markdownItSetup?: (MarkdownIt: MarkdownIt) => void
+
+  /**
+   * Options passed to grayMatter
+   * TODO grayMatterOptions type
+   */
+  grayMatterOptions?: any
 
   /**
    * Class names for wrapper div
