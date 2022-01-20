@@ -248,6 +248,30 @@ export default {
 
 Components under `./src/components` can be directly used in markdown components, and markdown components can also be put under `./src/components` to be auto imported.
 
+### Work with [prism-theme-vars](https://github.com/antfu/prism-theme-vars)
+
+```ts
+import Markdown from 'vite-plugin-md'
+
+export default {
+  plugins: [
+    Markdown({
+      // A function providing the Markdown It instance gets the ability to apply custom settings/plugins
+      markdownItSetup(md) {
+        // for example
+        md.use(require('markdown-it-prism'))
+      },
+    })
+  ],
+}
+```
+
+```css
+@import  'prism-theme-vars/base.css' ;
+```
+
+A customizable Prism.js theme using CSS variables. Or introduce basic style.
+
 ## TypeScript Shim
 
 ```ts
