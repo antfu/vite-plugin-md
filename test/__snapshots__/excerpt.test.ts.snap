@@ -1,0 +1,26 @@
+// Vitest Snapshot v1
+
+exports[`excerpt > basic-excerpt 1`] = `
+"<template><div class=\\"markdown-body\\"><p>This is an excerpt.</p>
+<!-- more -->
+<h1>Hello</h1>
+<ul>
+<li>A</li>
+<li>B</li>
+<li>C</li>
+</ul>
+</div></template>
+<script setup>
+const frontmatter = {\\"title\\":\\"Hey\\"}
+defineExpose({ frontmatter })
+const excerpt = \\"\\\\nThis is an excerpt.\\\\n\\\\n\\"
+</script>
+<script>
+export const title = \\"Hey\\"
+</script>
+<script>
+export const excerpt = \\"\\\\nThis is an excerpt.\\\\n\\\\n\\"
+</script>
+
+"
+`;

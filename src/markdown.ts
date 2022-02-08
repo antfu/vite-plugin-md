@@ -56,9 +56,14 @@ export function createMarkdown(options: ResolvedOptions) {
     if (transforms.before)
       raw = transforms.before(raw, id)
 
-    const { content: md, data } = options.frontmatter
-      ? matter(raw)
-      : { content: raw, data: null }
+    if (options.excerpt && !options.grayMatterOptions.excerpt)
+      options.grayMatterOptions.excerpt = true
+
+    const grayMatterFile = options.frontmatter
+      ? matter(raw, options.grayMatterOptions)
+      : { content: raw, data: null, excerpt: '' }
+    const { content: md, data } = grayMatterFile
+    const excerpt = grayMatterFile.excerpt === undefined ? '' : grayMatterFile.excerpt
 
     let html = markdown.render(md, { id })
 
@@ -67,7 +72,7 @@ export function createMarkdown(options: ResolvedOptions) {
     else
       html = `<div>${html}</div>`
     if (wrapperComponent)
-      html = `<${wrapperComponent}${options.frontmatter ? ' :frontmatter="frontmatter"' : ''}>${html}</${wrapperComponent}>`
+      html = `<${wrapperComponent}${options.frontmatter ? ' :frontmatter="frontmatter"' : ''}${options.excerpt ? ' :excerpt="excerpt"' : ''}>${html}</${wrapperComponent}>`
     if (transforms.after)
       html = transforms.after(html, id)
 
@@ -83,9 +88,19 @@ export function createMarkdown(options: ResolvedOptions) {
 
     const scriptLines: string[] = []
     let frontmatterExportsLines: string[] = []
+    let excerptExportsLine = ''
+    let excerptKeyOverlapping = false
 
     if (options.frontmatter) {
+      if (options.excerpt && data) {
+        if (data.excerpt !== undefined) excerptKeyOverlapping = true
+        data.excerpt = excerpt
+      }
+
       const { head, frontmatter } = frontmatterPreprocess(data || {}, options)
+
+      if (options.excerpt && !excerptKeyOverlapping && frontmatter.excerpt !== undefined)
+        delete frontmatter.excerpt
 
       scriptLines.push(`const frontmatter = ${JSON.stringify(frontmatter)}`)
 
@@ -101,11 +116,20 @@ export function createMarkdown(options: ResolvedOptions) {
       }
     }
 
+    if (options.excerpt) {
+      scriptLines.push(`const excerpt = ${JSON.stringify(excerpt)}`)
+
+      if (!excerptKeyOverlapping) excerptExportsLine = `export const excerpt = ${JSON.stringify(excerpt)}\n`
+
+      if (!isVue2 && options.exposeExcerpt && !defineExposeRE.test(hoistScripts.scripts.join('')))
+        scriptLines.push('defineExpose({ excerpt })')
+    }
+
     scriptLines.push(...hoistScripts.scripts)
 
     const scripts = isVue2
-      ? `<script>\n${scriptLines.join('\n')}\n${frontmatterExportsLines.join('\n')}\nexport default { data() { return { frontmatter } } }\n</script>`
-      : `<script setup>\n${scriptLines.join('\n')}\n</script>${frontmatterExportsLines.length ? `\n<script>\n${frontmatterExportsLines.join('\n')}\n</script>` : ''}`
+      ? `<script>\n${scriptLines.join('\n')}\n${frontmatterExportsLines.join('\n')}\n${excerptExportsLine}export default { data() { return { frontmatter } } }\n</script>`
+      : `<script setup>\n${scriptLines.join('\n')}\n</script>${frontmatterExportsLines.length ? `\n<script>\n${frontmatterExportsLines.join('\n')}\n</script>` : ''}${excerptExportsLine !== '' ? `\n<script>\n${excerptExportsLine}</script>` : ''}`
 
     const sfc = `<template>${html}</template>\n${scripts}\n${customBlocks.blocks.join('\n')}\n`
 
