@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { createMarkdown } from '../src/markdown'
 import { resolveOptions } from '../src/options'
 

@@ -1,4 +1,4 @@
-import { UserConfig } from 'vite'
+import type { UserConfig } from 'vite'
 import Vue from '@vitejs/plugin-vue'
 import Markdown from 'vite-plugin-md'
 import prism from 'markdown-it-prism'

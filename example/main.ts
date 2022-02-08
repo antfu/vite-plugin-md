@@ -1,8 +1,8 @@
 import { createApp } from 'vue'
 import { createHead } from '@vueuse/head'
 import {
-  createWebHistory,
   createRouter,
+  createWebHistory,
 } from 'vue-router'
 import routes from 'pages-generated'
 import App from './App.vue'
