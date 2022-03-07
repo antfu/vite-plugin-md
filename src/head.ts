@@ -1,23 +1,15 @@
-import type { ResolvedOptions } from './types'
+import type { Frontmatter, MetaProperty, ResolvedOptions } from './types'
 
-const headProperties = [
-  'title',
-  'meta',
-  'link',
-  'base',
-  'style',
-  'script',
-  'htmlAttrs',
-  'bodyAttrs',
-]
+const headProperties = ['title', 'meta', 'link', 'base', 'style', 'script', 'htmlAttrs', 'bodyAttrs']
 
-export function preprocessHead(frontmatter: any, options: ResolvedOptions) {
-  if (!options.headEnabled)
-    return frontmatter
+export function preprocessHead<T extends Frontmatter>(frontmatter: T, options: ResolvedOptions) {
+  if (!options.headEnabled) return frontmatter
 
-  const head = options.headField ? frontmatter[options.headField] || {} : frontmatter
+  const head: Frontmatter = options.headField
+    ? (frontmatter[options.headField] as Frontmatter) || {}
+    : frontmatter
 
-  const meta = head.meta = head.meta || []
+  const meta = (head.meta = head.meta || []) as MetaProperty[]
 
   if (head.title) {
     if (!meta.find((i: any) => i.property === 'og:title'))
@@ -43,8 +35,7 @@ export function preprocessHead(frontmatter: any, options: ResolvedOptions) {
   const result: any = {}
 
   for (const [key, value] of Object.entries(head)) {
-    if (headProperties.includes(key))
-      result[key] = value
+    if (headProperties.includes(key)) result[key] = value
   }
 
   return Object.entries(result).length === 0 ? null : result
