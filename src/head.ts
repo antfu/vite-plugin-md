@@ -34,9 +34,8 @@ export function preprocessHead<T extends Frontmatter>(frontmatter: T, options: R
 
   const result: any = {}
 
-  for (const [key, value] of Object.entries(head)) {
+  for (const [key, value] of Object.entries(head))
     if (headProperties.includes(key)) result[key] = value
-  }
 
   return Object.entries(result).length === 0 ? null : result
 }

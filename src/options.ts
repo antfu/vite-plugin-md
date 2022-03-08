@@ -27,13 +27,13 @@ export function resolveOptions(userOptions: Options): ResolvedOptions {
   const options = userOptions.frontmatterPreprocess
     ? { ...defaultOptions, ...userOptions }
     : {
-        ...defaultOptions,
-        ...userOptions,
-        frontmatterPreprocess: (frontmatter: Frontmatter, options: ResolvedOptions) => {
-          const head = preprocessHead(frontmatter, options)
-          return { head, frontmatter }
-        },
-      }
+      ...defaultOptions,
+      ...userOptions,
+      frontmatterPreprocess: (frontmatter: Frontmatter, options: ResolvedOptions) => {
+        const head = preprocessHead(frontmatter, options)
+        return { head, frontmatter }
+      },
+    }
 
   options.wrapperClasses = toArray(options.wrapperClasses)
     .filter((i?: string) => i)

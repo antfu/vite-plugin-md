@@ -2,7 +2,7 @@ import { readFile } from 'fs/promises'
 import { describe, expect, it } from 'vitest'
 import { createMarkdown } from '../src/markdown'
 import { resolveOptions } from '../src/options'
-import { Frontmatter, ResolvedOptions, MetaProperty } from '../src/types'
+import type { MetaProperty, ResolvedOptions } from '../src/types'
 
 const frontmatterPreprocess: ResolvedOptions['frontmatterPreprocess'] = (fm) => {
   const frontmatter = {
@@ -26,22 +26,22 @@ const frontmatterPreprocess: ResolvedOptions['frontmatterPreprocess'] = (fm) => 
 }
 
 describe('provide bespoke frontmatter processor', () => {
-  it('inline markdown is used over default properties', async () => {
+  it('inline markdown is used over default properties', async() => {
     const parser = createMarkdown(resolveOptions({ frontmatterPreprocess }))
     const md = parser('', await readFile('test/fixtures/simple.md', 'utf-8'))
     // Positive tests
     expect(
       md.includes('Hello World'),
-      "the title attribute is retained over the default 'title' value"
+      'the title attribute is retained over the default \'title\' value',
     ).toBeTruthy()
     expect(
       md.includes('testing is the path to true happiness'),
-      'description property is also retained'
+      'description property is also retained',
     ).toBeTruthy()
     // Negative tests
     expect(
       md.includes('default title'),
-      "the title attribute is retained over the default 'title' value"
+      'the title attribute is retained over the default \'title\' value',
     ).toBeFalsy()
     expect(md.includes('default description'), 'default description is ignored').toBeFalsy()
 

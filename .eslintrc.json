@@ -1,5 +1,3 @@
 {
-  "extends": "@antfu",
-  "plugins": ["eslint"],
-  "parser": "@typescript-eslint/parser"
+  "extends": "@antfu"
 }
