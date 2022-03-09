@@ -36,6 +36,7 @@
     "test": "vitest",
     "test:update": "vitest -u",
     "lint": "eslint \"**/*.{ts,vue,mjs}\"",
+    "lint:fix": "eslint \"**/*.{ts,vue,mjs}\" --fix",
     "prepublishOnly": "npm run build",
     "release": "bumpp --commit --tag --push"
   },
@@ -44,21 +45,25 @@
   },
   "dependencies": {
     "@antfu/utils": "^0.5.0",
-    "@rollup/pluginutils": "^4.1.2",
+    "@rollup/pluginutils": "^4.2.0",
     "@types/markdown-it": "^12.2.3",
     "gray-matter": "^4.0.3",
     "markdown-it": "^12.3.2"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^0.16.1",
-    "@antfu/ni": "^0.12.0",
-    "@typescript-eslint/eslint-plugin": "^5.11.0",
+    "@antfu/ni": "^0.13.2",
+    "@types/node": "^14.18.12",
+    "@typescript-eslint/eslint-plugin": "^5.14.0",
+    "@typescript-eslint/parser": "^5.14.0",
+    "@vue/test-utils": "^2.0.0-rc.18",
     "bumpp": "^7.1.1",
-    "eslint": "^8.8.0",
-    "rollup": "^2.67.1",
-    "tsup": "^5.11.13",
-    "typescript": "^4.5.5",
-    "vite": "^2.7.13",
-    "vitest": "^0.2.8"
+    "eslint": "^8.10.0",
+    "eslint-config-prettier": "^8.5.0",
+    "rollup": "^2.70.0",
+    "tsup": "^5.12.0",
+    "typescript": "^4.6.2",
+    "vite": "^2.8.6",
+    "vitest": "^0.6.0"
   }
 }

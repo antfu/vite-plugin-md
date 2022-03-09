@@ -1,13 +1,15 @@
 import { toArray } from '@antfu/utils'
 import { preprocessHead } from './head'
-import type { Options, ResolvedOptions } from './types'
+import type { Frontmatter, Options, ResolvedOptions } from './types'
 import { getVueVersion } from './utils'
 
 export function resolveOptions(userOptions: Options): ResolvedOptions {
-  const options = Object.assign({
+  const defaultOptions: Omit<ResolvedOptions, 'frontmatterPreprocess'> = {
     headEnabled: false,
     headField: '',
     frontmatter: true,
+    include: null,
+    exclude: null,
     excerpt: false,
     exposeFrontmatter: true,
     exposeExcerpt: false,
@@ -17,17 +19,25 @@ export function resolveOptions(userOptions: Options): ResolvedOptions {
     markdownItUses: [],
     markdownItSetup: () => {},
     grayMatterOptions: {},
-    wrapperClasses: 'markdown-body',
     wrapperComponent: null,
     transforms: {},
-    frontmatterPreprocess: (frontmatter: any, options: ResolvedOptions) => {
-      const head = preprocessHead(frontmatter, options)
-      return { head, frontmatter }
-    },
-  }, userOptions) as ResolvedOptions
+    vueVersion: userOptions.vueVersion || getVueVersion(),
+    wrapperClasses: 'markdown-body',
+  }
+  const options = userOptions.frontmatterPreprocess
+    ? { ...defaultOptions, ...userOptions }
+    : {
+      ...defaultOptions,
+      ...userOptions,
+      frontmatterPreprocess: (frontmatter: Frontmatter, options: ResolvedOptions) => {
+        const head = preprocessHead(frontmatter, options)
+        return { head, frontmatter }
+      },
+    }
 
-  options.wrapperClasses = toArray(options.wrapperClasses).filter(i => i).join(' ')
-  options.vueVersion = options.vueVersion || getVueVersion()
+  options.wrapperClasses = toArray(options.wrapperClasses)
+    .filter((i?: string) => i)
+    .join(' ')
 
-  return options
+  return options as ResolvedOptions
 }
