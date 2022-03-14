@@ -89,9 +89,25 @@ import { Counter } from './Counter.vue
 
 Or you can use [`vite-plugin-components`](#work-with-vite-plugin-components) for auto components registration.
 
-## Frontmatter
+## Document Metadata
 
-Frontmatter will be parsed and inject into Vue's instance data `frontmatter` field. 
+This plugin provides strong support for metadata in your markdown content. In general we think of metadata as fitting into the following structure:
+
+```mermaid
+flowchart TD
+  md((meta data)) --> frontmatter
+  md --> head
+  md --> router[route meta]
+
+  head --> meta([meta])
+  head --> other([other])
+```
+
+Now while that seem like a lot of _meta_ for _metadata_ for most most people you can just isolate to the most common of metadata in Markdown content: **frontmatter**.
+
+### Frontmatter
+
+Frontmatter is first class citizen and will be parsed and injected into Vue's instance data `frontmatter` field. 
 
 For example:
 
@@ -114,9 +130,18 @@ Will be rendered as
 
 It will also be passed to the wrapper component's props if you have set `wrapperComponent` option.
 
-## Document head and meta
+## Page HEAD Properties
 
-To manage document head and meta, you would need to install [`@vueuse/head`](https://github.com/vueuse/head) and do some setup.
+The two most common needs for injecting into the HEAD of a markdown page is:
+
+1. Adding meta info for social media sites like Facebook and Twitter to get more visually rich and descriptive links when people share your site
+2. Adding the "title" tag to a page
+
+There are of course more but it's kind of fair to group them into HEAD (general like title) and META (which tend to follow noticeable patterns).
+
+If you want to manage either with this plugin you'll need to leverage the [`@vueuse/head`](https://github.com/vueuse/head) package. Many of you will already be familiar it from working in VueJS and once nice benefit of using with your Markdown is that this can provide a bit of consistency between addressing the head of your pages regardless of whether you're using Markdown or VueJS components.
+
+To setup, do the following:
 
 ```bash
 npm i @vueuse/head
@@ -146,20 +171,62 @@ import { createHead } from '@vueuse/head' // <--
 
 const app = createApp(App)
 
-const head = createHead() // <--
+const head = createHead({ title: "My Cool App" }) // <--
 app.use(head) // <--
 ```
 
-Then you can use frontmatter to control the head. For example:
+Now you can use frontmatter to control the head. For example:
 
 ```yaml
 ---
-title: My Cool App
+title: Even Cooler Page
 meta:
   - name: description
     content: Hello World
+  - name: url
+    content: https://cool-site.com
 ---
 ```
+
+This does three things:
+
+1. This page -- _being particular cool_ -- will have the title of "Even Cooler Page" and other pages which don't specify will still have the title of "My Cool App" as a default.
+2. The meta tags `description` and `url` will be put into the head block and be given a slightly "enhanced" treatment (more in a moment)
+3. The `title` -- which we discussed in #1 is _also_ added as a meta tag with the same fancy "enhanced" treatment.
+
+Now before you become concerned that this sounds too _magical_ please understand it is actually very straight forward once you understand the processing steps and the idea of "mapping" that dictates what goes where.
+
+> See [Mapping section](./docs/MetaMapping.md) for more detail.
+
+### Router Meta
+
+When you're using this plugin with the popular pairing of `vite-plugin-pages` this plugin offers a custom SFC block called `<route>` and this allows your VueJS components to add something like:
+
+```html
+<script></script>
+<template></template>
+<route>
+  meta:
+    layout: exotic
+</route>
+```
+
+As convenient as this syntax is for a VueJS component, it feels awkward in Markdown where "notational velocity" is almost always the goal. Fortunately we've got you covered. If you're using the default configuration of this plugin you can express that the "exotic" layout property should be set on the route with just a frontmatter property:
+
+```md
+---
+layout: exotic
+---
+# Wow this is Amazing!
+```
+
+How this works -- exactly like Head and Meta properties -- is done via mapping.
+
+> See [Mapping section](./docs/MetaMapping.md) for more detail.
+
+
+
+
 
 For more options available, please refer to [`@vueuse/head`'s docs](https://github.com/vueuse/head).
 

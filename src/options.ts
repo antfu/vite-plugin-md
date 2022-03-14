@@ -3,7 +3,7 @@ import { preprocessHead } from './head'
 import type { Frontmatter, Options, ResolvedOptions } from './types'
 import { getVueVersion } from './utils'
 
-export function resolveOptions(userOptions: Options): ResolvedOptions {
+export function resolveOptions(userOptions: Options = {}): ResolvedOptions {
   const defaultOptions: Omit<ResolvedOptions, 'frontmatterPreprocess'> = {
     headEnabled: false,
     headField: '',
@@ -20,6 +20,8 @@ export function resolveOptions(userOptions: Options): ResolvedOptions {
     markdownItSetup: () => {},
     grayMatterOptions: {},
     wrapperComponent: null,
+    linkTransforms: f => f,
+    linkifyLookup: {},
     transforms: {},
     vueVersion: userOptions.vueVersion || getVueVersion(),
     wrapperClasses: 'markdown-body',

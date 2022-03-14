@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createMarkdown } from '../src/markdown'
+import { createSfcComponent } from '../src/createSfcComponent'
 import { resolveOptions } from '../src/options'
 
 describe('excerpt', () => {
@@ -10,7 +10,7 @@ describe('excerpt', () => {
       excerpt_separator: '<!-- more -->',
     },
   })
-  const markdownToVue = createMarkdown(options)
+  const markdownToVue = createSfcComponent(options)
 
   it('basic-excerpt', () => {
     const md = `---

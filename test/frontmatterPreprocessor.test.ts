@@ -1,8 +1,8 @@
 import { readFile } from 'fs/promises'
-import { describe, expect, it } from 'vitest'
-import { createMarkdown } from '../src/markdown'
+import { beforeAll, describe, expect, it } from 'vitest'
 import { resolveOptions } from '../src/options'
-import type { MetaProperty, ResolvedOptions } from '../src/types'
+import { composeSfcBlocks } from '../src/pipeline'
+import type { MetaProperty, Options, ResolvedOptions } from '../src/types'
 
 const frontmatterPreprocess: ResolvedOptions['frontmatterPreprocess'] = (fm) => {
   const frontmatter = {
@@ -22,31 +22,39 @@ const frontmatterPreprocess: ResolvedOptions['frontmatterPreprocess'] = (fm) => 
   return {
     head: { ...frontmatter, meta },
     frontmatter: { ...frontmatter, meta },
+    metaProps: [],
+    routeMeta: {},
   }
 }
 
+let md = ''
+
 describe('provide bespoke frontmatter processor', () => {
+  beforeAll(async() => {
+    md = await readFile('test/fixtures/simple.md', 'utf-8')
+  })
+
   it('inline markdown is used over default properties', async() => {
-    const parser = createMarkdown(resolveOptions({ frontmatterPreprocess }))
-    const md = parser('', await readFile('test/fixtures/simple.md', 'utf-8'))
+    const options: Options = { frontmatterPreprocess }
+    const { html } = composeSfcBlocks('', md, resolveOptions(options))
     // Positive tests
     expect(
-      md.includes('Hello World'),
+      html.includes('Hello World'),
       'the title attribute is retained over the default \'title\' value',
     ).toBeTruthy()
     expect(
-      md.includes('testing is the path to true happiness'),
+      html.includes('testing is the path to true happiness'),
       'description property is also retained',
     ).toBeTruthy()
     // Negative tests
     expect(
-      md.includes('default title'),
+      html.includes('default title'),
       'the title attribute is retained over the default \'title\' value',
     ).toBeFalsy()
-    expect(md.includes('default description'), 'default description is ignored').toBeFalsy()
+    expect(html.includes('default description'), 'default description is ignored').toBeFalsy()
 
     // Meta props
-    expect(md.includes('og:title')).toBeTruthy()
-    expect(md.includes('og:description')).toBeTruthy()
+    expect(html.includes('og:title')).toBeTruthy()
+    expect(html.includes('og:description')).toBeTruthy()
   })
 })
