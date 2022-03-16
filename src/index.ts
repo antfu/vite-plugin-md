@@ -17,7 +17,10 @@ function VitePluginMarkdown(userOptions: Options = {}): Plugin {
     name: 'vite-plugin-md',
     enforce: 'pre',
     transform(raw, id) {
-      if (!filter(id))
+      const [filename, query] = id.split('?')
+      if (!filter(filename))
+        return
+      if (query === 'raw')
         return
       try {
         return markdownToVue(id, raw)
