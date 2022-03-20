@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, it } from 'vitest'
 // import Simple, { title } from './fixtures/simple.md'
 
 describe('component tests', () => {

@@ -1,6 +1,4 @@
-/* eslint-disable no-console */
 import { readFile } from 'fs/promises'
-import { ref } from 'vue'
 import { beforeAll, describe, expect, it } from 'vitest'
 import { Window } from 'happy-dom'
 import { composeSfcBlocks } from '../src/pipeline'
@@ -133,7 +131,7 @@ describe('link testing', () => {
   })
 
   it.todo('reactive "path" adjusts relative links', () => {
-    const path = ref('foo/bar/baz')
+    // const path = ref('foo/bar/baz')
   })
 
   it('internal routes are converted to `<router-link>` elements by default', () => {
