@@ -1,4 +1,4 @@
-import type { ResolvedOptions } from './types'
+import type { ResolvedOptions } from './@types'
 
 export function getVueVersion(defaultVersion = '3.2.0') {
   try {
@@ -38,5 +38,5 @@ export function isVue2(options: ResolvedOptions) {
 }
 
 export function wrap(tag: string, content: string) {
-  return `<${tag}>${content}</${tag.split(/ /)[0]}>`
+  return `<${tag}>${content}\n</${tag.split(/ /)[0]}>`
 }

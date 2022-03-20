@@ -1,8 +1,8 @@
-import type { Plugin, UserConfig } from 'vite'
+import type { Plugin } from 'vite'
 import { createFilter } from '@rollup/pluginutils'
 import { createSfcComponent } from './createSfcComponent'
 import { resolveOptions } from './options'
-import type { Options } from './types'
+import type { Options } from './@types'
 export { link, meta } from './builders'
 
 function VitePluginMarkdown(userOptions: Options = {}): Plugin {

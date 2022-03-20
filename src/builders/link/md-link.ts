@@ -1,9 +1,10 @@
-import { normalizePath } from 'vite'
-import type { PluginWithOptions } from 'markdown-it'
-import type Token from 'markdown-it/lib/token'
-import type { ComputedRef, Ref } from '@vue/runtime-core'
 import { dirname, join } from 'node:path'
-import type { LinkElement, LinkTransformer } from '../../types'
+import { normalizePath } from 'vite'
+import type Token from 'markdown-it/lib/token'
+import type MarkdownIt from 'markdown-it'
+import type { PluginSimple } from 'markdown-it'
+import type { LinkElement } from '../../@types/core'
+import type { LinkTransformer } from './link-types'
 
 type NameValueTuple = [name: string, value: string]
 
@@ -13,32 +14,31 @@ export interface MdLinkOptions {
   /** the transform function which converts link attributes */
   transform: LinkTransformer
   /** the base URL for all internal links */
-  base: string
+  base?: string
 }
 
-export type WithExtras<T extends LinkElement> = T & {
+export type WithTagAndBase<T extends LinkElement> = T & {
   tagName?: string
   _base: string
 }
 
 /** converts the native attrs format to a dictionary style format */
-function toDictionary(t: Token, base: string): WithExtras<LinkElement> {
+function toDictionary(t: Token, base: string): WithTagAndBase<LinkElement> {
   const tagName = t.tag
   if (t.attrs === null)
-    return { tagName, _base: base } as WithExtras<LinkElement>
+    return { tagName, _base: base } as WithTagAndBase<LinkElement>
 
   return (t.attrs as NameValueTuple[]).reduce((acc, [k, v]) => {
     return { ...acc, [k]: v, tagName, _base: base }
-  }, {}) as WithExtras<LinkElement>
+  }, {}) as WithTagAndBase<LinkElement>
 }
 
 /**
  * Minimalist Markdown-IT plugin that receives all _link_ DOM attributes
  * and runs a transform function on it.
  */
-const plugin: PluginWithOptions<MdLinkOptions> = (
-  md,
-  o,
+const plugin = (o: MdLinkOptions): PluginSimple => (
+  md: MarkdownIt,
 ) => {
   if (!o || !o.transform) {
     throw new Error('link plugin requires a transform function to do it\'s job!')

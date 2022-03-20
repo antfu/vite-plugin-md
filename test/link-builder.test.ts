@@ -4,7 +4,6 @@ import { ref } from 'vue'
 import { beforeAll, describe, expect, it } from 'vitest'
 import { Window } from 'happy-dom'
 import { composeSfcBlocks } from '../src/pipeline'
-import { resolveOptions } from '../src/options'
 import { link } from '../src/index'
 
 const window = new Window()
@@ -18,7 +17,7 @@ describe('link testing', () => {
   })
 
   it('internal and external classes are brought in appropriately', () => {
-    const sfc = composeSfcBlocks('', md, resolveOptions({ linkTransforms: link() }))
+    const sfc = composeSfcBlocks('', md, { builders: [link()] })
     document.body.innerHTML = sfc.html
     const internalLinks = document.querySelectorAll('.internal-link')
     const externalLinks = document.querySelectorAll('.external-link')
@@ -37,7 +36,7 @@ describe('link testing', () => {
   })
 
   it('content-type classes are brought in appropriately', () => {
-    const sfc = composeSfcBlocks('', md, { linkTransforms: link() })
+    const sfc = composeSfcBlocks('', md, { builders: [link()] })
     document.body.innerHTML = sfc.html
     const imageLinks = document.querySelectorAll('.image-reference')
     const docLinks = document.querySelectorAll('.doc-reference')
@@ -49,11 +48,11 @@ describe('link testing', () => {
   })
 
   it('custom rules add classes as expected', () => {
-    const sfc = composeSfcBlocks('', md, resolveOptions({
-      linkTransforms: link({
+    const sfc = composeSfcBlocks('', md, {
+      builders: [link({
         ruleBasedClasses: [[/colors\.com/, 'colorful']],
-      }),
-    }))
+      })],
+    })
     document.body.innerHTML = sfc.html
     const colorful = document.querySelectorAll('.colorful')
 
@@ -64,47 +63,47 @@ describe('link testing', () => {
   })
 
   it('internal index route reference to a markdown file is cleaned up', () => {
-    const sfc = composeSfcBlocks('', md, resolveOptions({ linkTransforms: link({ useRouterLinks: false }) }))
+    const sfc = composeSfcBlocks('', md, { builders: [link({ useRouterLinks: false })] })
     document.body.innerHTML = sfc.html
     const internal = document.querySelectorAll('.internal-link')
     const indexRoute = internal.find(i => i.textContent === 'index route')
     expect(indexRoute).not.toBeUndefined()
-    expect(indexRoute.getAttribute('href')).toEqual('/foobar/')
+    expect(indexRoute?.getAttribute('href')).toEqual('/foobar/')
 
     // double check that conversion to router link works in the same way
-    const sfc2 = composeSfcBlocks('', md, { linkTransforms: link() })
+    const sfc2 = composeSfcBlocks('', md, { builders: [link()] })
     document.body.innerHTML = sfc2.html
     const internal2 = document.querySelectorAll('.internal-link')
     const indexRoute2 = internal2.find(i => i.textContent === 'index route')
     expect(indexRoute2).not.toBeUndefined()
-    expect(indexRoute2.getAttribute('href')).toBeNull()
-    expect(indexRoute2.getAttribute('to')).toEqual('/foobar/')
+    expect(indexRoute2?.getAttribute('href')).toBeNull()
+    expect(indexRoute2?.getAttribute('to')).toEqual('/foobar/')
   })
 
   it('internal non-index route with MD in href is shortened to route path', () => {
-    const sfc = composeSfcBlocks('repo/src/pages/current.md', md, { linkTransforms: link({ useRouterLinks: false }) })
+    const sfc = composeSfcBlocks('repo/src/pages/current.md', md, { builders: [link({ useRouterLinks: false })] })
     document.body.innerHTML = sfc.html
     const internal = document.querySelectorAll('.internal-link')
     const nonIndexRoute = internal.find(i => i.textContent === 'non-index route')
     expect(nonIndexRoute).not.toBeUndefined()
-    expect(nonIndexRoute.getAttribute('href')).toEqual('foo/bar')
+    expect(nonIndexRoute?.getAttribute('href')).toEqual('foo/bar')
   })
 
   it('external routes with .md reference are left as is', () => {
-    const sfc = composeSfcBlocks('', md, resolveOptions({ linkTransforms: link() }))
+    const sfc = composeSfcBlocks('', md, { builders: [link()] })
     document.body.innerHTML = sfc.html
     const external = document.querySelectorAll('.external-link')
     const indexRoute = external.find(i => i.textContent === 'external index routes')
     expect(indexRoute).not.toBeUndefined()
-    expect(indexRoute.getAttribute('href')).toEqual('https://dev.null/foo/index.md')
+    expect(indexRoute?.getAttribute('href')).toEqual('https://dev.null/foo/index.md')
 
     const nonIndexRoute = external.find(i => i.textContent === 'external non-index routes')
     expect(nonIndexRoute).not.toBeUndefined()
-    expect(nonIndexRoute.getAttribute('href')).toEqual('https://dev.null/foo/bar.md')
+    expect(nonIndexRoute?.getAttribute('href')).toEqual('https://dev.null/foo/bar.md')
   })
 
   it('"base" option set changes link resolution for relative links', () => {
-    const sfc = composeSfcBlocks('', md, { linkTransforms: link({ relativeLinkClass: 'relative-link' }) }, { base: 'one' })
+    const sfc = composeSfcBlocks('', md, { builders: [link({ relativeLinkClass: 'relative-link' })] }, { base: 'one' })
     document.body.innerHTML = sfc.html
 
     const links = document.querySelectorAll('.relative-link')
@@ -119,7 +118,7 @@ describe('link testing', () => {
   })
 
   it('"base" option set changes link resolution for fully qualified local links', () => {
-    const sfc = composeSfcBlocks('', md, { linkTransforms: link({ fullyQualifiedLinkClass: 'fq-link' }) }, { base: 'one' })
+    const sfc = composeSfcBlocks('', md, { builders: [link({ fullyQualifiedLinkClass: 'fq-link' })] }, { base: 'one' })
     document.body.innerHTML = sfc.html
 
     const links = document.querySelectorAll('.fq-link')
@@ -133,12 +132,12 @@ describe('link testing', () => {
     }
   })
 
-  it('reactive "path" adjusts relative links', () => {
+  it.todo('reactive "path" adjusts relative links', () => {
     const path = ref('foo/bar/baz')
   })
 
   it('internal routes are converted to `<router-link>` elements by default', () => {
-    const sfc = composeSfcBlocks('', md, { linkTransforms: link() })
+    const sfc = composeSfcBlocks('', md, { builders: [link()] })
     document.body.innerHTML = sfc.html
 
     const internal = document.querySelectorAll('.internal-link')

@@ -1,4 +1,4 @@
-import type { Options, ViteConfig } from './types'
+import type { Options, ViteConfig } from './@types'
 import { composeSfcBlocks } from './pipeline/index'
 
 /**

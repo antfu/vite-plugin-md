@@ -1,105 +1,63 @@
 // Vitest Snapshot v1
 
-exports[`transform > basic 1`] = `
-"<template><div class=\\"markdown-body\\"><h1>Hello</h1>
+exports[`transform snapshots > customBlocks remain the same 1`] = `
+[
+  "<style>h1 { color: red }</style>",
+]
+`;
+
+exports[`transform snapshots > frontmatter remains the same 1`] = `
+{
+  "description": "hello world",
+  "excerpt": undefined,
+  "hello": "how friendly",
+  "title": "transform tests",
+}
+`;
+
+exports[`transform snapshots > head props remains the same 1`] = `
+{
+  "description": "hello world",
+  "excerpt": undefined,
+  "hello": "how friendly",
+  "title": "transform tests",
+}
+`;
+
+exports[`transform snapshots > html remains the same 1`] = `
+"<div class=\\"markdown-body\\"><h1>Hello</h1>
+<style>h1 { color: red }</style>
+<script setup lang=\\"ts\\">
+import Foo from './Foo.vue'
+</script>
 <ul>
 <li>A</li>
 <li>B</li>
 <li>C</li>
 </ul>
-</div></template>
-<script setup>
-const frontmatter = {\\"title\\":\\"Hey\\"}
-defineExpose({ frontmatter })
-</script>
-<script>
-export const title = \\"Hey\\"
-</script>
-
-"
-`;
-
-exports[`transform > couldn't expose frontmatter 1`] = `
-"<template><div class=\\"markdown-body\\">
-</div></template>
-<script setup>
-const frontmatter = {\\"title\\":\\"Hey\\"}
-
-defineExpose({ test: 'test'})
-
-</script>
-<script>
-export const title = \\"Hey\\"
-</script>
-
-"
-`;
-
-exports[`transform > escapeCodeTagInterpolation 1`] = `
-"<template><div class=\\"markdown-body\\"><div>{{hello}}</div>
-<pre><code class=\\"language-ts\\" v-pre>&lt;div&gt;{{hello}}&lt;/div&gt;
+<h2>Escaping Code Tag Interpolation</h2>
+<div>{{hello}}</div>
+<p>When the markdown below is parsed – assuming the default behavior of “escapeCodeTagInterpolation” is set – it should be translated to include a “pre” attribute on the <code>code</code> tag so that VueJS does not interpolate this as a variable:</p>
+<pre><code class=\\"language-html\\" v-pre>&lt;div&gt;{{hello}}&lt;/div&gt;
 </code></pre>
-</div></template>
-<script setup>
-const frontmatter = {}
-defineExpose({ frontmatter })
-</script>
-
-"
+<p>By contrast, the below code fence will take on the opposite behavior:</p>
+<pre><code class=\\"language-ts\\">const theValue = {{ hello }};
+</code></pre>
+</div>"
 `;
 
-exports[`transform > exposes frontmatter 1`] = `
-"<template><div class=\\"markdown-body\\"><h1>Hello</h1>
-</div></template>
-<script setup>
-const frontmatter = {\\"title\\":\\"Hey\\"}
-defineExpose({ frontmatter })
-</script>
-<script>
-export const title = \\"Hey\\"
-</script>
+exports[`transform snapshots > meta props remains the same 1`] = `[]`;
 
-"
-`;
-
-exports[`transform > frontmatter interpolation 1`] = `
-"<template><div class=\\"markdown-body\\"><h1>Hello World</h1>
-<p>This is {{frontmatter.name}}</p>
-</div></template>
-<script setup>
-const frontmatter = {\\"name\\":\\"My Cool App\\"}
-defineExpose({ frontmatter })
-</script>
-<script>
-export const name = \\"My Cool App\\"
-</script>
-
-"
-`;
-
-exports[`transform > script setup 1`] = `
-"<template><div class=\\"markdown-body\\"><h1>Hello</h1>
-
-</div></template>
-<script setup>
-const frontmatter = {}
-defineExpose({ frontmatter })
-
+exports[`transform snapshots > script blocks remain the same 1`] = `
+"<script setup>
 import Foo from './Foo.vue'
 
-</script>
-
-"
-`;
-
-exports[`transform > style 1`] = `
-"<template><div class=\\"markdown-body\\"><h1>Hello</h1>
-
-</div></template>
-<script setup>
-const frontmatter = {}
+const frontmatter = {\\"title\\":\\"transform tests\\",\\"description\\":\\"hello world\\",\\"hello\\":\\"how friendly\\"}
+ const title = \\"transform tests\\"
+ const description = \\"hello world\\"
+ const hello = \\"how friendly\\"
+ const excerpt = undefined
 defineExpose({ frontmatter })
-</script>
-<style>h1 { color: red }</style>
-"
+const head = {\\"title\\":\\"transform tests\\",\\"description\\":\\"hello world\\",\\"hello\\":\\"how friendly\\"}
+</script>"
 `;

@@ -1,4 +1,4 @@
-import type { Frontmatter, MetaProperty, ResolvedOptions } from './types'
+import type { Frontmatter, MetaProperty, ResolvedOptions } from './@types'
 
 const headProperties = [
   'title',
