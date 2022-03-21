@@ -30,6 +30,7 @@
   "bugs": "https://github.com/antfu/vite-plugin-md/issues",
   "scripts": {
     "dev": "npm run build -- --watch",
+    "change": "npx changeset",
     "example:dev": "cp README.md example/README.md && npm -C example run dev",
     "example:build": "cp README.md example/README.md && npm -C example run build",
     "build": "tsup src/index.ts --dts --format cjs,esm",
@@ -56,6 +57,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^0.18.9",
     "@antfu/ni": "^0.13.2",
+    "@changesets/cli": "^2.21.1",
     "@types/node": "^14.18.12",
     "@typescript-eslint/eslint-plugin": "^5.15.0",
     "@typescript-eslint/parser": "^5.15.0",

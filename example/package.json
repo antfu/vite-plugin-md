@@ -1,4 +1,5 @@
 {
+  "name": "@vite-plugin-md/example",
   "private": true,
   "scripts": {
     "dev": "cross-env DEBUG=vite-plugin-md:* vite",
