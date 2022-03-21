@@ -1,7 +1,6 @@
 import { readFile } from 'fs/promises'
-import { describe, expect, it } from 'vitest'
-import { createMarkdown } from '../src/markdown'
-import { resolveOptions } from '../src/options'
+import { beforeAll, describe, expect, it } from 'vitest'
+import { composeSfcBlocks } from '../src/pipeline'
 import type { MetaProperty, ResolvedOptions } from '../src/types'
 
 const frontmatterPreprocess: ResolvedOptions['frontmatterPreprocess'] = (fm) => {
@@ -22,31 +21,72 @@ const frontmatterPreprocess: ResolvedOptions['frontmatterPreprocess'] = (fm) => 
   return {
     head: { ...frontmatter, meta },
     frontmatter: { ...frontmatter, meta },
+    metaProps: [],
+    routeMeta: {},
   }
 }
 
-describe('provide bespoke frontmatter processor', () => {
-  it('inline markdown is used over default properties', async() => {
-    const parser = createMarkdown(resolveOptions({ frontmatterPreprocess }))
-    const md = parser('', await readFile('test/fixtures/simple.md', 'utf-8'))
+let md = ''
+
+describe('frontmatter pre-processor', () => {
+  beforeAll(async () => {
+    md = await readFile('test/fixtures/simple.md', 'utf-8')
+  })
+
+  it('frontmatter is unchanged', () => {
+    const { frontmatter } = composeSfcBlocks('', md, { frontmatterPreprocess, headEnabled: true })
+    expect(frontmatter).toMatchSnapshot()
+  })
+
+  it('head is unchanged', () => {
+    const { head } = composeSfcBlocks('', md, { frontmatterPreprocess, headEnabled: true })
+    expect(head).toMatchSnapshot()
+  })
+
+  it('meta props are unchanged', () => {
+    const { meta } = composeSfcBlocks('', md, { frontmatterPreprocess, headEnabled: true })
+    expect(meta).toMatchSnapshot()
+  })
+
+  it('inline markdown is used over default properties', async () => {
+    const { frontmatter } = composeSfcBlocks('', md, { frontmatterPreprocess, headEnabled: true })
+
     // Positive tests
     expect(
-      md.includes('Hello World'),
+      frontmatter.title?.includes('Hello World'),
       'the title attribute is retained over the default \'title\' value',
     ).toBeTruthy()
+
     expect(
-      md.includes('testing is the path to true happiness'),
+      frontmatter.description?.includes('testing is the path to true happiness'),
       'description property is also retained',
     ).toBeTruthy()
+
     // Negative tests
     expect(
-      md.includes('default title'),
+      frontmatter.title?.includes('default title'),
       'the title attribute is retained over the default \'title\' value',
     ).toBeFalsy()
-    expect(md.includes('default description'), 'default description is ignored').toBeFalsy()
 
+    expect(
+      frontmatter.description?.includes('default description'),
+      'default description is ignored',
+    ).toBeFalsy()
+  })
+
+  it('meta and head props are populated based on default rules', async () => {
+    const { head, meta } = composeSfcBlocks('', md, { frontmatterPreprocess, headEnabled: true })
     // Meta props
-    expect(md.includes('og:title')).toBeTruthy()
-    expect(md.includes('og:description')).toBeTruthy()
+    const title = meta.find(i => i.property === 'og:title')
+    const desc = meta.find(i => i.property === 'og:description')
+
+    expect(head).toBeDefined()
+    expect(head.title).toBeDefined()
+    expect(head.meta).toBeDefined()
+
+    expect(title).toBeDefined()
+    expect(desc).toBeDefined()
+    expect(title?.property).toEqual('og:title')
+    expect(desc?.property).toEqual('og:description')
   })
 })

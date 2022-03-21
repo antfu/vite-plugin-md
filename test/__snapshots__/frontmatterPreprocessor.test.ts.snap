@@ -1,0 +1,60 @@
+// Vitest Snapshot v1
+
+exports[`frontmatter pre-processor > frontmatter is unchanged 1`] = `
+{
+  "description": "testing is the path to true happiness",
+  "excerpt": undefined,
+  "meta": [
+    {
+      "content": "Hello World",
+      "property": "og:title",
+    },
+    {
+      "content": "testing is the path to true happiness",
+      "property": "og:description",
+    },
+    {
+      "content": "testing is the path to true happiness",
+      "name": "description",
+    },
+  ],
+  "title": "Hello World",
+}
+`;
+
+exports[`frontmatter pre-processor > head is unchanged 1`] = `
+{
+  "meta": [
+    {
+      "content": "Hello World",
+      "property": "og:title",
+    },
+    {
+      "content": "testing is the path to true happiness",
+      "property": "og:description",
+    },
+    {
+      "content": "testing is the path to true happiness",
+      "name": "description",
+    },
+  ],
+  "title": "Hello World",
+}
+`;
+
+exports[`frontmatter pre-processor > meta props are unchanged 1`] = `
+[
+  {
+    "content": "Hello World",
+    "property": "og:title",
+  },
+  {
+    "content": "testing is the path to true happiness",
+    "property": "og:description",
+  },
+  {
+    "content": "testing is the path to true happiness",
+    "name": "description",
+  },
+]
+`;

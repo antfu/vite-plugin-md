@@ -17,10 +17,24 @@ Install
 npm i vite-plugin-md -D # yarn add vite-plugin-md -D
 ```
 
-Add it to `vite.config.js`
+### TypeScript Shim
+_where needed:_
+```ts
+declare module '*.vue' {
+  import type { ComponentOptions, ComponentOptions } from 'vue'
+  const Component: ComponentOptions
+  export default Component
+}
+
+declare module '*.md' {
+  const Component: ComponentOptions
+  export default Component
+}
+```
+
+then add the following to `vite.config.js`
 
 ```ts
-// vite.config.js
 import Vue from '@vitejs/plugin-vue'
 import Markdown from 'vite-plugin-md'
 
@@ -29,7 +43,7 @@ export default {
     Vue({
       include: [/\.vue$/, /\.md$/], // <--
     }),
-    Markdown()
+    Markdown(),
   ],
 }
 ```
@@ -122,8 +136,9 @@ To manage document head and meta, you would need to install [`@vueuse/head`](htt
 npm i @vueuse/head
 ```
 
+then in your `vite.config.js`:
+
 ```js
-// vite.config.js
 import Vue from '@vitejs/plugin-vue'
 import Markdown from 'vite-plugin-md'
 
@@ -133,14 +148,14 @@ export default {
       include: [/\.vue$/, /\.md$/],
     }),
     Markdown({
-      headEnabled: true // <--
-    })
-  ]
+      headEnabled: true, // <--
+    }),
+  ],
 }
 ```
 
+`src/main.js`
 ```js
-// src/main.js
 import { createApp } from 'vue'
 import { createHead } from '@vueuse/head' // <--
 
@@ -163,38 +178,64 @@ meta:
 
 For more options available, please refer to [`@vueuse/head`'s docs](https://github.com/vueuse/head).
 
-## Options
+## Configuration / Options
 
-`vite-plugin-md` uses [`markdown-it`](https://github.com/markdown-it/markdown-it) under the hood, see [`markdown-it`'s docs](https://markdown-it.github.io/markdown-it/) for more details
+1. **Options Hash**
 
-```ts
-// vite.config.js
-import Markdown from 'vite-plugin-md'
+   The configuration for this plugin is a fully typed dictionary of options and therefore is largely self-documenting.
 
-export default {
-  plugins: [
-    Markdown({
-      // default options passed to markdown-it
-      // see: https://markdown-it.github.io/markdown-it/
-      markdownItOptions: {
-        html: true,
-        linkify: true,
-        typographer: true,
+   See [the tsdoc](./src/types.ts) for more advanced options
+
+2. **Markdown-It** plugins (and options)
+
+   Under the hood this plugin leverages [`markdown-it`](https://github.com/markdown-it/markdown-it) for converting Markdown content to HTML. This parser is very mature and has a rich set of plugins that you use quite easily. If you don't find what you want you can also build your own plugin relatively easily [ [docs](https://markdown-it.github.io/markdown-it/) ].
+
+   Whether you're _using_ or _building_ a plugin, you will incorporate it into this plugin using the `markdownItSetup` property. Alternatively you can also set configuration options of **markdown-it** with `markdownItOptions`:
+
+      ```ts
+      // vite.config.js
+      import Markdown from 'vite-plugin-md'
+
+      export default {
+        plugins: [
+          Markdown({
+            markdownItOptions: {
+              html: true,
+              linkify: true,
+              typographer: true,
+            },
+            markdownItSetup(md) {
+              // add anchor links to your H[x] tags
+              md.use(require('markdown-it-anchor'))
+              // add code syntax highlighting with Prism
+              md.use(require('markdown-it-prism'))
+            }
+          ),
+        ]
       },
-      // A function providing the Markdown It instance gets the ability to apply custom settings/plugins
-      markdownItSetup(md) {
-        // for example
-        md.use(require('markdown-it-anchor'))
-        md.use(require('markdown-it-prism'))
-      },
-      // Class names for the wrapper div
-      wrapperClasses: 'markdown-body'
-    })
-  ],
-}
-```
+      ```
 
-See [the tsdoc](./src/types.ts) for more advanced options
+  3. [`Builder APIs`](./docs/BuilderApi.md)      
+
+      Builder API's are mini-configurators for a particular feature area. The idea behind them is to allow extending functionality quickly with _sensible defaults_ but also providing their own configurations to allow users to grow into and configure that feature area. The builder APIs available are:
+
+        - [Link Builder](./docs/LinkBuilder.md)
+        - [Meta Builder](./docs/MetaBuilder.md)
+
+      If you wanted to use both of these builders in their default configuration, you would simply add the following to your options config for this plugin:
+
+      ```ts
+      import Markdown, { link, meta } from 'markdown-it-md'
+      export default {
+        plugins: [
+          Markdown({
+            builders: [link(), meta()],
+          }),
+        ],
+      }
+      ```
+
+      If you're interested in building your own you can refer to the [Builder API](./docs/BuilderApi.md) docs.
 
 ## Example
 
@@ -204,65 +245,13 @@ Or the pre-configured starter template [Vitesse](https://github.com/antfu/vitess
 
 ## Integrations
 
-### Work with [vite-plugin-voie](https://github.com/vamplate/vite-plugin-voie)
+This plugin has good integrations with several other plugins, including:
 
-```ts
-import Markdown from 'vite-plugin-md'
-import Voie from 'vite-plugin-voie'
+- [`vite-plugin-pages`](https://github.com/hannoeru/vite-plugin-pages)
+- [`vite-plugin-components`](https://github.com/antfu/vite-plugin-components)
+- [`vite-plugin-vue-layouts`](https://github.dev/JohnCampionJr/vite-plugin-vue-layouts)
+- for details, refer to the [Integration Page](./docs/Integrations.md)
 
-export default {
-  plugins: [
-    Voie({
-      extensions: ['vue', 'md'],
-    }),
-    Markdown()
-  ],
-}
-```
-
-Put your markdown under `./src/pages/xx.md`, then you can access the page via route `/xx`.
-
-
-### Work with [vite-plugin-components](https://github.com/antfu/vite-plugin-components)
-
-`vite-plugin-components` allows you to do on-demand components auto importing without worrying about registration.
-
-```ts
-import Markdown from 'vite-plugin-md'
-import ViteComponents from 'vite-plugin-components'
-
-export default {
-  plugins: [
-    Markdown(),
-    // should be placed after `Markdown()`
-    ViteComponents({
-      // allow auto load markdown components under `./src/components/`
-      extensions: ['vue', 'md'],
-
-      // allow auto import and register components used in markdown
-      customLoaderMatcher: path => path.endsWith('.md'),
-    })
-  ],
-}
-```
-
-Components under `./src/components` can be directly used in markdown components, and markdown components can also be put under `./src/components` to be auto imported.
-
-## TypeScript Shim
-
-```ts
-declare module '*.vue' {
-  import { ComponentOptions } from 'vue'
-  const Component: ComponentOptions
-  export default Component
-}
-
-declare module '*.md' {
-  import { ComponentOptions } from 'vue'
-  const Component: ComponentOptions
-  export default Component
-}
-```
 
 ## License
 
