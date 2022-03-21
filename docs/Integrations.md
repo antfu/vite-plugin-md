@@ -13,7 +13,7 @@ export default {
     Voie({
       extensions: ['vue', 'md'],
     }),
-    Markdown()
+    Markdown(),
   ],
 }
 ```
@@ -41,7 +41,7 @@ export default {
 
       // allow auto import and register components used in markdown
       customLoaderMatcher: path => path.endsWith('.md'),
-    })
+    }),
   ],
 }
 ```

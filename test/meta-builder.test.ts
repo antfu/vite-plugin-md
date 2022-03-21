@@ -8,7 +8,7 @@ import { composeSfcBlocks } from '../src/pipeline'
 let md = ''
 
 describe('use "meta" builder for frontmatterPreprocess', () => {
-  beforeAll(async () => {
+  beforeAll(async() => {
     md = await readFile('test/fixtures/meta.md', 'utf-8')
   })
 
@@ -70,7 +70,7 @@ describe('use "meta" builder for frontmatterPreprocess', () => {
 })
 
 describe('meta() snapshots', () => {
-  beforeAll(async () => {
+  beforeAll(async() => {
     md = await readFile('test/fixtures/meta.md', 'utf-8')
   })
 

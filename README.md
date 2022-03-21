@@ -209,10 +209,10 @@ For more options available, please refer to [`@vueuse/head`'s docs](https://gith
               md.use(require('markdown-it-anchor'))
               // add code syntax highlighting with Prism
               md.use(require('markdown-it-prism'))
-            }
-          ),
-        ]
-      },
+            },
+          }),
+        ],
+      }
       ```
 
   3. [`Builder APIs`](./docs/BuilderApi.md)      

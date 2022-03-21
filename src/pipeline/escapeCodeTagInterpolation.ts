@@ -17,7 +17,7 @@ export function escapeCodeTagInterpolation(payload: Pipeline<PipelineStage.parse
   if (escapeCodeTagInterpolation) {
     const match = html.matchAll(/<code.*?language-([!]{0,1})(\w+).*?>/g)
     for (const m of match) {
-      // eslint-disable-next-line typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const [codeTag, negation, lang] = m
       fencedLanguages.add(lang)
       if (negation !== '!')
@@ -29,7 +29,7 @@ export function escapeCodeTagInterpolation(payload: Pipeline<PipelineStage.parse
   else {
     const match = html.matchAll(/<code.*?language-([!]{0,1})(\w+).*?>/g)
     for (const m of match) {
-      // eslint-disable-next-line typescript-eslint/no-unused-vars
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const [codeTag, negation, lang] = m
       fencedLanguages.add(lang)
       if (negation === '!')

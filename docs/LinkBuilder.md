@@ -9,10 +9,10 @@ In all cases, this configurator is meant to be plugged into the `linkTransforms`
 import Markdown, { link } from 'vite-plugin-md'
 
 export default defineConfig({
-    // ...
-    plugins: [
-        Markdown({ linkTransforms: link() }),
-    ],
+  // ...
+  plugins: [
+    Markdown({ linkTransforms: link() }),
+  ],
 })
 ```
 

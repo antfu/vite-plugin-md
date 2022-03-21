@@ -16,7 +16,7 @@ export function getVueVersion(defaultVersion = '3.2.0') {
 export type Keys<
   T extends Record<string, any> | readonly string[],
   W extends string | undefined = undefined,
-  > = T extends readonly string[]
+> = T extends readonly string[]
   ? W extends string ? Exclude<T[number], W> : T[number]
   : W extends string ? Exclude<keyof T & string, W> : keyof T & string
 
