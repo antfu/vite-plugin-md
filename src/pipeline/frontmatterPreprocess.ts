@@ -1,4 +1,4 @@
-import type { MetaProperty, Pipeline, PipelineStage } from '../@types'
+import type { MetaProperty, Pipeline, PipelineStage } from '../types'
 
 /**
  * Runs the `frontmatterPreprocess()` hook unless configured not to.

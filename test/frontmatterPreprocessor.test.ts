@@ -1,7 +1,7 @@
 import { readFile } from 'fs/promises'
 import { beforeAll, describe, expect, it } from 'vitest'
 import { composeSfcBlocks } from '../src/pipeline'
-import type { MetaProperty, ResolvedOptions } from '../src/@types'
+import type { MetaProperty, ResolvedOptions } from '../src/types'
 
 const frontmatterPreprocess: ResolvedOptions['frontmatterPreprocess'] = (fm) => {
   const frontmatter = {
@@ -29,7 +29,7 @@ const frontmatterPreprocess: ResolvedOptions['frontmatterPreprocess'] = (fm) => 
 let md = ''
 
 describe('frontmatter pre-processor', () => {
-  beforeAll(async() => {
+  beforeAll(async () => {
     md = await readFile('test/fixtures/simple.md', 'utf-8')
   })
 
@@ -48,7 +48,7 @@ describe('frontmatter pre-processor', () => {
     expect(meta).toMatchSnapshot()
   })
 
-  it('inline markdown is used over default properties', async() => {
+  it('inline markdown is used over default properties', async () => {
     const { frontmatter } = composeSfcBlocks('', md, { frontmatterPreprocess, headEnabled: true })
 
     // Positive tests
@@ -74,7 +74,7 @@ describe('frontmatter pre-processor', () => {
     ).toBeFalsy()
   })
 
-  it('meta and head props are populated based on default rules', async() => {
+  it('meta and head props are populated based on default rules', async () => {
     const { head, meta } = composeSfcBlocks('', md, { frontmatterPreprocess, headEnabled: true })
     // Meta props
     const title = meta.find(i => i.property === 'og:title')

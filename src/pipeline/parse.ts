@@ -1,4 +1,4 @@
-import type { Pipeline, PipelineStage } from '../@types'
+import type { Pipeline, PipelineStage } from '../types'
 
 /**
  * Using the MarkdownIt parser we are able to extract raw HTML content

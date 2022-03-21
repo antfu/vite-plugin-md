@@ -2,13 +2,13 @@ import { readFile } from 'fs/promises'
 import { beforeAll, describe, expect, it } from 'vitest'
 import { resolveOptions } from '../src/options'
 import { meta } from '../src/index'
-import type { Options } from '../src/@types'
+import type { Options } from '../src/types'
 import { composeSfcBlocks } from '../src/pipeline'
 
 let md = ''
 
 describe('use "meta" builder for frontmatterPreprocess', () => {
-  beforeAll(async() => {
+  beforeAll(async () => {
     md = await readFile('test/fixtures/meta.md', 'utf-8')
   })
 
@@ -70,7 +70,7 @@ describe('use "meta" builder for frontmatterPreprocess', () => {
 })
 
 describe('meta() snapshots', () => {
-  beforeAll(async() => {
+  beforeAll(async () => {
     md = await readFile('test/fixtures/meta.md', 'utf-8')
   })
 

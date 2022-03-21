@@ -1,15 +1,15 @@
-import type { Frontmatter, MetaProperty } from '../../@types'
+import type { Frontmatter, MetaProperty } from '../../types'
 import { createBuilder } from '../createBuilder'
 
 export type MetaFlag = [prop: string, defVal: boolean]
 
 export type HeadProperties = 'title'
-| 'link'
-| 'base'
-| 'style'
-| 'script'
-| 'htmlAttrs'
-| 'bodyAttrs'
+  | 'link'
+  | 'base'
+  | 'style'
+  | 'script'
+  | 'htmlAttrs'
+  | 'bodyAttrs'
 
 export type DefaultValueCallback = (fm: Frontmatter) => any
 

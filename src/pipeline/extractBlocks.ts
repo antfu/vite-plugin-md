@@ -2,7 +2,7 @@ import type {
   Pipeline,
   PipelineStage,
   ResolvedOptions,
-} from '../@types'
+} from '../types'
 import { isVue2, wrap } from '../utils'
 
 const scriptSetupRE = /<\s*script[^>]*\bsetup\b[^>]*>([\s\S]*)<\/script>/mg

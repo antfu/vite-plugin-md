@@ -1,6 +1,6 @@
 import matter from 'gray-matter'
-import type { ExcerptFunction, Pipeline, PipelineStage } from '../@types'
-import type { GraymatterOptions } from '../@types/core'
+import type { ExcerptFunction, Pipeline, PipelineStage } from '../types'
+import type { GraymatterOptions } from '../types/core'
 
 /**
  * Extracts meta data for the page:

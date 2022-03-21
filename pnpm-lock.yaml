@@ -12,7 +12,7 @@ importers:
       '@types/node': ^14.18.12
       '@typescript-eslint/eslint-plugin': ^5.15.0
       '@typescript-eslint/parser': ^5.15.0
-      '@vitest/ui': ^0.7.6
+      '@vitest/ui': ^0.7.7
       '@vue/runtime-core': ^3.2.31
       '@vue/test-utils': ^2.0.0-rc.18
       bumpp: ^7.1.1
@@ -20,7 +20,7 @@ importers:
       eslint-config-prettier: ^8.5.0
       fp-ts: ^2.11.9
       gray-matter: ^4.0.3
-      happy-dom: ^2.49.0
+      happy-dom: ^2.49.2
       markdown-it: ^12.3.2
       rollup: ^2.70.1
       tsup: ^5.12.1
@@ -28,7 +28,7 @@ importers:
       vite: ^2.8.6
       vite-plugin-pages: ^0.22.0
       vite-plugin-vue-layouts: ^0.6.0
-      vitest: ^0.7.6
+      vitest: ^0.7.7
       vue: ^3.2.31
       vue-router: ^4.0.14
     dependencies:
@@ -45,19 +45,19 @@ importers:
       '@types/node': 14.18.12
       '@typescript-eslint/eslint-plugin': 5.15.0_f2c49ce7d0e93ebcfdb4b7d25b131b28
       '@typescript-eslint/parser': 5.15.0_eslint@8.11.0+typescript@4.6.2
-      '@vitest/ui': 0.7.6
+      '@vitest/ui': 0.7.7
       '@vue/test-utils': 2.0.0-rc.18_vue@3.2.31
       bumpp: 7.1.1
       eslint: 8.11.0
       eslint-config-prettier: 8.5.0_eslint@8.11.0
-      happy-dom: 2.49.0
+      happy-dom: 2.49.2
       rollup: 2.70.1
       tsup: 5.12.1_typescript@4.6.2
       typescript: 4.6.2
       vite: 2.8.6
       vite-plugin-pages: 0.22.0_vite@2.8.6
       vite-plugin-vue-layouts: 0.6.0_da2b5bfcc9ee38bfd25c98b31b35c29d
-      vitest: 0.7.6_4eb56a78d1929453a48c60cb00eb41d8
+      vitest: 0.7.7_87c20bf7950ae73ababeac1de69a7f78
       vue: 3.2.31
       vue-router: 4.0.14_vue@3.2.31
 
@@ -520,8 +520,8 @@ packages:
       vue: 3.2.30
     dev: true
 
-  /@vitest/ui/0.7.6:
-    resolution: {integrity: sha512-UX99oH1XM9XXi6Py26CbzlqLhG8kOXVB2n7nneoj1uU+C9mKCaVKX8eN4reRU49ntby9FAMAVq4uIkVcAMHIAA==}
+  /@vitest/ui/0.7.7:
+    resolution: {integrity: sha512-r+8w1AlUUWcHmAbNbm2wuhhtLqAL5EPtgE2MYCF3/7fjLJUkxRdox8fn/bwqAQGoPTRDOyhLdOZWlJUpk5VKcw==}
     dependencies:
       sirv: 2.0.2
     dev: true
@@ -2230,8 +2230,8 @@ packages:
       strip-bom-string: 1.0.0
     dev: false
 
-  /happy-dom/2.49.0:
-    resolution: {integrity: sha512-mnPY9LmumUs8EmKyAQjutmFn/XzafvQeQ65w7MsZlHqG6OH3MratBzS0N4AAmuB3+F51KFUbUKNF763i3ZV19Q==}
+  /happy-dom/2.49.2:
+    resolution: {integrity: sha512-mZX4ojwi0ejrZ96Gh0CVYmFyGwMidF4RsSR+l7hSw4TVtucCdDp9EF7JmHyufU8dXHVLHXtrqFG2aTUOaiM8nw==}
     dependencies:
       css.escape: 1.5.1
       he: 1.2.0
@@ -3915,9 +3915,9 @@ packages:
       fsevents: 2.3.2
     dev: true
 
-  /vitest/0.7.6_4eb56a78d1929453a48c60cb00eb41d8:
-    resolution: {integrity: sha512-fqk0cn0I2BUpzwLfeZ725JeXJ7WGwDtVcVBksQ6SdyjrBi6aex8t3w70TWgyLOXgylS7FJ8C9DRap4MMgpkqYw==}
-    engines: {node: '>=14.14.0'}
+  /vitest/0.7.7_87c20bf7950ae73ababeac1de69a7f78:
+    resolution: {integrity: sha512-xU7BTB7T7GbcjFBdbZAAp/dIQUwn8bygI+cbw6Yq1oXj60oGRJ+nJ7AXvSOJyaHMTmglEoaqazyDGnCHJBXftw==}
+    engines: {node: '>=v14.19.1'}
     hasBin: true
     peerDependencies:
       '@vitest/ui': '*'
@@ -3936,9 +3936,9 @@ packages:
     dependencies:
       '@types/chai': 4.3.0
       '@types/chai-subset': 1.3.3
-      '@vitest/ui': 0.7.6
+      '@vitest/ui': 0.7.7
       chai: 4.3.6
-      happy-dom: 2.49.0
+      happy-dom: 2.49.2
       local-pkg: 0.4.1
       tinypool: 0.1.2
       tinyspy: 0.3.0

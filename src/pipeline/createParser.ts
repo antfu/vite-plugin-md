@@ -1,5 +1,5 @@
 import MarkdownIt from 'markdown-it'
-import type { Pipeline, PipelineStage } from '../@types'
+import type { Pipeline, PipelineStage } from '../types'
 
 /**
  * Creates a **MarkdownIt** parser instance which this plugin will use for all processing.

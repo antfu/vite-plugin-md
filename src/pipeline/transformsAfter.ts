@@ -1,4 +1,4 @@
-import type { Pipeline, PipelineStage } from '../@types'
+import type { Pipeline, PipelineStage } from '../types'
 
 /**
  * Call's the transformer function provided in `options.after` before finishing

@@ -1,4 +1,4 @@
-import type { Pipeline, PipelineStage } from '../@types'
+import type { Pipeline, PipelineStage } from '../types'
 
 /**
  * if the user has configured the `markdownItSetup(fn)` property, then

@@ -1,8 +1,8 @@
-import type { ResolvedOptions } from './@types'
+import type { ResolvedOptions } from './types'
 
 export function getVueVersion(defaultVersion = '3.2.0') {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    // eslint-disable-next-line typescript-eslint/no-var-requires
     let v = require('vue')
     if (v.default)
       v = v.default
@@ -16,7 +16,7 @@ export function getVueVersion(defaultVersion = '3.2.0') {
 export type Keys<
   T extends Record<string, any> | readonly string[],
   W extends string | undefined = undefined,
-> = T extends readonly string[]
+  > = T extends readonly string[]
   ? W extends string ? Exclude<T[number], W> : T[number]
   : W extends string ? Exclude<keyof T & string, W> : keyof T & string
 

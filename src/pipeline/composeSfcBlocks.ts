@@ -1,6 +1,6 @@
 import { pipe } from 'fp-ts/lib/function'
 import { resolveOptions } from '../options'
-import { PipelineStage } from '../@types'
+import { PipelineStage } from '../types'
 import type {
   BuilderConfig,
   BuilderOptions,
@@ -9,7 +9,7 @@ import type {
   Options,
   Pipeline,
   ViteConfigPassthrough,
-} from '../@types'
+} from '../types'
 import {
   applyMarkdownItOptions,
   escapeCodeTagInterpolation,

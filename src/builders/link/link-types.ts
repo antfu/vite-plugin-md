@@ -1,4 +1,4 @@
-import type { LinkElement } from '../../@types/core'
+import type { LinkElement } from '../../types/core'
 import type { WithTagAndBase } from './md-link'
 
 /**

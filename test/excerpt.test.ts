@@ -2,16 +2,16 @@ import { readFile } from 'fs/promises'
 import { beforeAll, describe, expect, it } from 'vitest'
 import { meta } from '../src'
 import { composeSfcBlocks } from '../src/pipeline'
-import type { Options } from '../src/@types'
+import type { Options } from '../src/types'
 
 let md = ''
 
 describe('excerpt', () => {
-  beforeAll(async() => {
+  beforeAll(async () => {
     md = await readFile('test/fixtures/excerpt-default.md', 'utf-8')
   })
 
-  it('excerpt ignored in body if option set to false', async() => {
+  it('excerpt ignored in body if option set to false', async () => {
     const options: Options = { excerpt: false }
     const sfc = composeSfcBlocks('excerpt.md', md, options)
     const preamble = `\nWhen excerpts are off [${sfc.options.excerpt}, ${sfc.options.grayMatterOptions.excerpt}, sep: ${sfc.options.grayMatterOptions.excerpt_separator}]`
@@ -27,7 +27,7 @@ describe('excerpt', () => {
     ).toBeTruthy()
   })
 
-  it('excerpt found in body if option set to true', async() => {
+  it('excerpt found in body if option set to true', async () => {
     const options: Options = { excerpt: true }
     const sfc = composeSfcBlocks('excerpt.md', md, options)
     expect(sfc.excerpt).toBeTypeOf('string')
@@ -38,7 +38,7 @@ describe('excerpt', () => {
     ).not.toContain('Hello')
   })
 
-  it('excerpt with custom separator found when specified', async() => {
+  it('excerpt with custom separator found when specified', async () => {
     const content = await readFile('test/fixtures/excerpt-custom-sep.md', 'utf-8')
     const options: Options = { excerpt: '<!-- more -->' }
     const sfc = composeSfcBlocks('excerpt.md', content, options)
@@ -48,7 +48,7 @@ describe('excerpt', () => {
     expect(sfc.frontmatter.excerpt).not.toContain('Hello')
   })
 
-  it('frontmatter default is overriden by body excerpt', async() => {
+  it('frontmatter default is overriden by body excerpt', async () => {
     const options: Options = {
       excerpt: true,
       builders: [meta({
@@ -66,7 +66,7 @@ describe('excerpt', () => {
 })
 
 describe('excerpt snapshots', () => {
-  beforeAll(async() => {
+  beforeAll(async () => {
     md = await readFile('test/fixtures/excerpt-default.md', 'utf-8')
   })
 

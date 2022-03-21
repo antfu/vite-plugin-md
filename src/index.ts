@@ -2,7 +2,7 @@ import type { Plugin } from 'vite'
 import { createFilter } from '@rollup/pluginutils'
 import { createSfcComponent } from './createSfcComponent'
 import { resolveOptions } from './options'
-import type { Options } from './@types'
+import type { Options } from './types'
 export { link, meta } from './builders'
 
 function VitePluginMarkdown(userOptions: Options = {}): Plugin {
@@ -37,7 +37,7 @@ function VitePluginMarkdown(userOptions: Options = {}): Plugin {
         return
 
       const defaultRead = ctx.read
-      ctx.read = async function() {
+      ctx.read = async function () {
         return markdownToVue(config)(ctx.file, await defaultRead())
       }
     },

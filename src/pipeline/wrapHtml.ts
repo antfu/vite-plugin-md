@@ -1,4 +1,4 @@
-import type { Pipeline, PipelineStage } from '../@types'
+import type { Pipeline, PipelineStage } from '../types'
 
 /**
  * Wraps the HTML with DIV and/or a VueJS component

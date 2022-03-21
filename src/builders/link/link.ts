@@ -1,7 +1,7 @@
 import { join } from 'path'
 import { pipe } from 'fp-ts/lib/function'
 import { normalizePath } from 'vite'
-import type { LinkElement } from '../../@types'
+import type { LinkElement } from '../../types'
 import { keys } from '../../utils'
 import { createBuilder } from '../createBuilder'
 import type { LinkTransformer, LinkifyConfig, StringTransformer } from './link-types'
@@ -39,7 +39,7 @@ function strTransform(transformer: string | StringTransformer | undefined, meta:
 
 /** returns an array of classes based on the URL and configuration */
 const addClasses = (c: LinkifyConfig): LinkTransformer =>
-/** returns an array of classes based on the URL and configuration */
+  /** returns an array of classes based on the URL and configuration */
   (lnk) => {
     const classes = keys(staticRuleLookup)
       .flatMap((key) => {
@@ -73,7 +73,7 @@ const addClasses = (c: LinkifyConfig): LinkTransformer =>
 
 /** adds "target" and "rel" properties to links */
 const addTargetingAndRel = (c: LinkifyConfig): LinkTransformer =>
-/** adds "target" and "rel" properties to links */
+  /** adds "target" and "rel" properties to links */
   (lnk) => {
     if (isExternalLink(lnk)) {
       lnk.target = strTransform(c.externalTarget, lnk)
@@ -89,7 +89,7 @@ const addTargetingAndRel = (c: LinkifyConfig): LinkTransformer =>
 
 /** works on URL structure and messages based on config */
 const cleanupAndCloseOut = (c: LinkifyConfig): LinkTransformer =>
-/** works on URL structure and messages based on config */
+  /** works on URL structure and messages based on config */
   (lnk) => {
     if (isInternalLink(lnk)) {
       if (lnk.href && lnk.href.trim().endsWith('index.md') && c.cleanIndexRoutes)

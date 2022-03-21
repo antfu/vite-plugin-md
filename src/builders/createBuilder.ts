@@ -1,4 +1,4 @@
-import type { BuilderApi, BuilderHandler, BuilderOptions, BuilderRegistration, IPipelineStage, Pipeline, PipelineStage } from '../@types'
+import type { BuilderApi, BuilderHandler, BuilderOptions, BuilderRegistration, IPipelineStage, Pipeline, PipelineStage } from '../types'
 
 /**
  * A utility function to help you build a type-safe "builder".
@@ -36,12 +36,12 @@ export function createBuilder<E extends IPipelineStage>(name: string, lifecycle:
              */
             handler: <R extends Pipeline<E>>(handler: BuilderHandler<O, E, R>) => {
               return {
-              /**
-               * A utility function to help you build a type-safe "builder".
-               *
-               * Step 5:
-               * - provide additional details describing this builder
-               */
+                /**
+                 * A utility function to help you build a type-safe "builder".
+                 *
+                 * Step 5:
+                 * - provide additional details describing this builder
+                 */
                 meta: (meta: Omit<BuilderRegistration<any, E>, 'name' | 'lifecycle' | 'handler' | 'options'>) => {
                   const registration: Omit<BuilderRegistration<O, E>, 'options'> = {
                     ...meta,

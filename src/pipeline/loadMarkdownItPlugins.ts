@@ -1,5 +1,5 @@
 import { toArray } from '@antfu/utils'
-import type { Pipeline, PipelineStage } from '../@types'
+import type { Pipeline, PipelineStage } from '../types'
 
 /**
  * iterate over each plugin which was supplied in this plugin's
