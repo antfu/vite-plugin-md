@@ -31,13 +31,6 @@ export enum PipelineStage {
   parsed = 'parsed',
 
   /**
-   * The `html` has now had all _script_ blocks extracted from it
-   * and the script blocks are isolated in the `hoistedScripts`
-   * property
-   */
-  hoisted = 'hoisted',
-
-  /**
    * SFC blocks (template, script, and an array of customBlocks) are ready for
    * builders to inspect/mutate/etc.
    */
@@ -100,7 +93,7 @@ export interface BuilderRegistration<O extends BuilderOptions, H extends IPipeli
 /** container of events organized by PipelineStage */
 export type BuilderStruct<T extends string> = Record<PipelineStage | T, any>
 
-export interface AvailablePipelineProps {
+export interface PipelineProperties {
   fileName: string
   /** the raw content in the file being processed */
   content: string
@@ -207,12 +200,12 @@ export type ParsedOmissions =
 export type SfcBlockOmissions = 'component'
 
 export type PipelineAvail<S extends IPipelineStage> = S extends 'initialize'
-  ? Omit<AvailablePipelineProps, InitializedOmissions>
-  : S extends 'metaExtracted' ? Omit<AvailablePipelineProps, MetaOmissions>
-    : S extends 'parser' ? Omit<AvailablePipelineProps, ParserOmissions>
-      : S extends 'parsed' ? Omit<AvailablePipelineProps, ParsedOmissions>
-        : S extends 'sfcBlocksExtracted' ? Omit<AvailablePipelineProps, SfcBlockOmissions>
-          : S extends 'closeout' ? AvailablePipelineProps
+  ? Omit<PipelineProperties, InitializedOmissions>
+  : S extends 'metaExtracted' ? Omit<PipelineProperties, MetaOmissions>
+    : S extends 'parser' ? Omit<PipelineProperties, ParserOmissions>
+      : S extends 'parsed' ? Omit<PipelineProperties, ParsedOmissions>
+        : S extends 'sfcBlocksExtracted' ? Omit<PipelineProperties, SfcBlockOmissions>
+          : S extends 'closeout' ? PipelineProperties
             : never
 
 /**
@@ -229,17 +222,17 @@ export type Pipeline<S extends IPipelineStage, E extends {} = {}> =
  */
 export type BuilderHandler<
   O extends BuilderOptions,
-  E extends IPipelineStage,
-  R extends Pipeline<E> = Pipeline<E>,
-> = (payload: Pipeline<E>, options: O) => R
+  S extends IPipelineStage,
+  R extends Pipeline<S> = Pipeline<S>,
+> = (payload: Pipeline<S>, options: O) => R
 
 /**
  * Builder's must provide an export which meets this API constraint. Basic
  * structure of this higher order function is:
  *
- * - options() -> register( ) -> listen( ) -> payload
+ * - options( ) -> register( ) -> { handler( payload ) -> payload }
  */
-export type BuilderApi<O extends {}, E extends IPipelineStage > = (options?: O) => () => BuilderRegistration<O, E>
+export type BuilderApi<O extends {}, S extends IPipelineStage > = (options?: O) => () => BuilderRegistration<O, S>
 
 export type InlineBuilder = <N extends string, L extends IPipelineStage>(name: N, lifecycle: L) => (payload: Pipeline<L>) => Pipeline<L>
 
@@ -248,11 +241,5 @@ export type InlineBuilder = <N extends string, L extends IPipelineStage>(name: N
  * be allowed to be an empty object
  * */
 export type BuilderOptions = Record<string, any> | {}
-
-// TODO: BELOW is the type i'd like to use but can't find way to index the enum
-
-// export type BuilderConfig = {
-//   [K in keyof UnionToTuple<IPipelineStage>]: BuilderRegistration<any, PipelineStage[K]>[]
-// }[keyof UnionToTuple<IPipelineStage>]
 
 export type BuilderConfig = Record<IPipelineStage, BuilderRegistration<any, any>[] | []>
