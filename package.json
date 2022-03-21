@@ -8,24 +8,24 @@
     "markdown-it"
   ],
   "license": "MIT",
+  "author": "Anthony Fu <anthonyfu117@hotmail.com>",
   "repository": {
     "type": "git",
     "url": "https://github.com/antfu/vite-plugin-md"
   },
   "funding": "https://github.com/sponsors/antfu",
-  "author": "Anthony Fu <anthonyfu117@hotmail.com>",
-  "files": [
-    "dist"
-  ],
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
     }
   },
-  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "homepage": "https://github.com/antfu/vite-plugin-md",
   "bugs": "https://github.com/antfu/vite-plugin-md/issues",
   "scripts": {
@@ -36,8 +36,8 @@
     "test": "vitest",
     "test:ui": "vitest --ui -c test/vite.config.ts",
     "test:update": "vitest -u",
-    "lint": "eslint \"**/*.{ts,vue,mjs}\"",
-    "lint:fix": "eslint \"**/*.{ts,vue,mjs}\" --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "prepublishOnly": "npm run build",
     "release": "bumpp --commit --tag --push"
   },

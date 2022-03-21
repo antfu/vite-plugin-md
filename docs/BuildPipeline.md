@@ -9,26 +9,26 @@ This pipelining processes looks something like this:
 
 ```mermaid
 flowchart LR
-    vite([Vite Config]) --> init
-    plugin([Plugin Options]) --> init
+  vite([Vite Config]) --> init
+  plugin([Plugin Options]) --> init
 
-    subgraph pipeline
-    init[initialize] --> parser[Parser]
-    parser --> pConfig[Parser configured]
-    pConfig --> meta[Meta Extacted]
-    meta --> blocks[SFC Blocks]
-    blocks --> static
-    end
+  subgraph pipeline
+  init[initialize] --> parser[Parser]
+  parser --> pConfig[Parser configured]
+  pConfig --> meta[Meta Extacted]
+  meta --> blocks[SFC Blocks]
+  blocks --> static
+  end
 
-    subgraph Builders
-    builder --> init
-    builder --> choice(( ))
-    choice -.-> meta
-    choice -.-> parser
-    choice -.-> static
-    choice -.-> blocks
+  subgraph Builders
+  builder --> init
+  builder --> choice(( ))
+  choice -.-> meta
+  choice -.-> parser
+  choice -.-> static
+  choice -.-> blocks
 
-    end
+  end
 
 ```
 > Note: always the finest grain and most up-to-date representation will be the _types_ associated with this: see [PipelineStage](../src/%40types/pipeline.ts) and []
@@ -38,62 +38,65 @@ flowchart LR
 - **Initialize**. Builder API's will always get a chance to influence the initialize the _plugin options_ as well as contribute their own specific contribution. The order in which Builders update the _options_ (aka, `ResolvedOptions` data structure) is non-deterministic and so it's good practice to take precautions to be _additive_ where possible rather than _destructive_ to existing configuration.
 - **Other Hooks**. A builder gets to choose one or more hooks where they want to participate in some fashion.
   - By example:
-    - the included [`link`](./LinkBuilder.md) builder hooks into the **Parser** event hook so that it can intercept all links on the page and do it's magic.
-    - the included [`meta`](./MetaBuilder.md) builder hooks into the **Meta Extracted** event and then produces a **Meta Mapped** event for other builders to hook into if they're interested.
+  - the included [`link`](./LinkBuilder.md) builder hooks into the **Parser** event hook so that it can intercept all links on the page and do it's magic.
+  - the included [`meta`](./MetaBuilder.md) builder hooks into the **Meta Extracted** event and then produces a **Meta Mapped** event for other builders to hook into if they're interested.
   - The [`meta`](./MetaBuilder.md) example is interesting because of it's ability to produce a new event and push it back into the pipeline
-    - Let's zoom in a little by imagining a configuration that looks like this:
+  - Let's zoom in a little by imagining a configuration that looks like this:
 
-      ```ts
-      export default {
-          plugins: [
-              Markdown({
-                  builders: [
-                      b1(),
-                      meta(),
-                      b3(),
-                      b => b.add('b4', 'MetaMapped')(ctx => { ...ctx, frontmatter: {
-                          ...ctx.frontmatter,
-                          newProp: 'some value'
-                      }})
-                  ]
-              })
-          ]
-      }
-      ```
+    ```ts
+    export default {
+      plugins: [
+        Markdown({
+          builders: [
+            b1(),
+            meta(),
+            b3(),
+            b => b.add('b4', 'MetaMapped')(ctx => ({
+              ...ctx,
+              frontmatter: {
+                ...ctx.frontmatter,
+                newProp: 'some value',
+              },
+            })),
+          ],
+        }),
+      ],
+    }
+    ```
 
-    - With this configuration, the pipeline executes up to the `MetaExtracted` stage and then calls the builders attached to that event:
-        ```mermaid
-        flowchart LR
+  - With this configuration, the pipeline executes up to the `MetaExtracted` stage and then calls the builders attached to that event:
+    ```mermaid
+    flowchart LR
 
-            subgraph Core Pipeline
-            me[MetaExtracted] --> seq(( ... ))
-            sfc(SFC Blocks)
-            end
+      subgraph Core Pipeline
+      me[MetaExtracted] --> seq(( ... ))
+      sfc(SFC Blocks)
+      end
 
-            subgraph Builders for MetaExtracted
-            b1
-            meta
-            b3
-            done([Done]) --> sfc
-            end
-            
-            subgraph produced events
-            b1 --> bp1([?])
-            seq --> b1
-            bp1 --> meta
-            meta --> mm[MetaMapped]
-            b3 --> bp3([?])
-            bp3 --> done([Done])
-            end
-            
-            subgraph Builders for MetaMapped
-            mm --> b4[b4]
-            b4 --> d2([Done])
-            d2 --> b3
-            end
+      subgraph Builders for MetaExtracted
+      b1
+      meta
+      b3
+      done([Done]) --> sfc
+      end
+      
+      subgraph produced events
+      b1 --> bp1([?])
+      seq --> b1
+      bp1 --> meta
+      meta --> mm[MetaMapped]
+      b3 --> bp3([?])
+      bp3 --> done([Done])
+      end
+      
+      subgraph Builders for MetaMapped
+      mm --> b4[b4]
+      b4 --> d2([Done])
+      d2 --> b3
+      end
 
-        ``` 
-    
+    ``` 
+  
 
 ## Event Payload
 

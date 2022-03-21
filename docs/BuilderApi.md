@@ -1,4 +1,5 @@
 # Builder API
+
 > References: [Build Pipeline](./BuildPipeline.md), [Meta Builder](./MetaBuilder.md), [Link Builder](./LinkBuilder.md)
 
 The builder API is a way of extending the functionality of this plugin by being given access to all the power of Vite, Markdown It, and this plugin's hooks. To create a plugin you only need to create a function with the following interface:
@@ -32,14 +33,14 @@ export type BuilderApi<
 This is made easier by the `createBuilder()` function which keeps the structure intuitive while ensuring strong type safety of the finished builder.
 
 ```ts
-import { createBuilder, PipelineStage} from 'vite-plugin-md'
+import { PipelineStage, createBuilder } from 'vite-plugin-md'
 
 export const builder = createBuilder('myBuilder', PipelineStage.parser)
   .options<MyOptions>()
-  .initializer((payload, options) => { ... })
-  .handler((payload, options) => { ... })
-  .meta({ 
-    description: 'better than sliced bread'
+  .initializer((payload, options) => { /* ... */ })
+  .handler((payload, options) => { /* ... */ })
+  .meta({
+    description: 'better than sliced bread',
   })
 ```
 
