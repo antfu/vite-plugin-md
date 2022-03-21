@@ -40,8 +40,8 @@ export function escapeCodeTagInterpolation(payload: Pipeline<PipelineStage.parse
   // iterate over interpolation replacements
   let updated: string = html
 
-  for (const [k, v] of replacements)
-    updated = updated.replaceAll(k, v)
+  for (const [before, after] of replacements)
+    updated = updated.replace(new RegExp(before, 'g'), after)
 
   return { ...payload, html: updated, fencedLanguages }
 }
