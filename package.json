@@ -7,6 +7,8 @@
     "vite-plugin",
     "markdown-it"
   ],
+  "homepage": "https://github.com/antfu/vite-plugin-md",
+  "bugs": "https://github.com/antfu/vite-plugin-md/issues",
   "license": "MIT",
   "author": "Anthony Fu <anthonyfu117@hotmail.com>",
   "repository": {
@@ -26,20 +28,18 @@
   "files": [
     "dist"
   ],
-  "homepage": "https://github.com/antfu/vite-plugin-md",
-  "bugs": "https://github.com/antfu/vite-plugin-md/issues",
   "scripts": {
-    "dev": "npm run build -- --watch",
-    "example:dev": "cp README.md example/README.md && npm -C example run dev",
-    "example:build": "cp README.md example/README.md && npm -C example run build",
     "build": "tsup src/index.ts --dts --format cjs,esm",
-    "test": "vitest",
-    "test:ui": "vitest --ui -c test/vite.config.ts",
-    "test:update": "vitest -u",
+    "dev": "npm run build -- --watch",
+    "example:build": "cp README.md example/README.md && npm -C example run build",
+    "example:dev": "cp README.md example/README.md && npm -C example run dev",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "prepublishOnly": "npm run build",
-    "release": "bumpp --commit --tag --push"
+    "release": "bumpp --commit --tag --push",
+    "test": "vitest",
+    "test:ui": "vitest --ui -c test/vite.config.ts",
+    "test:update": "vitest -u"
   },
   "peerDependencies": {
     "vite": "^2.0.0"
@@ -49,7 +49,6 @@
     "@rollup/pluginutils": "^4.2.0",
     "@types/markdown-it": "^12.2.3",
     "@vue/runtime-core": "^3.2.31",
-    "fp-ts": "^2.11.9",
     "gray-matter": "^4.0.3",
     "markdown-it": "^12.3.2"
   },
@@ -64,6 +63,7 @@
     "bumpp": "^7.1.1",
     "eslint": "^8.11.0",
     "eslint-config-prettier": "^8.5.0",
+    "fp-ts": "^2.11.9",
     "happy-dom": "^2.49.2",
     "rollup": "^2.70.1",
     "tsup": "^5.12.1",
