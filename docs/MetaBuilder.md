@@ -69,7 +69,7 @@ flowchart LR
 
 - everything starts out as being defined as a _frontmatter_ property and these properties are owned by the Component/Page itself
 - they can then be _mapped_ to:
-  - The integration with `@usevue/head` to manage HEAD and META properties
+  - The integration with `@vueuse/head` to manage HEAD and META properties
   - The `vue-router` (if using `vite-plugin-pages`) for ROUTER meta
 
 ## Configuration
