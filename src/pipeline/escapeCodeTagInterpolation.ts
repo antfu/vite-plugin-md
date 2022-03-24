@@ -1,5 +1,7 @@
 import type { Pipeline, PipelineStage } from '../types'
 
+const codeTagRe = /<code(?:.*?language-([!]{0,1})(\w+))?(.*?)>/g
+
 /**
  * Modifies the HTML based on the configuration of `options.
  * escapeCodeTagInterpolation` and the fenced code blocks language
@@ -13,25 +15,21 @@ export function escapeCodeTagInterpolation(payload: Pipeline<PipelineStage.parse
   const { options: { escapeCodeTagInterpolation }, html, fencedLanguages } = payload
   const replacements = new Map()
 
+  const match = html.matchAll(codeTagRe)
+
   // identify targets for interpolation in <code>, #14
-  if (escapeCodeTagInterpolation) {
-    const match = html.matchAll(/<code.*?language-([!]{0,1})(\w+).*?>/g)
-    for (const m of match) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const [codeTag, negation, lang] = m
+  for (const m of match) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [codeTag, negation, lang] = m
+    if (lang)
       fencedLanguages.add(lang)
+    if (escapeCodeTagInterpolation) {
       if (negation !== '!')
         replacements.set(codeTag, codeTag.replace('>', ' v-pre>'))
       else
         replacements.set(codeTag, codeTag.replace(`!${lang}`, `${lang}`))
     }
-  }
-  else {
-    const match = html.matchAll(/<code.*?language-([!]{0,1})(\w+).*?>/g)
-    for (const m of match) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const [codeTag, negation, lang] = m
-      fencedLanguages.add(lang)
+    else {
       if (negation === '!')
         replacements.set(codeTag, codeTag.replace(`!${lang}`, `${lang}`).replace('>', ' v-pre>'))
     }
