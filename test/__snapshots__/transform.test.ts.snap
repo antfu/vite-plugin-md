@@ -37,7 +37,7 @@ import Foo from './Foo.vue'
 </ul>
 <h2>Escaping Code Tag Interpolation</h2>
 <div>{{hello}}</div>
-<p>When the markdown below is parsed – assuming the default behavior of “escapeCodeTagInterpolation” is set – it should be translated to include a “pre” attribute on the <code>code</code> tag so that VueJS does not interpolate this as a variable:</p>
+<p>When the markdown below is parsed – assuming the default behavior of “escapeCodeTagInterpolation” is set – it should be translated to include a “pre” attribute on the <code v-pre>code</code> tag so that VueJS does not interpolate this as a variable:</p>
 <pre><code class=\\"language-html\\" v-pre>&lt;div&gt;{{hello}}&lt;/div&gt;
 </code></pre>
 <p>By contrast, the below code fence will take on the opposite behavior:</p>

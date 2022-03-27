@@ -8,7 +8,14 @@ test: test
 
 # Hello world!
 
-Front matter: {{ frontmatter }}
+Frontmatter: {{ frontmatter }}
+
+Code: `{{ frontmatter }}`
+
+Code Block:
+```
+{{ frontmatter }}
+```
 
 <style>
 h1 {

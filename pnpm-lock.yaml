@@ -36,7 +36,6 @@ importers:
       '@rollup/pluginutils': 4.2.0
       '@types/markdown-it': 12.2.3
       '@vue/runtime-core': 3.2.31
-      fp-ts: 2.11.9
       gray-matter: 4.0.3
       markdown-it: 12.3.2
     devDependencies:
@@ -50,6 +49,7 @@ importers:
       bumpp: 7.1.1
       eslint: 8.11.0
       eslint-config-prettier: 8.5.0_eslint@8.11.0
+      fp-ts: 2.11.9
       happy-dom: 2.49.2
       rollup: 2.70.1
       tsup: 5.12.1_typescript@4.6.2
@@ -1832,7 +1832,7 @@ packages:
 
   /fp-ts/2.11.9:
     resolution: {integrity: sha512-GhYlNKkCOfdjp71ocdtyaQGoqCswEoWDJLRr+2jClnBBq2dnSOtd6QxmJdALq8UhfqCyZZ0f0lxadU4OhwY9nw==}
-    dev: false
+    dev: true
 
   /fs.realpath/1.0.0:
     resolution: {integrity: sha1-FQStJSMVjKpA20onh8sBQRmU6k8=}
