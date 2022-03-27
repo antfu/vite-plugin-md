@@ -12,9 +12,10 @@ export function wrapHtml(payload: Pipeline<PipelineStage.parsed>): Pipeline<Pipe
   else
     updated = `<div>${html}</div>`
 
-  // if we wrap with component, make sure frontmatter props are passed down
+  // if we wrap with component, make sure frontmatter props
+  // are passed down
   if (wrapperComponent)
-    updated = `<${wrapperComponent}${frontmatter ? ' :frontmatter="frontmatter"' : ''}${excerpt ? ' :excerpt="excerpt"' : ''}>${html}</${wrapperComponent}>`
+    updated = `<${wrapperComponent}${frontmatter ? ' :frontmatter="frontmatter"' : ''}${excerpt ? ' :excerpt="excerpt"' : ''}>${updated}</${wrapperComponent}>`
 
   return { ...payload, html: updated }
 }
