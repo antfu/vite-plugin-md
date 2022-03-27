@@ -23,6 +23,7 @@ importers:
       happy-dom: ^2.49.2
       markdown-it: ^12.3.2
       rollup: ^2.70.1
+      source-map-js: ^1.0.2
       tsup: ^5.12.1
       typescript: ^4.6.2
       vite: ^2.8.6
@@ -38,6 +39,7 @@ importers:
       '@vue/runtime-core': 3.2.31
       gray-matter: 4.0.3
       markdown-it: 12.3.2
+      source-map-js: 1.0.2
     devDependencies:
       '@antfu/eslint-config': 0.18.9_eslint@8.11.0+typescript@4.6.2
       '@antfu/ni': 0.13.2

@@ -50,7 +50,8 @@
     "@types/markdown-it": "^12.2.3",
     "@vue/runtime-core": "^3.2.31",
     "gray-matter": "^4.0.3",
-    "markdown-it": "^12.3.2"
+    "markdown-it": "^12.3.2",
+    "source-map-js": "^1.0.2"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^0.18.9",
