@@ -1,4 +1,5 @@
 import type MarkdownIt from 'markdown-it'
+import type { RawSourceMap } from 'source-map-js'
 import type { UserConfig } from 'vite'
 import type { EnumValues, Frontmatter, MetaProperty, ResolvedOptions } from './core'
 
@@ -53,7 +54,7 @@ export interface RulesUse {
 
 export type PipelineInitializer = (i?: Pipeline<PipelineStage.initialize>) => Pipeline<PipelineStage.initialize>
 
-export interface BuilderRegistration<O extends BuilderOptions, H extends IPipelineStage > {
+export interface BuilderRegistration<O extends BuilderOptions, H extends IPipelineStage> {
   name: string
   description?: string
   /** The lifecycle event/hook which this builder will respond to */
@@ -151,60 +152,72 @@ export interface PipelineProperties {
 
   /** the finalized component in string form */
   component: string
+
+  /** a sourcemap for the generated file */
+  map?: RawSourceMap
 }
 
-export type InitializedOmissions = 'md'
-| 'fencedLanguages'
-| 'frontmatter'
-| 'head'
-| 'meta'
-| 'routeMeta'
-| 'excerpt'
-| 'html'
-| 'hoistedScripts'
-| 'templateBlock'
-| 'parser'
-| 'scriptBlock'
-| 'customBlocks'
-| 'component'
+export type InitializedOmissions =
+  | 'md'
+  | 'map'
+  | 'fencedLanguages'
+  | 'frontmatter'
+  | 'head'
+  | 'meta'
+  | 'routeMeta'
+  | 'excerpt'
+  | 'html'
+  | 'hoistedScripts'
+  | 'templateBlock'
+  | 'parser'
+  | 'scriptBlock'
+  | 'customBlocks'
+  | 'component'
 
 /** after extracting metadata */
 export type MetaOmissions =
-| 'fencedLanguages'
-| 'parser'
-| 'html'
-| 'hoistedScripts'
-| 'templateBlock'
-| 'scriptBlock'
-| 'customBlocks'
-| 'component'
+  | 'map'
+  | 'fencedLanguages'
+  | 'parser'
+  | 'html'
+  | 'hoistedScripts'
+  | 'templateBlock'
+  | 'scriptBlock'
+  | 'customBlocks'
+  | 'component'
 
 /** after providing the markdown-it parser */
 export type ParserOmissions =
-| 'fencedLanguages'
-| 'html'
-| 'hoistedScripts'
-| 'templateBlock'
-| 'scriptBlock'
-| 'customBlocks'
-| 'component'
+  | 'map'
+  | 'fencedLanguages'
+  | 'html'
+  | 'hoistedScripts'
+  | 'templateBlock'
+  | 'scriptBlock'
+  | 'customBlocks'
+  | 'component'
 
 /** after parsing to raw HTML using markdown-it */
 export type ParsedOmissions =
-| 'hoistedScripts'
-| 'templateBlock'
-| 'scriptBlock'
-| 'customBlocks'
-| 'component'
+  | 'map'
+  | 'hoistedScripts'
+  | 'templateBlock'
+  | 'scriptBlock'
+  | 'customBlocks'
+  | 'component'
 
-export type SfcBlockOmissions = 'component'
+export type SfcBlockOmissions = 'component' | 'map'
 
 export type PipelineAvail<S extends IPipelineStage> = S extends 'initialize'
   ? Omit<PipelineProperties, InitializedOmissions>
-  : S extends 'metaExtracted' ? Omit<PipelineProperties, MetaOmissions>
-    : S extends 'parser' ? Omit<PipelineProperties, ParserOmissions>
-      : S extends 'parsed' ? Omit<PipelineProperties, ParsedOmissions>
-        : S extends 'sfcBlocksExtracted' ? Omit<PipelineProperties, SfcBlockOmissions>
+  : S extends 'metaExtracted'
+    ? Omit<PipelineProperties, MetaOmissions>
+    : S extends 'parser'
+      ? Omit<PipelineProperties, ParserOmissions>
+      : S extends 'parsed'
+        ? Omit<PipelineProperties, ParsedOmissions>
+        : S extends 'sfcBlocksExtracted'
+          ? Omit<PipelineProperties, SfcBlockOmissions>
           : S extends 'closeout' ? PipelineProperties
             : never
 
@@ -232,7 +245,7 @@ export type BuilderHandler<
  *
  * - options( ) -> register( ) -> { handler( payload ) -> payload }
  */
-export type BuilderApi<O extends {}, S extends IPipelineStage > = (options?: O) => () => BuilderRegistration<O, S>
+export type BuilderApi<O extends {}, S extends IPipelineStage> = (options?: O) => () => BuilderRegistration<O, S>
 
 export type InlineBuilder = <N extends string, L extends IPipelineStage>(name: N, lifecycle: L) => (payload: Pipeline<L>) => Pipeline<L>
 

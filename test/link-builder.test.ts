@@ -15,7 +15,7 @@ describe('link testing', () => {
   })
 
   it('internal and external classes are brought in appropriately', () => {
-    const sfc = composeSfcBlocks('', md, { builders: [link()] })
+    const sfc = composeSfcBlocks('test/fixtures/links.md', md, { builders: [link()] })
     document.body.innerHTML = sfc.html
     const internalLinks = document.querySelectorAll('.internal-link')
     const externalLinks = document.querySelectorAll('.external-link')

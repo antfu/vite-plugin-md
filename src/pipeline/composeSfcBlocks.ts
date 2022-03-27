@@ -24,6 +24,7 @@ import {
   wrapHtml,
 } from '../pipeline'
 import { createParser } from './createParser'
+import { sourcemap } from './sourcemap'
 
 /**
  * Composes the `template` and `script` blocks, along with any other `customBlocks` from the raw
@@ -94,6 +95,7 @@ export function composeSfcBlocks(id: string, raw: string, opts: Options = {}, co
 
     finalize,
     transformsAfter,
+    sourcemap,
     callEventHooks(PipelineStage.closeout),
   )
 

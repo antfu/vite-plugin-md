@@ -13,7 +13,7 @@ describe('use "meta" builder for frontmatterPreprocess', () => {
   })
 
   it('with no config, doc props all available as frontmatter props and other meta props get default mapping', () => {
-    const sfc = composeSfcBlocks('', md, { builders: [meta()] })
+    const sfc = composeSfcBlocks('test/fixtures/meta.md', md, { builders: [meta()] })
 
     expect(sfc.frontmatter.title).toEqual('Metadata Rules')
     expect(sfc.frontmatter.byline).toEqual('who loves ya baby?')
@@ -37,7 +37,7 @@ describe('use "meta" builder for frontmatterPreprocess', () => {
         }),
       ],
     }
-    const sfc = composeSfcBlocks('', md, resolveOptions(options))
+    const sfc = composeSfcBlocks('test/fixtures/meta.md', md, resolveOptions(options))
 
     expect(
       sfc.frontmatter.title,
@@ -56,7 +56,7 @@ describe('use "meta" builder for frontmatterPreprocess', () => {
   })
 
   it('frontmatter props exported', () => {
-    const output = composeSfcBlocks('', md).component
+    const output = composeSfcBlocks('test/fixtures/meta.md', md).component
 
     expect(output.includes('const title')).toBeTruthy()
     expect(output.includes('const byline')).toBeTruthy()
