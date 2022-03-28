@@ -7,7 +7,7 @@ const defineExposeFound = /defineExpose\({ frontmatter }\)/
 const vue2ExposeFound = /export default { data\(\) { return { frontmatter } } }/
 
 describe('exposeFrontmatter property', () => {
-  beforeAll(async () => {
+  beforeAll(async() => {
     md = await readFile('test/fixtures/simple.md', 'utf-8')
   })
   it('Vue3 -- when exposeFrontmatter set to true -- uses defineExpose method to expose to other components', () => {
