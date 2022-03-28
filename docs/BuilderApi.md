@@ -1,5 +1,4 @@
 # Builder API
-
 > References: [Build Pipeline](./BuildPipeline.md), [Meta Builder](./MetaBuilder.md), [Link Builder](./LinkBuilder.md)
 
 The builder API is a way of extending the functionality of this plugin by being given access to all the power of Vite, Markdown It, and this plugin's hooks. To create a plugin you only need to create a function with the following interface:

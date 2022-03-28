@@ -67,6 +67,10 @@ export function extractBlocks(payload: Pipeline<PipelineStage.parsed>): Pipeline
       hoistedScripts.push('export default { data() { return { frontmatter } } }\n')
 
     if (head) hoistedScripts.push(`const head = ${JSON.stringify(head)}`)
+    if (!isVue2(options) && options.headEnabled && head) {
+      hoistedScripts.unshift('import { useHead } from "@vueuse/head"')
+      hoistedScripts.push('useHead(head)')
+    }
 
     if (Object.keys(routeMeta || {}).length > 0)
       customBlocks.push(`<route>{ meta: { ${JSON.stringify(routeMeta)} } }</route>`)
