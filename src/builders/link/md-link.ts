@@ -56,7 +56,7 @@ const plugin = (o: MdLinkOptions): PluginSimple => (
 
       for (const [k, v] of Object.entries(transformed)) {
         const attrIndex = link.attrIndex(k)
-        if (attrIndex < 0 && v !== undefined) {
+        if (attrIndex < 0 && v !== undefined && !k.startsWith('_')) {
           // this attr did not previously exist before the transform
           link.attrPush([k, v as string])
         }

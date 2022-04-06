@@ -101,7 +101,11 @@ describe('link testing', () => {
   })
 
   it('"base" option set changes link resolution for relative links', () => {
-    const sfc = composeSfcBlocks('', md, { builders: [link({ relativeLinkClass: 'relative-link' })] }, { base: 'one' })
+    const sfc = composeSfcBlocks('', md, {
+      builders: [
+        link({ relativeLinkClass: 'relative-link' }),
+      ],
+    }, { base: 'one' })
     document.body.innerHTML = sfc.html
 
     const links = document.querySelectorAll('.relative-link')
@@ -130,12 +134,8 @@ describe('link testing', () => {
     }
   })
 
-  it.todo('reactive "path" adjusts relative links', () => {
-    // const path = ref('foo/bar/baz')
-  })
-
   it('internal routes are converted to `<router-link>` elements by default', () => {
-    const sfc = composeSfcBlocks('', md, { builders: [link()] })
+    const sfc = composeSfcBlocks('test/fixtures/links.md', md, { builders: [link()] })
     document.body.innerHTML = sfc.html
 
     const internal = document.querySelectorAll('.internal-link')
@@ -143,13 +143,61 @@ describe('link testing', () => {
 
     expect(internal.length).toEqual(router.length)
 
-    internal.forEach(t =>
+    router.forEach(t =>
       expect(t.tagName, 'the tagname should have been converted from <a> to <router-link>').toEqual('ROUTER-LINK'),
     )
-    internal.forEach(t =>
+    router.forEach(t =>
       expect(t.getAttribute('href'), 'the "href" should be empty in favor of a "to" prop').toBeNull(),
     )
-    internal.forEach(t =>
+    router.forEach(t =>
       expect(t.getAttribute('to'), 'the "to" property should be set for <router-link>').toBeTypeOf('string'))
+  })
+
+  it('the "_base" attribute is removed prior to rendering HTML of router links', () => {
+    const sfc = composeSfcBlocks(
+      'test/fixtures/links.md',
+      md,
+      {
+        builders: [link()],
+      },
+    )
+    document.body.innerHTML = sfc.html
+
+    const router = document.querySelectorAll('.router-link')
+
+    router.forEach(t =>
+      expect(t.getAttribute('_base'), 'the _base attribute is set during the build process to ensure a relative path but should be removed in final rendering').toBeNull(),
+    )
+  })
+
+  it('router links which are relative are resolved to a valid route', () => {
+    const sfc = composeSfcBlocks(
+      'test/fixtures/links.md',
+      md,
+      {
+        builders: [link()],
+      },
+    )
+    document.body.innerHTML = sfc.html
+
+    const router = document.querySelectorAll('.router-link')
+
+    router.forEach(t => expect(t.getAttribute('to').startsWith('test/fixtures')))
+  })
+
+  it('router links add in "base" when present', () => {
+    const sfc = composeSfcBlocks(
+      'test/fixtures/links.md',
+      md,
+      {
+        builders: [link()],
+      },
+      { base: 'foobar' },
+    )
+    document.body.innerHTML = sfc.html
+
+    const router = document.querySelectorAll('.router-link')
+
+    router.forEach(t => expect(t.getAttribute('to').startsWith('foobar/test/fixtures')))
   })
 })

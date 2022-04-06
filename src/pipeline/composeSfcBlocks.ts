@@ -1,17 +1,20 @@
-import { pipe } from 'fp-ts/lib/function'
+import { flow, pipe } from 'fp-ts/lib/function'
+import * as TE from 'fp-ts/lib/TaskEither'
+import { isRight } from 'fp-ts/lib/Either'
 import { resolveOptions } from '../options'
-import { PipelineStage } from '../types'
+import {
+  PipelineStage,
+} from '../types'
 import type {
-  BuilderConfig,
-  BuilderOptions,
-  BuilderRegistration,
-  IPipelineStage,
   Options,
   Pipeline,
   ViteConfigPassthrough,
 } from '../types'
 import {
   applyMarkdownItOptions,
+  callEventHooks,
+  createParser,
+  // builderToTask,
   escapeCodeTagInterpolation,
   extractBlocks,
   extractFrontmatter,
@@ -23,15 +26,13 @@ import {
   transformsBefore,
   wrapHtml,
 } from '../pipeline'
-import { createParser } from './createParser'
 
 /**
  * Composes the `template` and `script` blocks, along with any other `customBlocks` from the raw
  * markdown content along with user options.
  */
-export function composeSfcBlocks(id: string, raw: string, opts: Options = {}, config: Partial<ViteConfigPassthrough> = {}) {
+export async function composeSfcBlocks(id: string, raw: string, opts: Options = {}, config: Partial<ViteConfigPassthrough> = {}) {
   const options = resolveOptions(opts)
-
   /**
    * The initial pipeline state
    */
@@ -42,60 +43,59 @@ export function composeSfcBlocks(id: string, raw: string, opts: Options = {}, co
     viteConfig: config,
   }
 
-  // store all builders into event structure
-  const builders = options.builders.reduce(
-    (acc, b) => {
-      const defn = b() as BuilderRegistration<BuilderOptions, IPipelineStage>
-      const current = acc[defn.lifecycle]
-      return {
-        ...acc,
-        [defn.lifecycle]: current
-          ? [...current, { handler: defn.handler, options: defn.options }]
-          : [{ handler: defn.handler, options: defn.options }],
-      }
-    },
-    {} as BuilderConfig,
-  )
+  /** Builder handler functions for the given lifecycle stage */
+  const handlers = callEventHooks(options)
 
-  /**
-   * Allow any builders which have attached to the given lifecycle hook
-   * to participate in the pipeline
-   */
-  const callEventHooks = <S extends PipelineStage>(stage: S) => (payload: Pipeline<S>): Pipeline<S> => {
-    for (const b of builders[stage] || [])
-      payload = b.handler(payload, b.options) as Pipeline<S>
-
-    return payload
-  }
-
-  // run the pipeline
+  // construct the async pipeline
   const result = pipe(
     payload,
 
     transformsBefore,
-    callEventHooks(PipelineStage.initialize),
+    handlers(PipelineStage.initialize),
 
-    extractFrontmatter,
-    frontmatterPreprocess,
-    callEventHooks(PipelineStage.metaExtracted),
+    TE.map(
+      flow(
+        extractFrontmatter,
+        frontmatterPreprocess,
+      ),
+    ),
+    handlers(PipelineStage.metaExtracted),
 
-    createParser,
-    loadMarkdownItPlugins,
-    applyMarkdownItOptions,
-    callEventHooks(PipelineStage.parser),
+    TE.map(
+      flow(
+        createParser,
+        loadMarkdownItPlugins,
+        applyMarkdownItOptions,
+      ),
+    ),
+    handlers(PipelineStage.parser),
 
-    parseHtml,
-    wrapHtml,
-    escapeCodeTagInterpolation,
-    callEventHooks(PipelineStage.parsed),
+    TE.map(
+      flow(
+        parseHtml,
+        wrapHtml,
+        escapeCodeTagInterpolation,
+      ),
+    ),
+    handlers(PipelineStage.parsed),
 
-    extractBlocks,
-    callEventHooks(PipelineStage.sfcBlocksExtracted),
+    TE.map(extractBlocks),
+    handlers(PipelineStage.sfcBlocksExtracted),
 
-    finalize,
-    transformsAfter,
-    callEventHooks(PipelineStage.closeout),
+    TE.map(
+      flow(
+        finalize,
+        transformsAfter,
+      ),
+    ),
+    handlers(PipelineStage.closeout),
   )
 
-  return result
+  // run the pipeline
+  const pipeline = await result()
+
+  if (isRight(pipeline))
+    return pipeline.right
+  else
+    throw new Error(pipeline.left)
 }

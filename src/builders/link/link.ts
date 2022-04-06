@@ -98,7 +98,6 @@ const cleanupAndCloseOut = (c: LinkifyConfig): LinkTransformer =>
         lnk.href = lnk.href.replace(/(\S+)\.md$/, '$1')
 
       const removal = new RegExp(`.*${c.rootDir}`)
-      // meta['data-removal'] = String(removal)
       if (isInternalLink(lnk))
         lnk.href = normalizePath(join(lnk._base.replace(removal, ''), lnk.href))
 
@@ -135,7 +134,7 @@ export const link = createBuilder('link', 'parser')
   // the approach for this builder is to inject a rule into the MarkdownIt
   // which will call our `transform` function on each instance of a link element
   // discovered and allow mutation.
-  .handler((p, o) => {
+  .handler(async(p, o) => {
     const { fileName, viteConfig: { base } } = p
     // merge default settings with user settings
     const options: LinkifyConfig = {

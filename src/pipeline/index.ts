@@ -1,6 +1,7 @@
 export * from './applyMarkdownItOptions'
 export * from './composeSfcBlocks'
 export * from './createParser'
+export * from './convertHandlerToTask'
 export * from './escapeCodeTagInterpolation'
 export * from './extractBlocks'
 export * from './extractFrontmatter'

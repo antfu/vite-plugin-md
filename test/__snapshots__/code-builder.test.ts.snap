@@ -1,0 +1,24 @@
+// Vitest Snapshot v1
+
+exports[`code() builder > line numbers are displayed when set 1`] = `
+"<div class=\\"markdown-body\\"><h1>Code Builder Test</h1>
+<p>this test is intended to validate testing of code blocks</p>
+<pre class='language-ts line-numbers-mode'><code v-pre>
+type Valid = 'foo' | 'bar' | 'baz'
+const t: Valid = 'foo'
+</code></pre><p>The test is now complete; everyone should return to their desks.</p>
+</div>"
+`;
+
+exports[`code() builder > valid language choice is rendered 1`] = `
+"<div class=\\"markdown-body\\"><h1>Code Builder Test</h1>
+<p>This test is intended to validate testing of code blocks; the first test is a typescript block.</p>
+<pre class='language-ts foobar'><code v-pre>
+type Valid = 'foo' | 'bar' | 'baz'
+const t: Valid = 'foo'
+</code></pre><p>But now we have some Rust code too:</p>
+<pre class='language-rust foobar' style='classless'><code v-pre>
+let count: usize = 100;
+</code></pre><p>The test is now complete; everyone should return to their desks.</p>
+</div>"
+`;

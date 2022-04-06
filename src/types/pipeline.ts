@@ -1,4 +1,5 @@
 import type MarkdownIt from 'markdown-it'
+import type * as TE from 'fp-ts/TaskEither'
 import type { UserConfig } from 'vite'
 import type { EnumValues, Frontmatter, MetaProperty, ResolvedOptions } from './core'
 
@@ -53,18 +54,18 @@ export interface RulesUse {
 
 export type PipelineInitializer = (i?: Pipeline<PipelineStage.initialize>) => Pipeline<PipelineStage.initialize>
 
-export interface BuilderRegistration<O extends BuilderOptions, H extends IPipelineStage > {
+export interface BuilderRegistration<O extends BuilderOptions, S extends IPipelineStage > {
   name: string
   description?: string
   /** The lifecycle event/hook which this builder will respond to */
-  lifecycle: H
+  lifecycle: S
   /**
    * The builder's handler function which receives the _payload_ for the
    * event lifecycle hook configured and then is allowed to mutate these
    * properties and pass back a similarly structured object to continue
    * on in that pipeline stage.
    */
-  handler: BuilderHandler<O, H>
+  handler: BuilderHandler<O, S>
 
   /**
    * The options _specific_ to the builder
@@ -199,7 +200,21 @@ export type ParsedOmissions =
 
 export type SfcBlockOmissions = 'component'
 
-export type PipelineAvail<S extends IPipelineStage> = S extends 'initialize'
+// export type PipelineAvail<S extends IPipelineStage> = S extends 'initialize'
+//   ? Omit<PipelineProperties, InitializedOmissions>
+//   : S extends 'metaExtracted' ? Omit<PipelineProperties, MetaOmissions>
+//     : S extends 'parser' ? Omit<PipelineProperties, ParserOmissions>
+//       : S extends 'parsed' ? Omit<PipelineProperties, ParsedOmissions>
+//         : S extends 'sfcBlocksExtracted' ? Omit<PipelineProperties, SfcBlockOmissions>
+//           : S extends 'closeout' ? PipelineProperties
+//             : never
+
+/**
+ * The _state/payload_ that is available at a given stage in the pipeline process.
+ *
+ * - `<S>` provides the stage we're in
+ */
+export type Pipeline<S extends IPipelineStage> = S extends 'initialize'
   ? Omit<PipelineProperties, InitializedOmissions>
   : S extends 'metaExtracted' ? Omit<PipelineProperties, MetaOmissions>
     : S extends 'parser' ? Omit<PipelineProperties, ParserOmissions>
@@ -209,22 +224,22 @@ export type PipelineAvail<S extends IPipelineStage> = S extends 'initialize'
             : never
 
 /**
- * The _state/payload_ that is available at a given stage in the pipeline process.
- *
- * - `<S>` provides the stage we're in
- * - `<E>` allows a builder to provide additional props for an event they are providing
- */
-export type Pipeline<S extends IPipelineStage, E extends {} = {}> =
-  PipelineAvail<S> & E
-
-/**
  * The Builder's event listener/handler
  */
 export type BuilderHandler<
   O extends BuilderOptions,
   S extends IPipelineStage,
-  R extends Pipeline<S> = Pipeline<S>,
-> = (payload: Pipeline<S>, options: O) => R
+> = (payload: Pipeline<S>, options: O) => Promise<Pipeline<S>>
+
+/**
+ * Users configure a `BuilderHandler` and we wrap this up functionality
+ * with a higher-order `BuilderTask`.
+ *
+ * @returns TaskEither<string, Pipeline<S>>
+ */
+export type BuilderTask<
+  S extends IPipelineStage,
+> = () => (payload: Pipeline<S>) => TE.TaskEither<string, Pipeline<S>>
 
 /**
  * Builder's must provide an export which meets this API constraint. Basic

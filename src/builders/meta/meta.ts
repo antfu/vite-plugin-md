@@ -40,7 +40,7 @@ export interface MetaConfig {
 export const meta = createBuilder('meta', 'metaExtracted')
   .options<Partial<MetaConfig>>()
   .initializer()
-  .handler((p, o) => {
+  .handler(async(p, o) => {
     let { frontmatter, meta, head, routeMeta } = p
     const c: MetaConfig = {
       metaProps: ['image', 'title', 'description', 'url', 'image_width', 'image_height'],

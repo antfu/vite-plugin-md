@@ -1,4 +1,11 @@
-import type { BuilderApi, BuilderHandler, BuilderOptions, BuilderRegistration, IPipelineStage, Pipeline, PipelineStage } from '../types'
+import type {
+  BuilderApi,
+  BuilderHandler,
+  BuilderOptions,
+  BuilderRegistration,
+  IPipelineStage,
+  PipelineStage,
+} from '../types'
 
 /**
  * A utility function to help you build a type-safe "builder".
@@ -33,8 +40,10 @@ export function createBuilder<E extends IPipelineStage>(name: string, lifecycle:
              * Step 4:
              * - provide the **handler function** which is called upon reaching the
              * lifecycle event you've subscribed to
+             * - your handler should be an async function which will receive the payload
+             * along with any options that your builder has configured
              */
-            handler: <R extends Pipeline<E>>(handler: BuilderHandler<O, E, R>) => {
+            handler: (handler: BuilderHandler<O, E>) => {
               return {
                 /**
                  * A utility function to help you build a type-safe "builder".

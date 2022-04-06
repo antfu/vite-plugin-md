@@ -3,7 +3,7 @@ import { createFilter } from '@rollup/pluginutils'
 import { createSfcComponent } from './createSfcComponent'
 import { resolveOptions } from './options'
 import type { Options } from './types'
-export { link, meta } from './builders'
+export { link, meta, code } from './builders'
 
 function VitePluginMarkdown(userOptions: Options = {}): Plugin {
   const options = resolveOptions(userOptions)

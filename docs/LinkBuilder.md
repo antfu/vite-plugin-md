@@ -11,7 +11,7 @@ import Markdown, { link } from 'vite-plugin-md'
 export default defineConfig({
   // ...
   plugins: [
-    Markdown({ linkTransforms: link() }),
+    Markdown({ builders: [link()] }),
   ],
 })
 ```
