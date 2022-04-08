@@ -6,7 +6,7 @@ import { transformer } from '../utils'
  *
  * Note: the links() builder will turn this off (setting to undefined)
  */
-export const frontmatterPreprocess = transformer('metaExtracted', 'metaExtracted', (payload) => {
+export const frontmatterPreprocess = transformer('frontmatterPreprocess', 'metaExtracted', 'metaExtracted', (payload) => {
   const { frontmatter, options: { frontmatterPreprocess } } = payload
   let { head, meta, routeMeta } = payload
 

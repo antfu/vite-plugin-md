@@ -11,7 +11,7 @@ const codeTagRe = /<code(?:.*?language-([!]{0,1})(\w+))?(.*?)>/g
  * the payload being passed through as this could be valuable for _search_
  * or other meta features.
  */
-export const escapeCodeTagInterpolation = transformer('parsed', 'parsed', (payload) => {
+export const escapeCodeTagInterpolation = transformer('escapeCodeTagInterpolation', 'parsed', 'parsed', (payload) => {
   const { options: { escapeCodeTagInterpolation }, html, fencedLanguages } = payload
   const replacements = new Map()
 

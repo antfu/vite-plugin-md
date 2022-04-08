@@ -15,29 +15,21 @@ import type { IPipelineStage, PipeEither, PipeTask, Pipeline, PipelineStage } fr
  * dclare function task = (P: PipeTask<F>) => PipeTask<T>
  * ```
  */
-export function transformer<F extends IPipelineStage, T extends IPipelineStage>(
+export const transformer = <F extends IPipelineStage, T extends IPipelineStage>(
   name: string,
   from: F,
   to: T,
   fn: (p: Pipeline<F>) => Pipeline<T>,
-): PipeTask<T> {
-  const fut = (p: Pipeline<F>) => {
-    try {
-      const success = fn(p)
-      return success
-    }
-    catch (e) {
-      return TE.left(`There was a problem using "${name}" to transform the pipeline`)
-    }
-  }
-
-  const task = (payload: PipeTask<F>) => pipe(
-    payload,
-    TE.map(fut),
-  )
-
-  return task
-}
+) => (payload: PipeTask<F>): PipeTask<T> => pipe(
+  payload,
+  TE.map(
+    p => TE.tryCatch(
+      () => Promise.resolve(fn(p)),
+      e => `There was a problem using "${name}" to transform the pipeline: ${e instanceof Error ? e.message : String(e)}`,
+    ),
+  ),
+  TE.flatten,
+)
 
 export function isPipeTask<S extends IPipelineStage>(payload: PipeTask<S> | PipeEither<S>): payload is PipeTask<S> {
   return typeof payload === 'function'

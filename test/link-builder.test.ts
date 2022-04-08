@@ -14,15 +14,20 @@ describe('link testing', () => {
     md = await readFile('test/fixtures/links.md', 'utf-8')
   })
 
-  it.only('component snapshot is consistent', async() => {
+  it('component snapshot is consistent', async() => {
     const sfc = await composeSfcBlocks('links.md', md, { builders: [link()] })
     expect(sfc.component).toMatchSnapshot()
   })
 
-  it('internal and external classes are brought in appropriately',async () => {
+  it('class links are found in HTML text', async() => {
+    const { html } = await composeSfcBlocks('links.md', md, { builders: [link()] })
+    expect(html.includes('internal-link')).toBeTruthy()
+    expect(html.includes('external-link')).toBeTruthy()
+  })
+
+  it('internal and external classes are found in DOM', async() => {
     const sfc = await composeSfcBlocks('links.md', md, { builders: [link()] })
-    console.log(sfc);
-    
+
     document.body.innerHTML = sfc.html
     const internalLinks = document.querySelectorAll('.internal-link')
     const externalLinks = document.querySelectorAll('.external-link')
@@ -59,6 +64,7 @@ describe('link testing', () => {
       })],
     })
     document.body.innerHTML = sfc.html
+
     const colorful = document.querySelectorAll('.colorful')
 
     expect(colorful.length).toBe(3)
@@ -85,7 +91,7 @@ describe('link testing', () => {
     expect(indexRoute2?.getAttribute('to')).toEqual('/foobar/')
   })
 
-  it('internal non-index route with MD in href is shortened to route path', async () => {
+  it('internal non-index route with MD in href is shortened to route path', async() => {
     const sfc = await composeSfcBlocks('repo/src/pages/current.md', md, { builders: [link({ useRouterLinks: false })] })
     document.body.innerHTML = sfc.html
     const internal = document.querySelectorAll('.internal-link')

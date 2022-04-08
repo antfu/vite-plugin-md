@@ -1,25 +1,21 @@
-import { identity, pipe } from 'fp-ts/lib/function'
-import * as E from 'fp-ts/lib/Either'
-import * as TE from 'fp-ts/lib/TaskEither'
+import { pipe } from 'fp-ts/lib/function'
 import { isRight } from 'fp-ts/lib/Either'
 import { resolveOptions } from '../options'
 import { PipelineStage } from '../types'
 import type {
   Options,
-  PipeTask,
   Pipeline,
   ViteConfigPassthrough,
 } from '../types'
 import {
   applyMarkdownItOptions,
-  gatherBuilderEvents,
   createParser,
-  // builderToTask,
   escapeCodeTagInterpolation,
   extractBlocks,
   extractFrontmatter,
   finalize,
   frontmatterPreprocess,
+  gatherBuilderEvents,
   loadMarkdownItPlugins,
   parseHtml,
   transformsAfter,
@@ -27,8 +23,6 @@ import {
   wrapHtml,
 } from '../pipeline'
 import { lift } from '../utils'
-
-type t = typeof transformsBefore
 
 /**
  * Composes the `template` and `script` blocks, along with any other `customBlocks` from the raw
@@ -47,7 +41,6 @@ export async function composeSfcBlocks(id: string, raw: string, opts: Options = 
   }
 
   const handlers = gatherBuilderEvents(options)
-  const x = handlers('closeout')
 
   // construct the async pipeline
   const result = pipe(
@@ -79,13 +72,10 @@ export async function composeSfcBlocks(id: string, raw: string, opts: Options = 
     transformsAfter,
     handlers(PipelineStage.closeout),
   )
+  const pipeline = await result()
 
-  // run the pipeline
-  // const pipeline = await result()
-  // console.log({pipeline});
-
-  if (isRight(result))
-    return result.right
+  if (isRight(pipeline))
+    return pipeline.right
   else
-    throw new Error(result.left as string)
+    throw new Error(pipeline.left)
 }

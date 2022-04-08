@@ -1,36 +1,9 @@
 // Vitest Snapshot v1
 
-exports[`meta() snapshots > HTML is consistent 1`] = `
-"<div class=\\"markdown-body\\"><h1>Metadata</h1>
-<blockquote>
-<p>{{ byline }}</p>
-</blockquote>
-<p>This is a markdown file intended for testing meta data.</p>
-<p><img src=\\"%7B%7Bimage%7D%7D\\" alt=\\"image\\">
-<img src=\\"{{ image }}\\" /></p>
-</div>"
-`;
+exports[`meta() snapshots > HTML is consistent 1`] = `undefined`;
 
-exports[`meta() snapshots > custom blocks are consistent 1`] = `[]`;
+exports[`meta() snapshots > custom blocks are consistent 1`] = `undefined`;
 
-exports[`meta() snapshots > frontmatter is consistent 1`] = `
-{
-  "byline": "who loves ya baby?",
-  "excerpt": undefined,
-  "image": "facebook.png",
-  "layout": "yowza",
-  "title": "Metadata Rules",
-}
-`;
+exports[`meta() snapshots > frontmatter is consistent 1`] = `undefined`;
 
-exports[`meta() snapshots > script blocks are consistent 1`] = `
-"<script setup>const frontmatter = {\\"title\\":\\"Metadata Rules\\",\\"byline\\":\\"who loves ya baby?\\",\\"layout\\":\\"yowza\\",\\"image\\":\\"facebook.png\\"}
- const title = \\"Metadata Rules\\"
- const byline = \\"who loves ya baby?\\"
- const layout = \\"yowza\\"
- const image = \\"facebook.png\\"
- const excerpt = undefined
-defineExpose({ frontmatter })
-const head = {\\"title\\":\\"Metadata Rules\\",\\"byline\\":\\"who loves ya baby?\\",\\"layout\\":\\"yowza\\",\\"image\\":\\"facebook.png\\"}
-</script>"
-`;
+exports[`meta() snapshots > script blocks are consistent 1`] = `undefined`;

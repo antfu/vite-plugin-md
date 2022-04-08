@@ -1,6 +1,5 @@
 import matter from 'gray-matter'
-import type { ExcerptFunction } from '../types'
-import type { GraymatterOptions } from '../types/core'
+import type { ExcerptFunction, GraymatterOptions } from '../types'
 import { transformer } from '../utils'
 
 /**
@@ -12,7 +11,7 @@ import { transformer } from '../utils'
  * - updates the "options" for Graymatter to reflect to downstream consumers what the
  * actual configuration used was.
  */
-export const extractFrontmatter = transformer('initialize', 'metaExtracted', (payload) => {
+export const extractFrontmatter = transformer('extractFrontmatter', 'initialize', 'metaExtracted', (payload) => {
   const { options: { grayMatterOptions: { excerpt: ge }, excerpt: e } } = payload
   const eConfig = [e, ge]
   const excerpt = eConfig.find(i => i === false) !== undefined
@@ -22,7 +21,7 @@ export const extractFrontmatter = transformer('initialize', 'metaExtracted', (pa
       : true
 
   const excerpt_separator = excerpt === false
-  // used to ensure all text stays in body
+    // used to ensure all text stays in body
     ? undefined
     : typeof e === 'string'
       ? e

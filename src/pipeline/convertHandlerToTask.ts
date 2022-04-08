@@ -1,6 +1,7 @@
-import { flow, pipe } from 'fp-ts/lib/function'
+import { identity, pipe } from 'fp-ts/lib/function'
 import * as TE from 'fp-ts/TaskEither'
-import { tryCatch } from 'fp-ts/TaskEither'
+import * as E from 'fp-ts/Either'
+
 import type { AsyncPipelineTransformer, BuilderConfig, BuilderOptions, BuilderRegistration, IPipelineStage, PipeTask, Pipeline, PipelineStage, ResolvedOptions } from '../types'
 
 const getBuilders = <S extends IPipelineStage>(stage: S, options: ResolvedOptions): Array<BuilderRegistration<any, S>> => options.builders.reduce(
@@ -28,10 +29,10 @@ const getBuilders = <S extends IPipelineStage>(stage: S, options: ResolvedOption
  *  = transformForBuilders(stage)
  * ```
  */
-export const getBuilderTasks = <S extends IPipelineStage>(
+export const getBuilderTask = <S extends IPipelineStage>(
   stage: S,
   options: ResolvedOptions,
-) => (payload: Pipeline<S>) => {
+) => (payload: Pipeline<S>): PipeTask<S> => {
   const builders = getBuilders(stage, options)
   if (builders.length === 0) {
     // if no builders then just return payload as-is
@@ -39,20 +40,36 @@ export const getBuilderTasks = <S extends IPipelineStage>(
   }
 
   // convert handlers to tasks
-  const tasks = builders.reduce(
-    (acc, b) => {
-      const task = tryCatch(
-        () => b.handler(payload, options),
-        e =>
-          `During the "${stage}" stage, the builder API "${b.name}" was unable to transform the payload. It received the following error message: ${e instanceof Error ? e.message : String(e)}`
-        ,
-      )
-      return [...acc, task]
-    },
-    [] as PipeTask<S>[],
-  )
+  // const tasks = builders.reduce(
+  //   (acc, b) => {
+  //     const task = TE.tryCatch(
+  //       () => b.handler(payload, options),
+  //       e =>
+  //         `During the "${stage}" stage, the builder API "${b.name}" was unable to transform the payload. It received the following error message: ${e instanceof Error ? e.message : String(e)}`
+  //       ,
+  //     )
+  //     return [...acc, task]
+  //   },
+  //   [] as PipeTask<S>[],
+  // )
+  // }
 
-  return tasks
+  const asyncApi = async(payload: Pipeline<S>) => {
+    for (const b of builders) {
+      try {
+        payload = await b.handler(payload, options)
+      }
+      catch (e) {
+        throw new Error(`During the "${stage}" stage, the builder API "${b.name}" was unable to transform the payload. It received the following error message: ${e instanceof Error ? e.message : String(e)}`)
+      }
+    }
+
+    return payload
+  }
+
+  const taskApi = TE.tryCatchK(asyncApi, reason => `${reason}`)
+
+  return taskApi(payload)
 }
 
 /**
@@ -93,17 +110,13 @@ export const gatherBuilderEvents = (options: ResolvedOptions) =>
    * which should be executed at this point in time and
    */
   <S extends IPipelineStage>(stage: S) => {
-    const task: AsyncPipelineTransformer<S, S> = (payload: PipeTask<S>) => {
-      const bt = getBuilderTasks(stage, options)
+    const task = (payload: PipeTask<S>) => {
+      const bt = getBuilderTask(stage, options)
       return pipe(
         payload,
-        TE.match(
-          // forward errors
-          e => TE.left(e),
-          //
-          bt,
-        ),
-      )
+        TE.map(bt),
+        TE.flatten,
+      ) as PipeTask<S>
     }
     return task
   }

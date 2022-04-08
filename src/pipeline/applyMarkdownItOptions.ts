@@ -5,7 +5,7 @@ import { transformer } from '../utils'
  * the parser will be passed into this callback function so that the
  * parser may be configured.
  */
-export const applyMarkdownItOptions = transformer('parser', 'parser', (payload) => {
+export const applyMarkdownItOptions = transformer('applyMarkdownItOptions', 'parser', 'parser', (payload) => {
   payload.options.markdownItSetup(payload.parser)
   return payload
 })

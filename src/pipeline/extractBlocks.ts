@@ -40,7 +40,8 @@ function extractCustomBlock(html: string, options: ResolvedOptions) {
  * Converts the markdown content to an HTML template and extracts both
  * the HTML and scripts.
  */
-export const extractBlocks = transformer('parsed', 'sfcBlocksExtracted', (payload) => {
+export const extractBlocks = transformer('extractBlocks', 'parsed', 'sfcBlocksExtracted', (payload) => {
+  // eslint-disable-next-line prefer-const
   let { html, options, frontmatter, head, routeMeta } = payload
   // extract script blocks, adjust HTML
   const hoistScripts = extractScriptBlocks(html)

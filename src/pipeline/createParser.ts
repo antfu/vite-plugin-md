@@ -4,7 +4,7 @@ import { transformer } from '../utils'
 /**
  * Creates a **MarkdownIt** parser instance which this plugin will use for all processing.
  */
-export const createParser = transformer('metaExtracted', 'parser', (payload) => {
+export const createParser = transformer('createParser', 'metaExtracted', 'parser', (payload) => {
   const parser = new MarkdownIt({
     html: true,
     linkify: true,

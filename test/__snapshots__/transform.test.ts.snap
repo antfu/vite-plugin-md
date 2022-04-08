@@ -1,63 +1,13 @@
 // Vitest Snapshot v1
 
-exports[`transform snapshots > customBlocks remain the same 1`] = `
-[
-  "<style>h1 { color: red }</style>",
-]
-`;
+exports[`transform snapshots > customBlocks remain the same 1`] = `undefined`;
 
-exports[`transform snapshots > frontmatter remains the same 1`] = `
-{
-  "description": "hello world",
-  "excerpt": undefined,
-  "hello": "how friendly",
-  "title": "transform tests",
-}
-`;
+exports[`transform snapshots > frontmatter remains the same 1`] = `undefined`;
 
-exports[`transform snapshots > head props remains the same 1`] = `
-{
-  "description": "hello world",
-  "excerpt": undefined,
-  "hello": "how friendly",
-  "title": "transform tests",
-}
-`;
+exports[`transform snapshots > head props remains the same 1`] = `undefined`;
 
-exports[`transform snapshots > html remains the same 1`] = `
-"<div class=\\"markdown-body\\"><h1>Hello</h1>
-<style>h1 { color: red }</style>
-<script setup lang=\\"ts\\">
-import Foo from './Foo.vue'
-</script>
-<ul>
-<li>A</li>
-<li>B</li>
-<li>C</li>
-</ul>
-<h2>Escaping Code Tag Interpolation</h2>
-<div>{{hello}}</div>
-<p>When the markdown below is parsed – assuming the default behavior of “escapeCodeTagInterpolation” is set – it should be translated to include a “pre” attribute on the <code v-pre>code</code> tag so that VueJS does not interpolate this as a variable:</p>
-<pre><code class=\\"language-html\\" v-pre>&lt;div&gt;{{hello}}&lt;/div&gt;
-</code></pre>
-<p>By contrast, the below code fence will take on the opposite behavior:</p>
-<pre><code class=\\"language-ts\\">const theValue = {{ hello }};
-</code></pre>
-</div>"
-`;
+exports[`transform snapshots > html remains the same 1`] = `undefined`;
 
-exports[`transform snapshots > meta props remains the same 1`] = `[]`;
+exports[`transform snapshots > meta props remains the same 1`] = `undefined`;
 
-exports[`transform snapshots > script blocks remain the same 1`] = `
-"<script setup>
-import Foo from './Foo.vue'
-
-const frontmatter = {\\"title\\":\\"transform tests\\",\\"description\\":\\"hello world\\",\\"hello\\":\\"how friendly\\"}
- const title = \\"transform tests\\"
- const description = \\"hello world\\"
- const hello = \\"how friendly\\"
- const excerpt = undefined
-defineExpose({ frontmatter })
-const head = {\\"title\\":\\"transform tests\\",\\"description\\":\\"hello world\\",\\"hello\\":\\"how friendly\\"}
-</script>"
-`;
+exports[`transform snapshots > script blocks remain the same 1`] = `undefined`;

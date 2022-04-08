@@ -9,7 +9,7 @@ async function getFixture(file: string): Promise<string> {
 }
 
 describe('code() builder', () => {
-  it.only('valid language choice is rendered', async() => {
+  it('valid language choice is rendered', async() => {
     const { templateBlock } = await composeSfcBlocks(
       'test/fixtures/ts-code-block.md',
       await getFixture('multi-code-block.md'),
@@ -23,7 +23,7 @@ describe('code() builder', () => {
     ).toBeFalsy()
   })
   it('"unknown language" fallback is used when language stated but not matched', async() => {
-    const { templateBlock } =await composeSfcBlocks(
+    const { templateBlock } = await composeSfcBlocks(
       'test/fixtures/ts-code-block.md',
       await getFixture('unknown-code-block.md'),
       { builders: [code()] },

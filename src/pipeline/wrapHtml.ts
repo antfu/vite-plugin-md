@@ -3,7 +3,7 @@ import { transformer } from '../utils'
 /**
  * Wraps the HTML with DIV and/or a VueJS component
  */
-export const wrapHtml = transformer('parsed', 'parsed', (payload) => {
+export const wrapHtml = transformer('wrapHtml', 'parsed', 'parsed', (payload) => {
   const { options: { wrapperClasses, wrapperComponent }, html, frontmatter, excerpt } = payload
   let updated = html
 
