@@ -10,7 +10,7 @@ async function getFixture(file: string): Promise<string> {
 
 describe('code() builder', () => {
   it.only('valid language choice is rendered', async() => {
-    const { templateBlock } = composeSfcBlocks(
+    const { templateBlock } = await composeSfcBlocks(
       'test/fixtures/ts-code-block.md',
       await getFixture('multi-code-block.md'),
       { builders: [code()] },
@@ -23,7 +23,7 @@ describe('code() builder', () => {
     ).toBeFalsy()
   })
   it('"unknown language" fallback is used when language stated but not matched', async() => {
-    const { templateBlock } = composeSfcBlocks(
+    const { templateBlock } =await composeSfcBlocks(
       'test/fixtures/ts-code-block.md',
       await getFixture('unknown-code-block.md'),
       { builders: [code()] },
@@ -34,7 +34,7 @@ describe('code() builder', () => {
     expect(templateBlock.includes('language-xxx')).toBeFalsy()
   })
   it('line numbers are displayed when set', async() => {
-    const { templateBlock } = composeSfcBlocks(
+    const { templateBlock } = await composeSfcBlocks(
       'test/fixtures/ts-code-block.md',
       await getFixture('ts-code-block.md'),
       { builders: [code({ lineNumbers: true })] },

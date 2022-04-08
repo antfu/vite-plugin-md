@@ -1,18 +1,18 @@
-import { flow, pipe } from 'fp-ts/lib/function'
+import { identity, pipe } from 'fp-ts/lib/function'
+import * as E from 'fp-ts/lib/Either'
 import * as TE from 'fp-ts/lib/TaskEither'
 import { isRight } from 'fp-ts/lib/Either'
 import { resolveOptions } from '../options'
-import {
-  PipelineStage,
-} from '../types'
+import { PipelineStage } from '../types'
 import type {
   Options,
+  PipeTask,
   Pipeline,
   ViteConfigPassthrough,
 } from '../types'
 import {
   applyMarkdownItOptions,
-  callEventHooks,
+  gatherBuilderEvents,
   createParser,
   // builderToTask,
   escapeCodeTagInterpolation,
@@ -26,6 +26,9 @@ import {
   transformsBefore,
   wrapHtml,
 } from '../pipeline'
+import { lift } from '../utils'
+
+type t = typeof transformsBefore
 
 /**
  * Composes the `template` and `script` blocks, along with any other `customBlocks` from the raw
@@ -43,59 +46,46 @@ export async function composeSfcBlocks(id: string, raw: string, opts: Options = 
     viteConfig: config,
   }
 
-  /** Builder handler functions for the given lifecycle stage */
-  const handlers = callEventHooks(options)
+  const handlers = gatherBuilderEvents(options)
+  const x = handlers('closeout')
 
   // construct the async pipeline
   const result = pipe(
     payload,
+    lift('initialize'),
 
     transformsBefore,
+
     handlers(PipelineStage.initialize),
 
-    TE.map(
-      flow(
-        extractFrontmatter,
-        frontmatterPreprocess,
-      ),
-    ),
+    extractFrontmatter,
+    frontmatterPreprocess,
     handlers(PipelineStage.metaExtracted),
 
-    TE.map(
-      flow(
-        createParser,
-        loadMarkdownItPlugins,
-        applyMarkdownItOptions,
-      ),
-    ),
+    createParser,
+    loadMarkdownItPlugins,
+    applyMarkdownItOptions,
     handlers(PipelineStage.parser),
 
-    TE.map(
-      flow(
-        parseHtml,
-        wrapHtml,
-        escapeCodeTagInterpolation,
-      ),
-    ),
+    parseHtml,
+    wrapHtml,
+    escapeCodeTagInterpolation,
     handlers(PipelineStage.parsed),
 
-    TE.map(extractBlocks),
+    extractBlocks,
     handlers(PipelineStage.sfcBlocksExtracted),
 
-    TE.map(
-      flow(
-        finalize,
-        transformsAfter,
-      ),
-    ),
+    finalize,
+    transformsAfter,
     handlers(PipelineStage.closeout),
   )
 
   // run the pipeline
-  const pipeline = await result()
+  // const pipeline = await result()
+  // console.log({pipeline});
 
-  if (isRight(pipeline))
-    return pipeline.right
+  if (isRight(result))
+    return result.right
   else
-    throw new Error(pipeline.left)
+    throw new Error(result.left as string)
 }

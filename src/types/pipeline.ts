@@ -1,6 +1,8 @@
 import type MarkdownIt from 'markdown-it'
 import type * as TE from 'fp-ts/TaskEither'
 import type { UserConfig } from 'vite'
+import type { Either } from 'fp-ts/lib/Either'
+import type { Task } from 'fp-ts/lib/Task'
 import type { EnumValues, Frontmatter, MetaProperty, ResolvedOptions } from './core'
 
 export enum PipelineStage {
@@ -54,7 +56,7 @@ export interface RulesUse {
 
 export type PipelineInitializer = (i?: Pipeline<PipelineStage.initialize>) => Pipeline<PipelineStage.initialize>
 
-export interface BuilderRegistration<O extends BuilderOptions, S extends IPipelineStage > {
+export interface BuilderRegistration<O extends BuilderOptions, S extends IPipelineStage> {
   name: string
   description?: string
   /** The lifecycle event/hook which this builder will respond to */
@@ -171,32 +173,32 @@ export type InitializedOmissions = 'md'
 
 /** after extracting metadata */
 export type MetaOmissions =
-| 'fencedLanguages'
-| 'parser'
-| 'html'
-| 'hoistedScripts'
-| 'templateBlock'
-| 'scriptBlock'
-| 'customBlocks'
-| 'component'
+  | 'fencedLanguages'
+  | 'parser'
+  | 'html'
+  | 'hoistedScripts'
+  | 'templateBlock'
+  | 'scriptBlock'
+  | 'customBlocks'
+  | 'component'
 
 /** after providing the markdown-it parser */
 export type ParserOmissions =
-| 'fencedLanguages'
-| 'html'
-| 'hoistedScripts'
-| 'templateBlock'
-| 'scriptBlock'
-| 'customBlocks'
-| 'component'
+  | 'fencedLanguages'
+  | 'html'
+  | 'hoistedScripts'
+  | 'templateBlock'
+  | 'scriptBlock'
+  | 'customBlocks'
+  | 'component'
 
 /** after parsing to raw HTML using markdown-it */
 export type ParsedOmissions =
-| 'hoistedScripts'
-| 'templateBlock'
-| 'scriptBlock'
-| 'customBlocks'
-| 'component'
+  | 'hoistedScripts'
+  | 'templateBlock'
+  | 'scriptBlock'
+  | 'customBlocks'
+  | 'component'
 
 export type SfcBlockOmissions = 'component'
 
@@ -247,7 +249,7 @@ export type BuilderTask<
  *
  * - options( ) -> register( ) -> { handler( payload ) -> payload }
  */
-export type BuilderApi<O extends {}, S extends IPipelineStage > = (options?: O) => () => BuilderRegistration<O, S>
+export type BuilderApi<O extends {}, S extends IPipelineStage> = (options?: O) => () => BuilderRegistration<O, S>
 
 export type InlineBuilder = <N extends string, L extends IPipelineStage>(name: N, lifecycle: L) => (payload: Pipeline<L>) => Pipeline<L>
 
@@ -258,3 +260,44 @@ export type InlineBuilder = <N extends string, L extends IPipelineStage>(name: N
 export type BuilderOptions = Record<string, any> | {}
 
 export type BuilderConfig = Record<IPipelineStage, BuilderRegistration<any, any>[] | []>
+
+/**
+ * Carries an Either<T> condition which is either:
+ * - a _string_ error condition
+ * - a `Pipeline<S>` value
+ */
+export type PipeEither<S extends IPipelineStage> = Either<string, Pipeline<S>>
+
+/**
+ * Carries an `TaskEither<T>` condition which is either:
+ * - a _string_ error condition
+ * - a `() => Promise<Pipeline<S>>` task
+ */
+export type PipeTask<S extends IPipelineStage> = TE.TaskEither<string, Pipeline<S>>
+
+/**
+ * A pipeline payload or either an async `PipeTask<S>` or a synchronous `PipeEither<S>`
+ */
+export type PipelinePayload<S extends IPipelineStage> = PipeTask<S> | PipeEither<S>
+
+/**
+ * A _synchronous_ transformer function which:
+ *
+ * - recieves a payload of `PipeEither<F>`, and
+ * - converts it to a type of `PipeEither<T>`
+ */
+export type SyncPipelineTransformer<
+  F extends IPipelineStage,
+  T extends IPipelineStage,
+> = (payload: PipeTask<F>) => PipeTask<T>
+
+/**
+* An _asynchronous_ transformer function which:
+*
+* - recieves a payload of `PipeTask<F>` (async) or `PipeEither<F>` (sync)
+* - converts it to a type of `PipeTask<T>`
+*/
+export type AsyncPipelineTransformer<
+  F extends IPipelineStage,
+  T extends IPipelineStage,
+> = (payload: PipeTask<F>) => PipeTask<T>

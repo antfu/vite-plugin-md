@@ -1,10 +1,10 @@
 import MarkdownIt from 'markdown-it'
-import type { Pipeline, PipelineStage } from '../types'
+import { transformer } from '../utils'
 
 /**
  * Creates a **MarkdownIt** parser instance which this plugin will use for all processing.
  */
-export function createParser(payload: Pipeline<PipelineStage.metaExtracted>): Pipeline<PipelineStage.parser> {
+export const createParser = transformer('metaExtracted', 'parser', (payload) => {
   const parser = new MarkdownIt({
     html: true,
     linkify: true,
@@ -15,4 +15,4 @@ export function createParser(payload: Pipeline<PipelineStage.metaExtracted>): Pi
   parser.linkify.set({ fuzzyLink: false })
 
   return { ...payload, parser }
-}
+})

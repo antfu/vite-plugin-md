@@ -1,9 +1,11 @@
-import type { Pipeline, PipelineStage } from '../types'
+import { transformer } from '../utils'
 
 /**
  * Call's the transformer function provided in `options.after` before finishing
  */
-export function transformsAfter(payload: Pipeline<PipelineStage.closeout>): Pipeline<PipelineStage.closeout> {
+export const transformsAfter = transformer('closeout', 'closeout', (payload) => {
   const { options: { transforms: { after } } } = payload
-  return after ? { ...payload, content: after(payload.component, payload.fileName) } : payload
-}
+  return after
+    ? { ...payload, content: after(payload.component, payload.fileName) }
+    : payload
+})

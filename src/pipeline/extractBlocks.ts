@@ -1,9 +1,7 @@
 import type {
-  Pipeline,
-  PipelineStage,
   ResolvedOptions,
 } from '../types'
-import { isVue2, wrap } from '../utils'
+import { isVue2, transformer, wrap } from '../utils'
 
 const scriptSetupRE = /<\s*script[^>]*\bsetup\b[^>]*>([\s\S]*)<\/script>/mg
 const defineExposeRE = /defineExpose\s*\(/mg
@@ -42,8 +40,7 @@ function extractCustomBlock(html: string, options: ResolvedOptions) {
  * Converts the markdown content to an HTML template and extracts both
  * the HTML and scripts.
  */
-export function extractBlocks(payload: Pipeline<PipelineStage.parsed>): Pipeline<PipelineStage.sfcBlocksExtracted> {
-  // eslint-disable-next-line prefer-const
+export const extractBlocks = transformer('parsed', 'sfcBlocksExtracted', (payload) => {
   let { html, options, frontmatter, head, routeMeta } = payload
   // extract script blocks, adjust HTML
   const hoistScripts = extractScriptBlocks(html)
@@ -66,7 +63,8 @@ export function extractBlocks(payload: Pipeline<PipelineStage.parsed>): Pipeline
     else if (isVue2(options) && options.exposeFrontmatter)
       hoistedScripts.push('export default { data() { return { frontmatter } } }\n')
 
-    if (head) hoistedScripts.push(`const head = ${JSON.stringify(head)}`)
+    if (head)
+      hoistedScripts.push(`const head = ${JSON.stringify(head)}`)
     if (!isVue2(options) && options.headEnabled && head) {
       hoistedScripts.unshift('import { useHead } from "@vueuse/head"')
       hoistedScripts.push('useHead(head)')
@@ -81,4 +79,4 @@ export function extractBlocks(payload: Pipeline<PipelineStage.parsed>): Pipeline
     : wrap('script setup', hoistedScripts.join('\n'))
 
   return { ...payload, hoistedScripts, templateBlock, scriptBlock, customBlocks }
-}
+})

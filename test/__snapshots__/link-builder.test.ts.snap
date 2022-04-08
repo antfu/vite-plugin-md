@@ -1,0 +1,3 @@
+// Vitest Snapshot v1
+
+exports[`link testing > component snapshot is consistent 1`] = `undefined`;

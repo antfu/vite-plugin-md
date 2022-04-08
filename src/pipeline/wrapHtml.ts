@@ -1,9 +1,9 @@
-import type { Pipeline, PipelineStage } from '../types'
+import { transformer } from '../utils'
 
 /**
  * Wraps the HTML with DIV and/or a VueJS component
  */
-export function wrapHtml(payload: Pipeline<PipelineStage.parsed>): Pipeline<PipelineStage.parsed> {
+export const wrapHtml = transformer('parsed', 'parsed', (payload) => {
   const { options: { wrapperClasses, wrapperComponent }, html, frontmatter, excerpt } = payload
   let updated = html
 
@@ -18,4 +18,4 @@ export function wrapHtml(payload: Pipeline<PipelineStage.parsed>): Pipeline<Pipe
     updated = `<${wrapperComponent}${frontmatter ? ' :frontmatter="frontmatter"' : ''}${excerpt ? ' :excerpt="excerpt"' : ''}>${updated}</${wrapperComponent}>`
 
   return { ...payload, html: updated }
-}
+})

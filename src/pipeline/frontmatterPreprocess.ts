@@ -1,11 +1,12 @@
-import type { MetaProperty, Pipeline, PipelineStage } from '../types'
+import type { MetaProperty } from '../types'
+import { transformer } from '../utils'
 
 /**
  * Runs the `frontmatterPreprocess()` hook unless configured not to.
  *
  * Note: the links() builder will turn this off (setting to undefined)
  */
-export function frontmatterPreprocess(payload: Pipeline<PipelineStage.metaExtracted>): Pipeline<PipelineStage.metaExtracted> {
+export const frontmatterPreprocess = transformer('metaExtracted', 'metaExtracted', (payload) => {
   const { frontmatter, options: { frontmatterPreprocess } } = payload
   let { head, meta, routeMeta } = payload
 
@@ -20,4 +21,4 @@ export function frontmatterPreprocess(payload: Pipeline<PipelineStage.metaExtrac
   routeMeta = { ...routeMeta, ...results.routeMeta }
 
   return { ...payload, ...results, head, meta, routeMeta }
-}
+})

@@ -1,4 +1,4 @@
-import type { ResolvedOptions } from './types'
+import type { ResolvedOptions } from '../types'
 
 export function getVueVersion(defaultVersion = '3.2.0') {
   try {

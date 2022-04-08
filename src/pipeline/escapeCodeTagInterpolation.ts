@@ -1,4 +1,4 @@
-import type { Pipeline, PipelineStage } from '../types'
+import { transformer } from '../utils'
 
 const codeTagRe = /<code(?:.*?language-([!]{0,1})(\w+))?(.*?)>/g
 
@@ -11,7 +11,7 @@ const codeTagRe = /<code(?:.*?language-([!]{0,1})(\w+))?(.*?)>/g
  * the payload being passed through as this could be valuable for _search_
  * or other meta features.
  */
-export function escapeCodeTagInterpolation(payload: Pipeline<PipelineStage.parsed>): Pipeline<PipelineStage.parsed> {
+export const escapeCodeTagInterpolation = transformer('parsed', 'parsed', (payload) => {
   const { options: { escapeCodeTagInterpolation }, html, fencedLanguages } = payload
   const replacements = new Map()
 
@@ -42,4 +42,4 @@ export function escapeCodeTagInterpolation(payload: Pipeline<PipelineStage.parse
     updated = updated.replace(new RegExp(before, 'g'), after)
 
   return { ...payload, html: updated, fencedLanguages }
-}
+})

@@ -1,0 +1,7 @@
+// Vitest Snapshot v1
+
+exports[`frontmatter pre-processor > frontmatter is unchanged 1`] = `undefined`;
+
+exports[`frontmatter pre-processor > head is unchanged 1`] = `undefined`;
+
+exports[`frontmatter pre-processor > meta props are unchanged 1`] = `undefined`;

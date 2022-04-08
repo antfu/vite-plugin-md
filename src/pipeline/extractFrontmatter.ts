@@ -1,6 +1,7 @@
 import matter from 'gray-matter'
-import type { ExcerptFunction, Pipeline, PipelineStage } from '../types'
+import type { ExcerptFunction } from '../types'
 import type { GraymatterOptions } from '../types/core'
+import { transformer } from '../utils'
 
 /**
  * Extracts meta data for the page:
@@ -11,7 +12,7 @@ import type { GraymatterOptions } from '../types/core'
  * - updates the "options" for Graymatter to reflect to downstream consumers what the
  * actual configuration used was.
  */
-export function extractFrontmatter(payload: Pipeline<PipelineStage.initialize>): Pipeline<PipelineStage.metaExtracted> {
+export const extractFrontmatter = transformer('initialize', 'metaExtracted', (payload) => {
   const { options: { grayMatterOptions: { excerpt: ge }, excerpt: e } } = payload
   const eConfig = [e, ge]
   const excerpt = eConfig.find(i => i === false) !== undefined
@@ -21,7 +22,7 @@ export function extractFrontmatter(payload: Pipeline<PipelineStage.initialize>):
       : true
 
   const excerpt_separator = excerpt === false
-    // used to ensure all text stays in body
+  // used to ensure all text stays in body
     ? undefined
     : typeof e === 'string'
       ? e
@@ -52,4 +53,5 @@ export function extractFrontmatter(payload: Pipeline<PipelineStage.initialize>):
     head: [],
     routeMeta: {},
   }
-}
+},
+)

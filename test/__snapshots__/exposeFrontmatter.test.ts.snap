@@ -1,0 +1,5 @@
+// Vitest Snapshot v1
+
+exports[`exposeFrontmatter property > Vue2 -- when exposeFrontmatter set to false -- does NOT use defineExpose method from Vue3 1`] = `undefined`;
+
+exports[`exposeFrontmatter property > Vue3 -- when exposeFrontmatter set to false -- does NOT use defineExpose to expose frontmatter 1`] = `undefined`;
