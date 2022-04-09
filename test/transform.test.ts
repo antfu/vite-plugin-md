@@ -9,28 +9,28 @@ describe('transform snapshots', () => {
     page = await readFile('test/fixtures/transform.md', 'utf-8')
   })
 
-  it('frontmatter remains the same', () => {
-    const sfc = composeSfcBlocks('transform.md', page)
+  it('frontmatter remains the same', async() => {
+    const sfc = await composeSfcBlocks('transform.md', page)
     expect(sfc.frontmatter).toMatchSnapshot()
   })
-  it('meta props remains the same', () => {
-    const sfc = composeSfcBlocks('transform.md', page)
+  it('meta props remains the same', async() => {
+    const sfc = await composeSfcBlocks('transform.md', page)
     expect(sfc.meta).toMatchSnapshot()
   })
-  it('head props remains the same', () => {
-    const sfc = composeSfcBlocks('transform.md', page)
+  it('head props remains the same', async() => {
+    const sfc = await composeSfcBlocks('transform.md', page)
     expect(sfc.head).toMatchSnapshot()
   })
-  it('html remains the same', () => {
-    const sfc = composeSfcBlocks('transform.md', page)
+  it('html remains the same', async() => {
+    const sfc = await composeSfcBlocks('transform.md', page)
     expect(sfc.html).toMatchSnapshot()
   })
-  it('customBlocks remain the same', () => {
-    const sfc = composeSfcBlocks('transform.md', page)
+  it('customBlocks remain the same', async() => {
+    const sfc = await composeSfcBlocks('transform.md', page)
     expect(sfc.customBlocks).toMatchSnapshot()
   })
-  it('script blocks remain the same', () => {
-    const sfc = composeSfcBlocks('transform.md', page)
+  it('script blocks remain the same', async() => {
+    const sfc = await composeSfcBlocks('transform.md', page)
     expect(sfc.scriptBlock).toMatchSnapshot()
   })
 })
@@ -48,8 +48,8 @@ describe('transform', () => {
     page = await readFile('test/fixtures/transform.md', 'utf-8')
   })
 
-  it('escapeCodeTagInterpolation behavior exhibited when option set to true (default)', () => {
-    const sfc = composeSfcBlocks('transform.md', page)
+  it('escapeCodeTagInterpolation behavior exhibited when option set to true (default)', async() => {
+    const sfc = await composeSfcBlocks('transform.md', page)
 
     expect(sfc.html.includes(ESCAPED_CODE_TAG('html'))).toBeTruthy()
     expect(
@@ -58,8 +58,8 @@ describe('transform', () => {
     ).toBeTruthy()
   })
 
-  it('escapeCodeTagInterpolation behavior removed when set to false', () => {
-    const sfc = composeSfcBlocks('transform.md', page, { escapeCodeTagInterpolation: false })
+  it('escapeCodeTagInterpolation behavior removed when set to false', async() => {
+    const sfc = await composeSfcBlocks('transform.md', page, { escapeCodeTagInterpolation: false })
     expect(sfc.html.includes(UN_ESCAPED_CODE_TAG('html'))).toBeTruthy()
     expect(
       sfc.html.includes(ESCAPED_CODE_TAG('ts')),

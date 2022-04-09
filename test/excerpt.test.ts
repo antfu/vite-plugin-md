@@ -13,7 +13,7 @@ describe('excerpt', () => {
 
   it('excerpt ignored in body if option set to false', async() => {
     const options: Options = { excerpt: false }
-    const sfc = composeSfcBlocks('excerpt.md', md, options)
+    const sfc = await composeSfcBlocks('excerpt.md', md, options)
     const preamble = `\nWhen excerpts are off [${sfc.options.excerpt}, ${sfc.options.grayMatterOptions.excerpt}, sep: ${sfc.options.grayMatterOptions.excerpt_separator}]`
     expect(sfc.frontmatter.excerpt, `${preamble}, frontmatter.excerpt should be undefined but wasn't`).toBeUndefined()
     expect(sfc.excerpt).toBeUndefined()
@@ -29,7 +29,7 @@ describe('excerpt', () => {
 
   it('excerpt found in body if option set to true', async() => {
     const options: Options = { excerpt: true }
-    const sfc = composeSfcBlocks('excerpt.md', md, options)
+    const sfc = await composeSfcBlocks('excerpt.md', md, options)
     expect(sfc.excerpt).toBeTypeOf('string')
     expect(sfc.frontmatter.excerpt).toContain('The default excerpt is assumed to be the text up to')
     expect(
@@ -41,7 +41,7 @@ describe('excerpt', () => {
   it('excerpt with custom separator found when specified', async() => {
     const content = await readFile('test/fixtures/excerpt-custom-sep.md', 'utf-8')
     const options: Options = { excerpt: '<!-- more -->' }
-    const sfc = composeSfcBlocks('excerpt.md', content, options)
+    const sfc = await composeSfcBlocks('excerpt.md', content, options)
 
     expect(sfc.frontmatter.excerpt).toBeTypeOf('string')
     expect(sfc.frontmatter.excerpt).toContain('This is an excerpt')
@@ -57,7 +57,7 @@ describe('excerpt', () => {
         },
       })],
     }
-    const sfc = composeSfcBlocks('excerpt.md', md, options)
+    const sfc = await composeSfcBlocks('excerpt.md', md, options)
 
     expect(sfc.frontmatter.excerpt).toBeTypeOf('string')
     expect(sfc.frontmatter.excerpt).toContain('The default excerpt is assumed to be the text up to')
@@ -70,23 +70,23 @@ describe('excerpt snapshots', () => {
     md = await readFile('test/fixtures/excerpt-default.md', 'utf-8')
   })
 
-  it('frontmatter is consistent', () => {
-    const { frontmatter } = composeSfcBlocks('excerpt.md', md)
+  it('frontmatter is consistent', async() => {
+    const { frontmatter } = await composeSfcBlocks('excerpt.md', md)
     expect(frontmatter).toMatchSnapshot()
   })
 
-  it('HTML is consistent', () => {
-    const { html } = composeSfcBlocks('excerpt.md', md)
+  it('HTML is consistent', async() => {
+    const { html } = await composeSfcBlocks('excerpt.md', md)
     expect(html).toMatchSnapshot()
   })
 
-  it('script blocks are consistent', () => {
-    const { scriptBlock } = composeSfcBlocks('excerpt.md', md)
+  it('script blocks are consistent', async() => {
+    const { scriptBlock } = await composeSfcBlocks('excerpt.md', md)
     expect(scriptBlock).toMatchSnapshot()
   })
 
-  it('custom blocks are consistent', () => {
-    const { customBlocks } = composeSfcBlocks('excerpt.md', md)
+  it('custom blocks are consistent', async() => {
+    const { customBlocks } = await composeSfcBlocks('excerpt.md', md)
     expect(customBlocks).toMatchSnapshot()
   })
 })

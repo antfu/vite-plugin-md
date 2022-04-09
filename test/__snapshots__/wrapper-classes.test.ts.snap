@@ -1,5 +1,17 @@
 // Vitest Snapshot v1
 
-exports[`Snapshots for wrapper-testing > html is consistent for default config 1`] = `undefined`;
+exports[`Snapshots for wrapper-testing > html is consistent for default config 1`] = `
+"<div class=\\"markdown-body\\"><h1>My H1</h1>
+<p>lorem ipsum</p>
+<h2>Transformed</h2>
+<p>base: {{ title }}</p>
+</div>"
+`;
 
-exports[`Snapshots for wrapper-testing > html is consistent for explicit config 1`] = `undefined`;
+exports[`Snapshots for wrapper-testing > html is consistent for explicit config 1`] = `
+"<post :frontmatter=\\"frontmatter\\"><div class=\\"prose m-auto\\"><h1>My H1</h1>
+<p>lorem ipsum</p>
+<h2>Transformed</h2>
+<p>base: {{ title }}</p>
+</div></post>"
+`;

@@ -1,12 +1,11 @@
-import { identity, pipe } from 'fp-ts/lib/function'
+import { pipe } from 'fp-ts/lib/function'
 import * as TE from 'fp-ts/TaskEither'
-import * as E from 'fp-ts/Either'
-
-import type { AsyncPipelineTransformer, BuilderConfig, BuilderOptions, BuilderRegistration, IPipelineStage, PipeTask, Pipeline, PipelineStage, ResolvedOptions } from '../types'
+import type { BuilderConfig, BuilderOptions, BuilderRegistration, IPipelineStage, PipeTask, Pipeline, ResolvedOptions } from '../types'
 
 const getBuilders = <S extends IPipelineStage>(stage: S, options: ResolvedOptions): Array<BuilderRegistration<any, S>> => options.builders.reduce(
   (acc, b) => {
     const defn = b() as BuilderRegistration<BuilderOptions, IPipelineStage>
+
     const current = acc[defn.lifecycle]
     return {
       ...acc,
@@ -57,7 +56,7 @@ export const getBuilderTask = <S extends IPipelineStage>(
   const asyncApi = async(payload: Pipeline<S>) => {
     for (const b of builders) {
       try {
-        payload = await b.handler(payload, options)
+        payload = await b.handler(payload, b.options)
       }
       catch (e) {
         throw new Error(`During the "${stage}" stage, the builder API "${b.name}" was unable to transform the payload. It received the following error message: ${e instanceof Error ? e.message : String(e)}`)
@@ -73,29 +72,6 @@ export const getBuilderTask = <S extends IPipelineStage>(
 }
 
 /**
- * The second partial application stage of a CallEventHooks call:
- *
- * - returns a _stage_ which needs to be stated
- * - and then the handlers can take a "payload" of either:
- *    - a synchronous `Pipeline<S>`
- *    - an asynchronous `TaskEither<unknown, Pipeline<S>`
- * - in _both_ cases the return type will be a `TaskEither<string, S>`
- */
-export interface HandlerLifecycle {
-  <S extends PipelineStage>(stage: S): AsyncPipelineTransformer<S, S>
-}
-/**
- * A higher order function which starts by taking the `options` for this plugin
- *
- * - returns a function requesting a _stage_,
- * - another function of type `AsyncTransformer` which recieves
- *    - a synchronous `Pipeline<S>`
- *    - an asynchronous `TaskEither<unknown, Pipeline<S>`
- * - in _both_ cases the return type will be a `TaskEither<string, S>`
- */
-export type CallEventHooks = (options: ResolvedOptions) => HandlerLifecycle
-
-/**
  * A higher order function which starts by taking the `options` for this plugin
  *
  * - returns a function requesting a _stage_,
@@ -105,6 +81,7 @@ export type CallEventHooks = (options: ResolvedOptions) => HandlerLifecycle
  * - in _both_ cases the return type will be a `TaskEither<string, S>`
  */
 export const gatherBuilderEvents = (options: ResolvedOptions) =>
+
   /**
    * Providing the _stage_ allows isolating only those events
    * which should be executed at this point in time and

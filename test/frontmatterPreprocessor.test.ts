@@ -33,23 +33,23 @@ describe('frontmatter pre-processor', () => {
     md = await readFile('test/fixtures/simple.md', 'utf-8')
   })
 
-  it('frontmatter is unchanged', () => {
-    const { frontmatter } = composeSfcBlocks('', md, { frontmatterPreprocess, headEnabled: true })
+  it('frontmatter is unchanged', async() => {
+    const { frontmatter } = await composeSfcBlocks('', md, { frontmatterPreprocess, headEnabled: true })
     expect(frontmatter).toMatchSnapshot()
   })
 
-  it('head is unchanged', () => {
-    const { head } = composeSfcBlocks('', md, { frontmatterPreprocess, headEnabled: true })
+  it('head is unchanged', async() => {
+    const { head } = await composeSfcBlocks('', md, { frontmatterPreprocess, headEnabled: true })
     expect(head).toMatchSnapshot()
   })
 
-  it('meta props are unchanged', () => {
-    const { meta } = composeSfcBlocks('', md, { frontmatterPreprocess, headEnabled: true })
+  it('meta props are unchanged', async() => {
+    const { meta } = await composeSfcBlocks('', md, { frontmatterPreprocess, headEnabled: true })
     expect(meta).toMatchSnapshot()
   })
 
   it('inline markdown is used over default properties', async() => {
-    const { frontmatter } = composeSfcBlocks('', md, { frontmatterPreprocess, headEnabled: true })
+    const { frontmatter } = await composeSfcBlocks('', md, { frontmatterPreprocess, headEnabled: true })
 
     // Positive tests
     expect(
@@ -75,7 +75,7 @@ describe('frontmatter pre-processor', () => {
   })
 
   it('meta and head props are populated based on default rules', async() => {
-    const { head, meta } = composeSfcBlocks('', md, { frontmatterPreprocess, headEnabled: true })
+    const { head, meta } = await composeSfcBlocks('', md, { frontmatterPreprocess, headEnabled: true })
     // Meta props
     const title = meta.find(i => i.property === 'og:title')
     const desc = meta.find(i => i.property === 'og:description')

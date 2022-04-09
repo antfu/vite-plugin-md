@@ -60,6 +60,7 @@ export function createBuilder<E extends IPipelineStage>(name: string, lifecycle:
                     initializer,
                   }
 
+                  // return a function so that the consumer can add in their options
                   return (
                     (options: Partial<O> = {}) =>
                       () => ({ ...registration, options }) as BuilderRegistration<O, E>

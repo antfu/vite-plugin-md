@@ -63,6 +63,7 @@ describe('link testing', () => {
         ruleBasedClasses: [[/colors\.com/, 'colorful']],
       })],
     })
+
     document.body.innerHTML = sfc.html
 
     const colorful = document.querySelectorAll('.colorful')

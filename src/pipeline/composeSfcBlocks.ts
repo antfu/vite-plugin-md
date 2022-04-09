@@ -46,7 +46,6 @@ export async function composeSfcBlocks(id: string, raw: string, opts: Options = 
   const result = pipe(
     payload,
     lift('initialize'),
-
     transformsBefore,
 
     handlers(PipelineStage.initialize),

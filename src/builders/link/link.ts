@@ -63,6 +63,7 @@ const addClasses = (c: LinkifyConfig): LinkTransformer =>
     if (lnk.href) {
       c.ruleBasedClasses.forEach((rc) => {
         const [rule, klass] = rc
+
         if (rule.test(lnk.href as string))
           lnk.class = [lnk.class, klass].join(' ')
       })

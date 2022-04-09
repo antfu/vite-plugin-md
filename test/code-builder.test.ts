@@ -22,7 +22,7 @@ describe('code() builder', () => {
       'while "bash" is the default language, it should not be falling back to that with a valid language detected',
     ).toBeFalsy()
   })
-  it('"unknown language" fallback is used when language stated but not matched', async() => {
+  it.only('"unknown language" fallback is used when language stated but not matched', async() => {
     const { templateBlock } = await composeSfcBlocks(
       'test/fixtures/ts-code-block.md',
       await getFixture('unknown-code-block.md'),
