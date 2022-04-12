@@ -6,7 +6,7 @@ title: Typescript Code Block
 
 this test is intended to validate testing of code blocks
 
-```ts
+```ts {4}
 type Valid = 'foo' | 'bar' | 'baz'
 const testVariable: Valid = 'foo'
 function myFunc(name: string) {

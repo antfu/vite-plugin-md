@@ -50,9 +50,6 @@ export async function getShikiHighlighter(options: ShikiOptions) {
     )
   }
 
-  // // ensure language is loaded
-  // await shiki.loadLanguage(lang)
-
   return {
     highlight(code: string, lang: Lang, klass: LineClassFn): string {
       const modes = themes.map((t) => {

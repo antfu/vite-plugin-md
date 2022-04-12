@@ -1,16 +1,16 @@
 import { PipelineStage } from '../../types'
 import { createBuilder } from '../createBuilder'
 import { fence } from './mdi'
-import type { CodeOptions } from './types/code-types'
+import type { CodeOptions, PrismOptions } from './types/code-types'
 import { Highlighter } from './types/code-types'
 
-const PRISM_DEFAULTS = {
+const PRISM_DEFAULTS: Partial<PrismOptions> = {
   engine: Highlighter.prism,
   plugins: [],
   init: () => {
     // do nothing by default
   },
-  defaultLanguageForUnknown: undefined,
+  defaultLanguageForUnknown: 'bash',
   defaultLanguageForUnspecified: 'bash',
   defaultLanguage: undefined,
 }

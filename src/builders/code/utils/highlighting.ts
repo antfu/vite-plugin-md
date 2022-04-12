@@ -1,13 +1,14 @@
+import type { CodeBlockMeta, CodeOptions, LineCallback, PrismOptions, ShikiOptions } from '../types'
+import { Highlighter } from '../types'
+import { validPrismLanguage } from './prism-languages'
 
-import type { CodeFenceMeta, CodeOptions, LineCallback, PrismOptions, ShikiOptions } from './types'
-import { Highlighter } from './types'
-
-export function isValidLanguage(h: Highlighter, _meta: CodeFenceMeta): boolean {
+export function isValidLanguage(h: Highlighter, meta: CodeBlockMeta): boolean {
   if (h === Highlighter.prism) {
-    //
+    return validPrismLanguage(meta.lang)
   }
   else {
-    //
+    // TODO: do for Shiki
+    return true
   }
 }
 

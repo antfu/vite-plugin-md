@@ -1,7 +1,8 @@
+import type { DocumentFragment } from 'happy-dom'
 import type Prism from 'prismjs'
 import type { ILanguageRegistration, IThemeRegistration, Lang, Highlighter as ShikiHighlighter } from 'shiki'
 import type { Pipeline, PipelineStage } from '../../../types'
-import type { PrismLanguage } from './prism-language'
+import type { PrismLanguage } from '../utils'
 
 export enum Highlighter {
   /** [Shiki Highlighter](https://shiki.matsu.io/) */
@@ -9,6 +10,8 @@ export enum Highlighter {
   /** [PrismJS Highlighter](https://prismjs.com/)  */
   prism = 'prism',
 }
+
+export type HTML = string
 
 /**
  * A callback called for each line of a code block and responsible
@@ -28,12 +31,12 @@ export interface CommonOptions {
    * Hook into the fence mutation process _before_ the builder
    * gets involved.
    */
-  before: (fence: CodeFenceMeta, payload: Pipeline<PipelineStage.parser>, options: CodeOptions) => CodeFenceMeta
+  before: (fence: CodeBlockMeta<'code'>, payload: Pipeline<PipelineStage.parser>, options: CodeOptions) => CodeBlockMeta<'code'>
   /**
    * Hook into the fence mutation process _after_ the builder
    * has mutated CodeFenceMeta to it's configured rules.
    */
-  after: (fence: CodeFenceMeta, payload: Pipeline<PipelineStage.parser>, options: CodeOptions) => CodeFenceMeta
+  after: (fence: CodeBlockMeta<'lines'>, payload: Pipeline<PipelineStage.parser>, options: CodeOptions) => CodeBlockMeta<'lines'>
 
   /**
    * By default each _line_ in the code will be given a class of "line" but you can override this
@@ -135,16 +138,36 @@ export enum Modifier {
   '!' = '!',
 }
 
+export type TokenType = 'keyword' | 'operator' | 'punctuation' | 'interpolation-punctuation' | 'builtin' | 'template-punctuation' | 'punctuation' | 'string'
+
+export type CodeParsingStage = 'code' | 'lines' | 'complete'
+
 /**
  * When a fence block is encountered it will be parsed
  * into the following structure for evaluation.
  */
-export interface CodeFenceMeta {
+export interface CodeBlockMeta<S extends CodeParsingStage> {
   /**
-   * This is the content within the block. Typically this means _code_
-   * but it might be raw data of some other sort in edge cases.
+   * The code as just a string
    */
-  data: string
+  code: S extends 'lines' ? never: string
+  /**
+   * The code block's brokendown by line and then parsed as HTML
+   * so that it can be better manipulated by downstream functions
+   */
+  lines: S extends 'block-string' ? never : DocumentFragment[]
+  /**
+   * while in the `lines` stage, you may state a DOM string which
+   * should be used to wrap all code lines when to converting back
+   * to a code string
+   */
+  wrapLines: S extends 'block-string' ? never : string
+
+  /**
+   * The number of lines in the code block
+   */
+  codeLinesCount: S extends 'block-string' ? never : number
+
   /**
    * The tagName for the block; will be `code` except for edge cases
    */
@@ -160,10 +183,18 @@ export interface CodeFenceMeta {
   props: {
     class?: string
     style?: string
+    /**
+     * Indicates what lines to highlight, this can be:
+     * - a single line number
+     * - a line range
+     * - a line with a give token block (TODO: figure out how to model)
+     */
+    highlight?: number | [from: number, to: number] | { kind?: TokenType; name: string }
     width?: number | string
     height?: number | string
     alt?: string
     tooltip?: any
+    'data-codeLines'?: number
     [key: string]: any
   }
   modifiers: Modifier[]

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { PrismLanguage } from './types/prism-language'
+import type { PrismLanguage } from './utils/prism-languages'
 
 declare module 'prismjs' {
   const Prism = {

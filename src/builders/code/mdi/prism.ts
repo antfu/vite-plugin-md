@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 import type { Grammar } from 'prismjs'
 import { escapeHtml } from 'markdown-it/lib/common/utils'
-import type { LineClassFn, PrismLanguage, PrismOptions } from '../types'
+import type { LineClassFn, PrismOptions } from '../types'
+import type { PrismLanguage } from '../utils'
 
 function wrap(line: string, klass: LineClassFn) {
   return `<span class="${klass(line)}">${line}</span>`

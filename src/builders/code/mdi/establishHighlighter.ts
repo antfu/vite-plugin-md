@@ -4,11 +4,11 @@ import type {
   CodeOptions,
   HighlighterFunction,
   LineClassFn,
-  PrismLanguage,
   PrismOptions,
   ShikiOptions,
 } from '../types'
-import { usesPrismHighlighting } from '../utils'
+import type { PrismLanguage } from '../utils'
+import { usesPrismHighlighting } from '../utils/highlighting'
 import { getPrismHighlighter } from './prism'
 import { getShikiHighlighter } from './shiki'
 

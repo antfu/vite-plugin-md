@@ -1,19 +1,31 @@
 // Vitest Snapshot v1
 
-exports[`code() builder > line numbers are displayed when set 1`] = `
+exports[`code() builder using Prism (incl generalized tests) > line highlighting of single line works using vuepress/vitepress syntax 1`] = `
 "<div class=\\"markdown-body\\"><h1>Code Builder Test</h1>
 <p>this test is intended to validate testing of code blocks</p>
-<pre class='language-ts line-numbers-mode'><code v-pre>
+<pre class='language-typescript'><code v-pre>
 <span class=\\"line\\"><span class=\\"token keyword\\">type</span> <span class=\\"token class-name\\">Valid</span> <span class=\\"token operator\\">=</span> <span class=\\"token string\\">'foo'</span> <span class=\\"token operator\\">|</span> <span class=\\"token string\\">'bar'</span> <span class=\\"token operator\\">|</span> <span class=\\"token string\\">'baz'</span></span>
-<span class=\\"line\\"><span class=\\"token keyword\\">const</span> t<span class=\\"token operator\\">:</span> Valid <span class=\\"token operator\\">=</span> <span class=\\"token string\\">'foo'</span></span>
+<span class=\\"line\\"><span class=\\"token keyword\\">const</span> testVariable<span class=\\"token operator\\">:</span> Valid <span class=\\"token operator\\">=</span> <span class=\\"token string\\">'foo'</span></span>
+<span class=\\"line\\"><span class=\\"token keyword\\">function</span> <span class=\\"token function\\">myFunc</span><span class=\\"token punctuation\\">(</span>name<span class=\\"token operator\\">:</span> <span class=\\"token builtin\\">string</span><span class=\\"token punctuation\\">)</span> <span class=\\"token punctuation\\">{</span></span>
+<span class=\\"line\\">  <span class=\\"token keyword\\">return</span> <span class=\\"token template-string\\"><span class=\\"token template-punctuation string\\">\`</span><span class=\\"token string\\">hello </span><span class=\\"token interpolation\\"><span class=\\"token interpolation-punctuation punctuation\\">\${</span>name<span class=\\"token interpolation-punctuation punctuation\\">}</span></span><span class=\\"token template-punctuation string\\">\`</span></span></span>
+<span class=\\"line\\"><span class=\\"token punctuation\\">}</span></span>
 </code></pre><p>The test is now complete; everyone should return to their desks.</p>
 </div>"
 `;
 
-exports[`code() builder > valid language choice is rendered 1`] = `
+exports[`code() builder using Prism (incl generalized tests) > line numbers are displayed when set 1`] = `
+"<div class=\\"markdown-body\\"><h1>Code Builder Test</h1>
+<p>this test is intended to validate testing of code blocks</p>
+<pre class='language-typescript line-numbers-mode'><code v-pre>
+<table class=\\"code-with-line-numbers\\"><tr class=\\"line row-1 odd\\"><td class=\\"col-line-number\\">1</td><td class=\\"col-code\\"><span class=\\"code-block\\"><span class=\\"token keyword\\">type</span> <span class=\\"token class-name\\">Valid</span> <span class=\\"token operator\\">=</span> <span class=\\"token string\\">'foo'</span> <span class=\\"token operator\\">|</span> <span class=\\"token string\\">'bar'</span> <span class=\\"token operator\\">|</span> <span class=\\"token string\\">'baz'</span></span></td></tr><tr class=\\"line row-2 even\\"><td class=\\"col-line-number\\">2</td><td class=\\"col-code\\"><span class=\\"code-block\\"><span class=\\"token keyword\\">const</span> testVariable<span class=\\"token operator\\">:</span> Valid <span class=\\"token operator\\">=</span> <span class=\\"token string\\">'foo'</span></span></td></tr><tr class=\\"line row-3 odd\\"><td class=\\"col-line-number\\">3</td><td class=\\"col-code\\"><span class=\\"code-block\\"><span class=\\"token keyword\\">function</span> <span class=\\"token function\\">myFunc</span><span class=\\"token punctuation\\">(</span>name<span class=\\"token operator\\">:</span> <span class=\\"token builtin\\">string</span><span class=\\"token punctuation\\">)</span> <span class=\\"token punctuation\\">{</span></span></td></tr><tr class=\\"line row-4 even\\"><td class=\\"col-line-number\\">4</td><td class=\\"col-code\\"><span class=\\"code-block\\">  <span class=\\"token keyword\\">return</span> <span class=\\"token template-string\\"><span class=\\"token template-punctuation string\\">\`</span><span class=\\"token string\\">hello </span><span class=\\"token interpolation\\"><span class=\\"token interpolation-punctuation punctuation\\">\${</span>name<span class=\\"token interpolation-punctuation punctuation\\">}</span></span><span class=\\"token template-punctuation string\\">\`</span></span></span></td></tr><tr class=\\"line row-5 odd\\"><td class=\\"col-line-number\\">5</td><td class=\\"col-code\\"><span class=\\"code-block\\"><span class=\\"token punctuation\\">}</span></span></td></tr></table>
+</code></pre><p>The test is now complete; everyone should return to their desks.</p>
+</div>"
+`;
+
+exports[`code() builder using Prism (incl generalized tests) > valid language choice is rendered 1`] = `
 "<div class=\\"markdown-body\\"><h1>Code Builder Test</h1>
 <p>This test is intended to validate testing of code blocks; the first test is a typescript block.</p>
-<pre class='language-ts foobar'><code v-pre>
+<pre class='language-typescript foobar'><code v-pre>
 <span class=\\"line\\"><span class=\\"token keyword\\">type</span> <span class=\\"token class-name\\">Valid</span> <span class=\\"token operator\\">=</span> <span class=\\"token string\\">'foo'</span> <span class=\\"token operator\\">|</span> <span class=\\"token string\\">'bar'</span> <span class=\\"token operator\\">|</span> <span class=\\"token string\\">'baz'</span></span>
 <span class=\\"line\\"><span class=\\"token keyword\\">const</span> t<span class=\\"token operator\\">:</span> Valid <span class=\\"token operator\\">=</span> <span class=\\"token string\\">'foo'</span></span>
 </code></pre><p>But now we have some Rust code too:</p>
