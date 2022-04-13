@@ -26,6 +26,12 @@ export type LineCallback = (
   lang: string
 ) => string
 
+/**
+ * A callback for a block node which provides build-time capability to
+ * modify a property with a callback
+ */
+export type BlockCallback<T> = (fence: CodeBlockMeta<'code'>, filename: string, frontmatter: Pipeline<PipelineStage.parser>['frontmatter']) => T
+
 export interface CommonOptions {
   /**
    * Hook into the fence mutation process _before_ the builder
@@ -36,7 +42,7 @@ export interface CommonOptions {
    * Hook into the fence mutation process _after_ the builder
    * has mutated CodeFenceMeta to it's configured rules.
    */
-  after: (fence: CodeBlockMeta<'lines'>, payload: Pipeline<PipelineStage.parser>, options: CodeOptions) => CodeBlockMeta<'lines'>
+  after: (fence: CodeBlockMeta<'dom'>, payload: Pipeline<PipelineStage.parser>, options: CodeOptions) => CodeBlockMeta<'dom'>
 
   /**
    * By default each _line_ in the code will be given a class of "line" but you can override this
@@ -48,6 +54,15 @@ export interface CommonOptions {
    * 3. if you want _no classes_ then you can pass in a `false` value to indicate this
    */
   lineClass?: string | false | LineCallback
+
+  /**
+   * Any default classes to add to the header region (when region is found to exist)
+   */
+  headingClasses?: string[] | BlockCallback<string[]>
+  /**
+   * Any default classes to add to the footer region (when region is found to exist)
+   */
+  footerClasses?: string[] | BlockCallback<string[]>
 
   /**
    * Determines the default behavior for showing/hiding the line numbers in code blocks
@@ -140,7 +155,7 @@ export enum Modifier {
 
 export type TokenType = 'keyword' | 'operator' | 'punctuation' | 'interpolation-punctuation' | 'builtin' | 'template-punctuation' | 'punctuation' | 'string'
 
-export type CodeParsingStage = 'code' | 'lines' | 'complete'
+export type CodeParsingStage = 'code' | 'dom' | 'complete'
 
 /**
  * When a fence block is encountered it will be parsed
@@ -148,30 +163,43 @@ export type CodeParsingStage = 'code' | 'lines' | 'complete'
  */
 export interface CodeBlockMeta<S extends CodeParsingStage> {
   /**
-   * The code as just a string
+   * The finalized HTML based on the code pipeline
    */
-  code: S extends 'lines' ? never: string
+  html: S extends 'complete' ? string : never
+
+  pre: S extends 'code' ? string : DocumentFragment
+  lineNumbersWrapper: S extends 'code' ? string : DocumentFragment
+  codeBlockWrapper: S extends 'code' ? string : DocumentFragment
+
   /**
-   * The code block's brokendown by line and then parsed as HTML
-   * so that it can be better manipulated by downstream functions
+   * The code block; represented as either a string or a DOM tree
+   * based on lifecycle
    */
-  lines: S extends 'block-string' ? never : DocumentFragment[]
+  code: S extends 'code' ? string : DocumentFragment
+
   /**
-   * while in the `lines` stage, you may state a DOM string which
-   * should be used to wrap all code lines when to converting back
-   * to a code string
+   * An optional heading to put above the code block
    */
-  wrapLines: S extends 'block-string' ? never : string
+  heading?: S extends 'code' ? string : DocumentFragment
+  /**
+   * An optional footer to put under the code block
+   */
+  footer?: S extends 'code' ? string : DocumentFragment
 
   /**
    * The number of lines in the code block
    */
-  codeLinesCount: S extends 'block-string' ? never : number
+  codeLinesCount: S extends 'code' ? never : number
 
   /**
    * The tagName for the block; will be `code` except for edge cases
    */
   tag: string
+
+  /**
+   * The nesting level
+   */
+  level: number
   /**
    * The identified language in the code block
    */
@@ -181,8 +209,6 @@ export interface CodeBlockMeta<S extends CodeParsingStage> {
    * key/value pairs will be assigned to the
    */
   props: {
-    class?: string
-    style?: string
     /**
      * Indicates what lines to highlight, this can be:
      * - a single line number
@@ -190,11 +216,21 @@ export interface CodeBlockMeta<S extends CodeParsingStage> {
      * - a line with a give token block (TODO: figure out how to model)
      */
     highlight?: number | [from: number, to: number] | { kind?: TokenType; name: string }
+    /** classes to add to the heading section */
+    heading?: string
+    /** classes to add to the footer section */
+    footer?: string
+
+    /** classes to add to the codeblock section */
+    class?: string
+    /** style properties to add to the codeblock section */
+    style?: string
     width?: number | string
     height?: number | string
     alt?: string
     tooltip?: any
     'data-codeLines'?: number
+
     [key: string]: any
   }
   modifiers: Modifier[]

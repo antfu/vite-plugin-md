@@ -1,14 +1,11 @@
-import { pipe } from 'fp-ts/lib/function'
 import type { CodeBlockMeta, CodeOptions } from '../types'
-import { addClassToNode } from '../utils'
+import { Modifier } from '../types'
 
 function isRangeTuple(value: unknown): value is [from: number, to: number] {
   return Array.isArray(value) && value.length === 2 && value.every(i => typeof i === 'number')
 }
 
-function linesToHighlight(info: CodeBlockMeta<'lines'>['props']['hightlight']): number[] {
-  console.log({ info })
-
+function linesToHighlight(info: CodeBlockMeta<'dom'>['props']['hightlight']): number[] {
   switch (typeof info) {
     case 'number':
       return [info]
@@ -22,7 +19,7 @@ function linesToHighlight(info: CodeBlockMeta<'lines'>['props']['hightlight']): 
         return values
       }
       else if (Array.isArray(info)) {
-        return info.flatMap(i => linesToHighlight(i as CodeBlockMeta<'lines'>['props']['hightlight']))
+        return info.flatMap(i => linesToHighlight(i as CodeBlockMeta<'dom'>['props']['hightlight']))
       }
       else if ('kind' in info && 'name' in info) {
         // TODO: build out
@@ -37,21 +34,29 @@ function linesToHighlight(info: CodeBlockMeta<'lines'>['props']['hightlight']): 
 /**
  * If highlighted line numbers are configured, will add "highlight" class to lines specified
  * using both traditional Vuepress/Vitepress nomenclature or attribute/object notation
- *
- * Note: by the time we're _here_ both methods of indicating intent to highlight has been
- * expressed in the `props.highlight` prop and the content we must modify is
- * inside of the code block
  */
-export const highlightLines = (o: CodeOptions) => (fence: CodeBlockMeta<'lines'>) => {
+export const highlightLines = (_o: CodeOptions) => (fence: CodeBlockMeta<'dom'>) => {
   const hl = linesToHighlight(fence.props.highlight)
+  if (fence.props.hightlight) {
+    fence.code.querySelectorAll('.line').forEach((line, idx) => {
+      if (hl.includes(idx)) {
+        line.setAttribute(
+          'class',
+          [line.getAttribute('class').split(/\s+/g), 'highlight'].join(' ').trim(),
+        )
+      }
+    })
 
-  return o.lineNumbers && fence.props.hightlight
-    ? {
-      ...fence,
-      lines: fence.lines.map((l, idx) => hl.includes(idx + 1)
-        ? pipe(l, addClassToNode('highlight'))
-        : l,
-      ),
-    }
-    : fence
+    // if (o.lineNumbers || fence.modifiers.includes(Modifier['#'])) {
+    fence.code.querySelectorAll('.line-number').forEach((line, idx) => {
+      if (hl.includes(idx)) {
+        line.setAttribute(
+          'class',
+          [line.getAttribute('class').split(/\s+/g), 'highlight'].join(' ').trim(),
+        )
+      }
+    })
+  }
+
+  return fence
 }

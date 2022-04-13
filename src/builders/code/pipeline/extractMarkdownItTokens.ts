@@ -13,9 +13,9 @@ function typedValue(value: string) {
 
 /**
  * Converts the Markdown-IT _tokens_ into a `CodeBlockeMeta` data structure
- * which includes the language, modifiers, props, and code block
+ * which includes the language, modifiers, props, and code block.
  */
-export function extractInfo(t: Token): CodeBlockMeta<'code'> {
+export function extractMarkdownItTokens(t: Token): CodeBlockMeta<'code'> {
   const matches = t.info.trim().match(/((!|#|\*){0,2})(\w+)\s+({.*}){0,1}(.*)$/)
   let props: Record<string, any> = {}
   let modifiers: Modifier[] = []
@@ -60,7 +60,12 @@ export function extractInfo(t: Token): CodeBlockMeta<'code'> {
   }
 
   return {
+    pre: '',
+    codeBlockWrapper: '',
+    lineNumbersWrapper: '',
+
     code: t.content,
+    level: t.level,
     tag: t.tag,
     lang,
     props,

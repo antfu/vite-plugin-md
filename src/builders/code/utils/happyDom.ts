@@ -2,6 +2,7 @@ import { Window } from 'happy-dom'
 import type { Document, DocumentFragment, INode } from 'happy-dom'
 import { pipe } from 'fp-ts/lib/function'
 import type { HTML } from '../types'
+const TAB_SPACING = 4
 
 /**
  * Converts an HTML string into a Happy DOM document tree
@@ -51,6 +52,14 @@ export function cloneNode<D extends Document | DocumentFragment>(doc: D): D {
  */
 export function getCodeLines(html: string): DocumentFragment[] {
   return (html || '\n').split(/\r?\n/g).map(l => htmlToDocFragment(l))
+}
+
+/**
+ * ensures that a given string doesn't have any HTML inside of it
+ */
+export function safeString(str: string): string {
+  const node = htmlToDocFragment(str)
+  return node.textContent
 }
 
 export interface SelectorApi<D extends Document | DocumentFragment> {
@@ -111,14 +120,33 @@ export const removeClassFromDoc = (remove: string) => <D extends Document | Docu
 /**
  * Adds a class to the top level node of a document's body.
  */
-export const addClassToNode = (add: string) =>
+export const addClassToNode = (add: string | string[]) =>
+  <
+    D extends Document | DocumentFragment,
+  >(doc: D): D => {
+    if (!Array.isArray(add))
+      add = [add]
+
+    const cloned: D = cloneNode(doc)
+    const node = isDocument(cloned) ? cloned.body : cloned.firstElementChild
+    const classes = node.firstElementChild?.getAttribute('class')?.split(/\s+/g) || []
+
+    node.firstElementChild.setAttribute(
+      'class',
+      [...classes, add.join(' ')].join(' ').trim(),
+    )
+
+    return cloned
+  }
+
+export const addAttributeToNode = (attr: string, val: string) =>
   <
     D extends Document | DocumentFragment,
   >(doc: D): D => {
     const cloned: D = cloneNode(doc)
     const node = isDocument(cloned) ? cloned.body : cloned.firstElementChild
-    const classes = node.firstElementChild?.getAttribute('class')?.split(/\s+/g) || []
-    node.firstElementChild.setAttribute('class', [...classes, add].join(' ').trim())
+
+    node.firstElementChild.setAttribute(attr, val)
 
     return cloned
   }
@@ -159,36 +187,48 @@ export const nodeIsEmpty = <D extends Document | DocumentFragment>(node: D) => {
 }
 
 /**
- * Wrap each line of a code block
+ * Wrap each element with some given text.
  */
-export const wrapEachLine = (wrapper: HTML) => (lines: DocumentFragment | DocumentFragment[]): DocumentFragment[] => {
-  if (!Array.isArray(lines))
-    lines = [lines]
+export const wrapWithText = (before?: string, after?: string, indent = 0) => <D extends DocumentFragment | DocumentFragment[]>(fragments: D): D => {
+  const frags: DocumentFragment[] = Array.isArray(fragments) ? fragments : [fragments]
 
-  const newLines = [] as DocumentFragment[]
-  for (const line of lines) {
-    if (!nodeIsEmpty(line)) {
-      const parent = htmlToDocFragment(wrapper)
-      newLines.push(wrap(parent, [line]))
-    }
+  const tab = (count = 1) => count === 0
+    ? ''
+    : ''.padStart(count, '\t')
+
+  if (indent !== 0) {
+    before = before
+      ? `${tab(indent)}${before}`
+      : undefined
   }
-  return newLines
-}
 
-/**
- * Wrap the entire code block with a wrapper element and back as a `DocumentFragment`
- */
-export const wrapCodeBlock = (wrapper: HTML) => (lines: DocumentFragment | DocumentFragment[]): DocumentFragment => {
-  if (!Array.isArray(lines))
-    lines = [lines]
+  before = before || ''
+  after = after || ''
 
-  // const codeLinesHtml = getHtmlFromCodeLines(lines)
-  return pipe(
-    lines,
-    parentNodeWithChildren(
-      htmlToDocFragment(wrapper),
-    ),
-  )
+  const newFrags = frags.map((f) => {
+    return pipe(
+      f,
+      cloneNode,
+      getHtmlFromNode,
+      (html) => {
+        const preFormatting = html
+          .replace(/(\s*)$/, '')
+          .replace(html.trim(), '')
+        const postFormatting = html
+          .replace(/^(\s*)/, '')
+          .replace(html.trim(), '')
+        const rest = html
+          .replace(preFormatting, '')
+          .replace(postFormatting, '')
+        console.log({ html, preFormatting, postFormatting, rest, before, after, all: `${preFormatting}${before}${rest}${after}${postFormatting}` })
+
+        return `${preFormatting}${before}${rest}${after}${postFormatting}`
+      },
+      htmlToDocFragment,
+    )
+  })
+
+  return (Array.isArray(fragments) ? newFrags : newFrags[0]) as D
 }
 
 function wrap(parent: DocumentFragment, children: DocumentFragment | DocumentFragment[]) {

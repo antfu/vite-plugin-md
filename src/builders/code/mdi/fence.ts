@@ -2,13 +2,15 @@ import { pipe } from 'fp-ts/lib/function'
 import type MarkdownIt from 'markdown-it'
 import type { Pipeline, PipelineStage } from '../../../types'
 import {
-  convertLinesToCodeBlock,
-  extractInfo,
+  convertBlocksToDomNodes,
+  defaultBlocks,
+  extractMarkdownItTokens,
   highlightLines,
-  parseLines,
-  renderFence,
+  renderHtml,
   resolveLanguage,
-  showLineNumbers,
+  updateCodeBlockWrapper,
+  updateLineNumbers,
+  updatePreWrapper,
   useHighlighter, userRules,
 } from '../pipeline'
 import type {
@@ -31,21 +33,25 @@ export const fence = async(payload: Pipeline<PipelineStage.parser>, options: Cod
     md.renderer.rules.fence = (state, idx) => {
       // fence mutation pipeline
       const fence = pipe(
-        extractInfo(state[idx]),
-        userRules('before', payload, options),
+        extractMarkdownItTokens(state[idx]),
+        defaultBlocks(options),
         resolveLanguage(options),
+
+        userRules('before', payload, options),
         useHighlighter(highlighter, options),
-        // the 'code' property is converted from a string to a DOM tree
-        parseLines,
+
+        convertBlocksToDomNodes(payload, options),
+
+        updateCodeBlockWrapper(options),
+        updateLineNumbers(options),
         highlightLines(options),
-        showLineNumbers(options),
+        updatePreWrapper,
         userRules('after', payload, options),
-        // the 'code' property is converted back to a string
-        convertLinesToCodeBlock,
-        renderFence,
+
+        renderHtml,
       )
 
-      return fence
+      return fence.html
     }
   }
 }

@@ -45,11 +45,11 @@
     "vite": "^2.0.0"
   },
   "dependencies": {
-    "@antfu/utils": "^0.5.0",
+    "@antfu/utils": "^0.5.1",
     "@rollup/pluginutils": "^4.2.0",
     "@types/markdown-it": "^12.2.3",
     "@types/prismjs": "^1.26.0",
-    "@vue/runtime-core": "^3.2.31",
+    "@vue/runtime-core": "^3.2.32",
     "gray-matter": "^4.0.3",
     "markdown-it": "^12.3.2"
   },
@@ -61,10 +61,10 @@
     "@antfu/eslint-config": "^0.20.2",
     "@antfu/ni": "^0.14.0",
     "@types/node": "^17.0.23",
-    "@typescript-eslint/eslint-plugin": "^5.18.0",
-    "@typescript-eslint/parser": "^5.18.0",
-    "@vitest/ui": "^0.9.2",
-    "@vue/test-utils": "^2.0.0-rc.19",
+    "@typescript-eslint/eslint-plugin": "^5.19.0",
+    "@typescript-eslint/parser": "^5.19.0",
+    "@vitest/ui": "^0.9.3",
+    "@vue/test-utils": "^2.0.0-rc.20",
     "bumpp": "^7.1.1",
     "eslint": "^8.13.0",
     "eslint-config-prettier": "^8.5.0",
@@ -73,13 +73,13 @@
     "prismjs": "^1.27.0",
     "rollup": "^2.70.1",
     "shiki": "^0.10.1",
-    "tsup": "^5.12.4",
+    "tsup": "^5.12.5",
     "typescript": "^4.6.3",
-    "vite": "^2.9.1",
+    "vite": "^2.9.3",
     "vite-plugin-pages": "^0.22.0",
     "vite-plugin-vue-layouts": "^0.6.0",
-    "vitest": "^0.9.2",
-    "vue": "^3.2.31",
+    "vitest": "^0.9.3",
+    "vue": "^3.2.32",
     "vue-router": "^4.0.14"
   }
 }

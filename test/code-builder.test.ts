@@ -54,12 +54,13 @@ describe('code() builder using Prism (incl generalized tests)', () => {
     const langLine = templateBlock.split('\n').find(i => i.includes('language-markdown'))
     expect(templateBlock.includes('language-bash'), `when no language is stated we configured to have it converted to 'md' but we got:\n${langLine}`).toBeTruthy()
   })
-  it('line numbers are displayed when set', async() => {
+  it.only('line numbers are displayed when set', async() => {
     const { templateBlock, html } = await composeSfcBlocks(
       'test/fixtures/ts-code-block.md',
       await getFixture('ts-code-block.md'),
       { builders: [code({ lineNumbers: true })] },
     )
+    console.log(html)
 
     const dom = queryHtml(html)
 
@@ -79,7 +80,7 @@ describe('code() builder using Prism (incl generalized tests)', () => {
     expect(templateBlock).toMatchSnapshot()
   })
 
-  it.only('line highlighting of single line works using vuepress/vitepress syntax', async() => {
+  it('line highlighting of single line works using vuepress/vitepress syntax', async() => {
     // Vite/Vuepress support adding something like {3} to highlight line 3
     // any line which is highlighted is done so by adding the `highlight` class to a line's span element
     const { templateBlock, html } = await composeSfcBlocks(
@@ -87,7 +88,6 @@ describe('code() builder using Prism (incl generalized tests)', () => {
       await getFixture('highlight-one-line.md'),
       { builders: [code()] },
     )
-    console.log(html)
 
     const dom = queryHtml(html)
     const lines = dom.all('.line')

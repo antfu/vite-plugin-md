@@ -8,11 +8,10 @@ import {
   getHtmlFromNode,
   htmlToDocFragment,
   htmlToDocument,
-  queryNode,
   removeClassFromDoc,
+  safeString,
   wrapChildNodes,
-  wrapCodeBlock,
-  wrapEachLine,
+  wrapWithText,
 } from '../src/builders/code/utils/happyDom'
 
 const tokenizedCode = `
@@ -45,9 +44,12 @@ describe('HappyDom\'s can be idempotent', () => {
   it('HTML remains unchanged when passed into and out of DocumentFragment', () => {
     const html1 = htmlToDocFragment(tokenizedCode)
     const html2 = htmlToDocFragment(bareCode)
+    const html3 = '\n\t<span>foobar</span>\n'
+    const frag3 = htmlToDocFragment(html3)
 
     expect(html1.firstElementChild?.innerHTML).toEqual(tokenizedCode)
     expect(html2.firstElementChild?.innerHTML).toEqual(bareCode)
+    expect(getHtmlFromNode(frag3)).toEqual(html3)
 
     expect(getHtmlFromNode(htmlToDocFragment(bareCode))).toEqual(bareCode)
   })
@@ -59,28 +61,153 @@ describe('HappyDom\'s can be idempotent', () => {
     expect(tokenizedCode).toBe(code)
   })
 
-  it('wrap each line of code using wrapEachLine() utility', () => {
-    const lines = getCodeLines(bareCode)
-    const wrapped = wrapEachLine('<div class="wrapper" />')(lines)
+  it('wrapWithText() utility able to wrap one or more fragments with html before and after', () => {
+    const html1 = '<div>foo</div>'
+    const html2 = 'hello world'
+    const html3 = 'hello <span>world</span>'
+
+    const frag1 = htmlToDocFragment(html1)
+    const frag2 = htmlToDocFragment(html2)
+    const frag3 = htmlToDocFragment(html3)
+
+    const wrap1 = wrapWithText('before', 'after')(frag1)
+    const wrap2 = wrapWithText('before', 'after')(frag2)
+    const wrap3 = wrapWithText('before', 'after')(frag3)
+
+    const wrap1alt = wrapWithText('<div class="wrap">', '</div>')(frag1)
+    const wrap2alt = wrapWithText('<div class="wrap">', '</div>')(frag2)
+    const wrap3alt = wrapWithText('<div class="wrap">', '</div>')(frag3)
+
+    // #region standard
+    expect(
+      getHtmlFromNode(wrap1).startsWith('before'),
+      `wrap1 should start with "before": ${getHtmlFromNode(wrap1)}`,
+    ).toBeTruthy()
+    expect(
+      getHtmlFromNode(wrap1).endsWith('after'),
+      `wrap1 should end with with "after": ${getHtmlFromNode(wrap1)}`,
+    ).toBeTruthy()
+    expect(getHtmlFromNode(wrap1)).toContain(html1)
 
     expect(
-      wrapped,
-      'empty lines should be excluded which includes first/last in this example',
-    ).toHaveLength(5)
-    for (const line of wrapped)
-      expect(getHtmlFromNode(line).startsWith('<div class="wrapper"')).toBeTruthy()
-  })
+      getHtmlFromNode(wrap2).startsWith('before'),
+      `wrap2 should start with "before": ${getHtmlFromNode(wrap2)}`,
+    ).toBeTruthy()
+    expect(
+      getHtmlFromNode(wrap2).endsWith('after'),
+      `wrap1 should end with with "after": ${getHtmlFromNode(wrap2)}`,
+    ).toBeTruthy()
+    expect(getHtmlFromNode(wrap2)).toContain(html2)
 
-  it('wrapCodeBlock() utility allows the entire code block to be wrapped with a element', () => {
-    const wrapped = wrapCodeBlock(
-      '<div class="wrapper" />')(wrapEachLine('<span class="line" />')(getCodeLines(bareCode)),
-    )
+    expect(
+      getHtmlFromNode(wrap3).startsWith('before'),
+      `wrap3 should start with "before": ${getHtmlFromNode(wrap3)}`,
+    ).toBeTruthy()
+    expect(
+      getHtmlFromNode(wrap3).endsWith('after'),
+      `wrap1 should end with with "after": ${getHtmlFromNode(wrap3)}`,
+    ).toBeTruthy()
+    expect(getHtmlFromNode(wrap3)).toContain(html3)
+    // #endregion
 
-    const dom = queryNode(wrapped)
-    const lines = dom.all('.line')
-    const wrapper = dom.all('.wrapper')
-    expect(wrapper).toHaveLength(1)
-    expect(lines).toHaveLength(5)
+    // #region alt
+    expect(
+      getHtmlFromNode(wrap1alt).startsWith('<div class="wrap">'),
+      `wrap1alt should start with DIV wrapper: ${getHtmlFromNode(wrap1alt)}`,
+    ).toBeTruthy()
+    expect(
+      getHtmlFromNode(wrap1alt).endsWith('</div>'),
+      `wrap1alt should end with with DIV wrapper: ${getHtmlFromNode(wrap1alt)}`,
+    ).toBeTruthy()
+    expect(getHtmlFromNode(wrap1alt)).toContain(html1)
+
+    expect(
+      getHtmlFromNode(wrap2alt).startsWith('<div class="wrap">'),
+      `wrap2alt should start with DIV wrapper: ${getHtmlFromNode(wrap2alt)}`,
+    ).toBeTruthy()
+    expect(
+      getHtmlFromNode(wrap2alt).endsWith('</div>'),
+      `wrap2alt should end with with DIV wrapper: ${getHtmlFromNode(wrap2alt)}`,
+    ).toBeTruthy()
+    expect(getHtmlFromNode(wrap2alt)).toContain(html2)
+
+    expect(
+      getHtmlFromNode(wrap3alt).startsWith('<div class="wrap">'),
+      `wrap3alt should start with DIV wrapper: ${getHtmlFromNode(wrap3alt)}`,
+    ).toBeTruthy()
+    expect(
+      getHtmlFromNode(wrap3alt).endsWith('</div>'),
+      `wrap3alt should end with with DIV wrapper: ${getHtmlFromNode(wrap3alt)}`,
+    ).toBeTruthy()
+    expect(getHtmlFromNode(wrap3alt)).toContain(html3)
+    // #endregion alt
+
+    // #region special
+    const special1 = wrapWithText('\tbefore', 'after\n')(frag1)
+    const special2 = wrapWithText('\tbefore', 'after\n')(frag2)
+    const special3 = wrapWithText('\tbefore', 'after\n', 1)(frag1)
+    const special4 = wrapWithText('\tbefore', 'after\n', 1)(frag2)
+
+    const sHtml1 = getHtmlFromNode(special1)
+    const sHtml2 = getHtmlFromNode(special2)
+    const sHtml3 = getHtmlFromNode(special3)
+    const sHtml4 = getHtmlFromNode(special4)
+
+    expect(
+      getHtmlFromNode(special1).startsWith('\tbefore'),
+      `special1 should start with "\tbefore" but actual was:\n"${sHtml1}"`,
+    ).toBeTruthy()
+    expect(
+      getHtmlFromNode(special1).endsWith('after\n'),
+      `special1 should have ended with a '\n': ${getHtmlFromNode(special1).slice(-1)}`,
+    ).toBeTruthy()
+    expect(getHtmlFromNode(special1)).toContain(html1)
+    // 2
+    expect(
+      getHtmlFromNode(special2).startsWith('\tbefore'),
+      `special2 should start with "\tbefore" but actual was:\n"${sHtml2}"`,
+    ).toBeTruthy()
+    expect(
+      getHtmlFromNode(special2).endsWith('after\n'),
+      `special2 should have ended with a '\n': ${getHtmlFromNode(special2).slice(-1)}`,
+    ).toBeTruthy()
+    expect(getHtmlFromNode(special2)).toContain(html2)
+    // 3
+    expect(
+      getHtmlFromNode(special3).startsWith('\t\tbefore'),
+      `special3 should start with "\\t\\tbefore" but actual was:\n"${sHtml3}"`,
+    ).toBeTruthy()
+    expect(
+      getHtmlFromNode(special3).endsWith('after\n'),
+      `special3 should have ended with a '\\n': "${getHtmlFromNode(special3)}"`,
+    ).toBeTruthy()
+    expect(getHtmlFromNode(special3)).toContain(html1)
+    // 4
+    expect(
+      getHtmlFromNode(special4).startsWith('\t\tbefore'),
+      `special4 should start with "\\t\\tbefore" but actual was:\n"${sHtml4}"`,
+    ).toBeTruthy()
+    expect(
+      getHtmlFromNode(special4).endsWith('after\n'),
+      `special4 should have ended with a '\\n': "${getHtmlFromNode(special4)}"`,
+    ).toBeTruthy()
+    expect(getHtmlFromNode(special4)).toContain(html2)
+    // 5
+    const html5 = '\n\tHello World\n'
+    const frag5 = htmlToDocFragment(html5)
+    // note: indentation of 2 will add `\t\t` to beginning of "before"
+    const special5 = wrapWithText('before', 'after\n', 2)(frag5)
+    expect(
+      getHtmlFromNode(special5).startsWith('\n\t\t\tbefore'),
+      `special5 should start with "\\n\\t\\t\\tbefore" but actual was:\n"${html5}"`,
+    ).toBeTruthy()
+    expect(
+      getHtmlFromNode(special5).endsWith('after\n\n'),
+      `special5 should have ended with a '\\n\\n': "${getHtmlFromNode(special5)}"`,
+    ).toBeTruthy()
+    expect(getHtmlFromNode(special5), 'special5 contains original html').toContain(html5.trim())
+
+    // #endregion special
   })
 
   it('HappyDom\'s conversion to lines remains consistent', () => {
@@ -97,7 +224,7 @@ describe('HappyDom\'s can be idempotent', () => {
   })
 
   it('addClassToDoc utility is able to add a class to the top-most node in Document', () => {
-    const starting = htmlToDocument('<div class=\'foobar\'>testing</div>')
+    const starting = htmlToDocument('<div class="foobar">testing</div>')
     const plusOne = pipe(starting, addClassToNode('one'))
     const plusTwo = pipe(plusOne, addClassToNode('two'))
 
@@ -131,5 +258,16 @@ describe('HappyDom\'s can be idempotent', () => {
 
     expect(pipe(falseFlag, getClasslistFromNode)).toContain('foobar')
     expect(pipe(empty, getClasslistFromNode)).lengthOf(0)
+  })
+
+  it('safeString', () => {
+    const t1 = 'hi there'
+    const t2 = '<div>hi there</div>'
+    const t3 = '5 is > 4'
+    const t4 = 'hi <span>there</span>'
+    expect(safeString(t1)).toBe(t1)
+    expect(safeString(t2)).toBe('hi there')
+    expect(safeString(t3)).toBe(t3)
+    expect(safeString(t4)).toBe('hi there')
   })
 })

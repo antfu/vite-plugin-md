@@ -8,8 +8,8 @@ import type { CodeBlockMeta, CodeOptions } from '../types'
 export const userRules = <
   W extends 'before' | 'after',
 >(when: W, p: Pipeline<PipelineStage.parser>, o: CodeOptions) =>
-  (fence: CodeBlockMeta<W extends 'before' ? 'code' : 'lines'>) => {
+  (fence: CodeBlockMeta<W extends 'before' ? 'code' : 'dom'>) => {
     return (o[when]
       ? o[when]((fence as CodeBlockMeta<any>), p, o)
-      : fence) as CodeBlockMeta<W extends 'before' ? 'code' : 'lines'>
+      : fence) as CodeBlockMeta<W extends 'before' ? 'code' : 'dom'>
   }
