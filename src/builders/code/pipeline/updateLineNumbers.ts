@@ -1,16 +1,18 @@
 import { pipe } from 'fp-ts/lib/function'
 import type { CodeBlockMeta, CodeOptions } from '../types'
 import {
-  addClassToNode,
-  htmlToDocFragment,
+  addClass,
+  createFragment,
+  wrap,
   wrapChildNodes,
 } from '../utils'
 
 /**
  * Builds up the full DOM tree for line numbers and puts it back into the
- * `lineNumbersWrapper` property. This is done regardless of whether lineNumbers
- * are turned on, this functions responsibility is only to ensure that if its needed
- * it is ready.
+ * `lineNumbersWrapper` property.
+ *
+ * This is done regardless of whether lineNumbers are turned on, this
+ * functions responsibility is only to ensure that if its needed it is ready.
  */
 export const updateLineNumbers = (_o: CodeOptions) =>
   (fence: CodeBlockMeta<'dom'>): CodeBlockMeta<'dom'> => {
@@ -21,6 +23,7 @@ export const updateLineNumbers = (_o: CodeOptions) =>
         : lineNumber === fence.codeLinesCount - 1
           ? 'last-row'
           : undefined
+
       const classes = [
         'line-number',
         evenOdd,
@@ -30,10 +33,14 @@ export const updateLineNumbers = (_o: CodeOptions) =>
 
       fence.lineNumbersWrapper = pipe(
         fence.lineNumbersWrapper,
-        wrapChildNodes(pipe(
-          htmlToDocFragment(`<span>${lineNumber}</span>`),
-          addClassToNode(classes),
-        )),
+        wrap('\n', '\n', fence.level + 1),
+        wrap(
+          pipe(
+            createFragment(`<span>${lineNumber}</span>`),
+            addClass(classes),
+            wrap('\n', '\n', fence.level + 2),
+          ),
+        ),
       )
     }
 

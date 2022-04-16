@@ -9,6 +9,7 @@ import {
   renderHtml,
   resolveLanguage,
   updateCodeBlockWrapper,
+  updateCodeWrapper,
   updateLineNumbers,
   updatePreWrapper,
   useHighlighter, userRules,
@@ -23,7 +24,7 @@ import { establishHighlighter } from './establishHighlighter'
  * A higher-order function which receives payload and options for context up front
  * and then can be added as Markdown plugin using the standard `.use()` method.
  */
-export const fence = async(payload: Pipeline<PipelineStage.parser>, options: CodeOptions) => {
+export const fence = async (payload: Pipeline<PipelineStage.parser>, options: CodeOptions) => {
   const highlighter = await establishHighlighter(options)
 
   // return a Markdown-IT plugin
@@ -45,6 +46,7 @@ export const fence = async(payload: Pipeline<PipelineStage.parser>, options: Cod
         updateCodeBlockWrapper(options),
         updateLineNumbers(options),
         highlightLines(options),
+        updateCodeWrapper,
         updatePreWrapper,
         userRules('after', payload, options),
 

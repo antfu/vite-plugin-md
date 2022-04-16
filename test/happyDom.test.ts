@@ -1,18 +1,22 @@
 import { pipe } from 'fp-ts/lib/function'
 import { describe, expect, it } from 'vitest'
+import type { DocRoot } from '../src/builders/code/utils/happyDom'
 import {
-  addClassToNode,
-  getClasslistFromNode,
-  getCodeLines,
-  getHtmlFromCodeLines,
-  getHtmlFromNode,
-  htmlToDocFragment,
-  htmlToDocument,
-  removeClassFromDoc,
+  addClass,
+  createDocument,
+  createFragment,
+  createTextNode,
+  getAttribute,
+  nodeBoundedByElements,
+  nodeChildrenAllElements,
+  removeClass,
   safeString,
-  wrapChildNodes,
-  wrapWithText,
+  setAttribute,
+  toHtml,
+  wrap,
 } from '../src/builders/code/utils/happyDom'
+
+const getClass = (node: DocRoot | string) => getAttribute('class')(node).split(/\s+/).filter(i => i)
 
 const tokenizedCode = `
 <span class="line"><span class="token keyword">type</span> <span class="token class-name">Valid</span> <span class="token operator">=</span> <span class="token string">'foo'</span> <span class="token operator">|</span> <span class="token string">'bar'</span> <span class="token operator">|</span> <span class="token string">'baz'</span></span>
@@ -32,232 +36,209 @@ function myFunc(name: string) {
 
 describe('HappyDom\'s can be idempotent', () => {
   it('HTML remains unchanged when passed into and out of Document', () => {
-    const html = htmlToDocument(tokenizedCode)
-    const html2 = htmlToDocument(bareCode)
+    const d = createDocument(tokenizedCode)
+    const d2 = createDocument(bareCode)
+    const f = createFragment(tokenizedCode)
+    const f2 = createFragment(bareCode)
 
-    expect(html.body.innerHTML).toEqual(tokenizedCode)
-    expect(html2.body.innerHTML).toEqual(bareCode)
+    expect(toHtml(d.body.innerHTML)).toEqual(tokenizedCode)
+    expect(toHtml(d2.body.innerHTML)).toEqual(bareCode)
 
-    expect(getHtmlFromNode(htmlToDocument(bareCode))).toEqual(bareCode)
+    expect(toHtml(f)).toEqual(tokenizedCode)
+    expect(toHtml(f2)).toEqual(bareCode)
   })
 
   it('HTML remains unchanged when passed into and out of DocumentFragment', () => {
-    const html1 = htmlToDocFragment(tokenizedCode)
-    const html2 = htmlToDocFragment(bareCode)
-    const html3 = '\n\t<span>foobar</span>\n'
-    const frag3 = htmlToDocFragment(html3)
+    const html1 = createFragment(tokenizedCode)
+    const html2 = createFragment(bareCode)
+    const html3 = createFragment('\n\t<span>foobar</span>\n')
 
-    expect(html1.firstElementChild?.innerHTML).toEqual(tokenizedCode)
-    expect(html2.firstElementChild?.innerHTML).toEqual(bareCode)
-    expect(getHtmlFromNode(frag3)).toEqual(html3)
+    expect(toHtml(html1)).toEqual(tokenizedCode)
+    expect(toHtml(html2)).toEqual(bareCode)
+    expect(toHtml(html3)).toEqual('\n\t<span>foobar</span>\n')
 
-    expect(getHtmlFromNode(htmlToDocFragment(bareCode))).toEqual(bareCode)
+    expect(toHtml(createFragment(bareCode))).toEqual(bareCode)
   })
 
-  it('code block split by lines and parsed can be reassembled without change', () => {
-    const lines = getCodeLines(tokenizedCode)
-    const code = getHtmlFromCodeLines(lines)
+  it('basics', () => {
+    const html = '<span>foobar</span>'
+    const frag = createFragment(html)
+    expect(toHtml(frag.firstElementChild)).toBe(html)
+    expect(frag.textContent).toBe('foobar')
+    expect(frag.childNodes.length, 'HTML results in single child node').toBe(1)
+    expect(frag.firstElementChild).not.toBeNull()
+    expect(frag.firstElementChild).toBe(frag.lastElementChild)
+    expect(frag.firstChild, 'node and element are equivalent').toBe(frag.firstElementChild)
 
-    expect(tokenizedCode).toBe(code)
+    const text = 'hello world'
+    const frag2 = createFragment(text)
+    expect(frag2.textContent).toBe(text)
+    expect(frag2.childNodes.length, 'text node results in single child node').toBe(1)
+    expect(frag2.childNodes[0].hasChildNodes()).toBeFalsy()
+    expect(frag2.firstElementChild).toBeNull()
+    expect(frag2.firstChild).not.toBeNull()
+    expect(frag2.firstChild.textContent).toBe(text)
+
+    const hybrid = 'hello <span>world</span>'
+    const frag3 = createFragment(hybrid)
+    expect(frag3.textContent).toBe(text)
+    expect(frag3.childNodes.length, 'hybrid node results two child nodes').toBe(2)
+    expect(frag3.firstElementChild, 'hybrid has a "first element"').not.toBeNull()
+    expect(frag3.firstChild, 'hybrid frag has a child').not.toBeNull()
+    expect(frag3.firstChild.childNodes.length, 'hybrid firstChild node has children').not.toBeNull()
+    expect(frag3.lastChild).toBe(frag3.lastElementChild)
+    frag3.prepend('\n')
+    frag3.lastElementChild.append('\n')
+    expect(frag3.textContent).toBe('\nhello world\n')
+
+    const siblings = '<span>one</span><span>two</span><span>three</span>'
+    const frag4 = createFragment(siblings)
+    expect(frag4.textContent).toBe('onetwothree')
+    expect(frag4.childNodes).toHaveLength(3)
+    expect(frag4.firstElementChild.textContent).toBe('one')
+    frag4.firstElementChild.prepend('\n')
+    frag4.lastElementChild.append('\n')
+    expect(frag4.textContent).toBe('\nonetwothree\n')
+    expect(nodeBoundedByElements(frag4)).toBeTruthy()
+    expect(nodeChildrenAllElements(frag4)).toBeTruthy()
+
+    const middling = '<span>one</span>two<span>three</span>'
+    const frag5 = createFragment(middling)
+    expect(frag5.textContent).toBe('onetwothree')
+    expect(frag5.childNodes).toHaveLength(3)
+    expect(frag5.firstElementChild.textContent).toBe('one')
+    frag5.firstElementChild.prepend('\n')
+    frag5.lastElementChild.append('\n')
+    expect(frag5.textContent).toBe('\nonetwothree\n')
+    expect(nodeBoundedByElements(frag5)).toBeTruthy()
+    expect(nodeChildrenAllElements(frag5)).toBeFalsy()
+
+    const tnode = createTextNode('hello')
+    expect(tnode.hasChildNodes()).toBeFalsy()
   })
 
-  it('wrapWithText() utility able to wrap one or more fragments with html before and after', () => {
-    const html1 = '<div>foo</div>'
-    const html2 = 'hello world'
-    const html3 = 'hello <span>world</span>'
+  it('wrap() utility can add text around using before/after and indent', () => {
+    const html = '<span>foobar</span>'
+    const text = 'foobar'
+    const siblings = '<span>one</span><span>two</span><span>three</span>'
+    const middling = '<span>one</span>two<span>three</span>'
+    const withSpecial = 'hey ho<span>\n\tlet\'s go\n</span>'
 
-    const frag1 = htmlToDocFragment(html1)
-    const frag2 = htmlToDocFragment(html2)
-    const frag3 = htmlToDocFragment(html3)
+    const fHtml = createFragment(html)
 
-    const wrap1 = wrapWithText('before', 'after')(frag1)
-    const wrap2 = wrapWithText('before', 'after')(frag2)
-    const wrap3 = wrapWithText('before', 'after')(frag3)
+    const wText = wrap('\n', '\n')(text)
+    expect(wText, 'text passed into wrap returns html').toBe('\nfoobar\n')
 
-    const wrap1alt = wrapWithText('<div class="wrap">', '</div>')(frag1)
-    const wrap2alt = wrapWithText('<div class="wrap">', '</div>')(frag2)
-    const wrap3alt = wrapWithText('<div class="wrap">', '</div>')(frag3)
+    const wHtml = wrap('\n', '\n')(html)
+    expect(wHtml, 'html passed into wrap returns html new text outside span').toBe('\n<span>foobar</span>\n')
 
-    // #region standard
+    const wfHtml = wrap('\n', '\n')(fHtml)
     expect(
-      getHtmlFromNode(wrap1).startsWith('before'),
-      `wrap1 should start with "before": ${getHtmlFromNode(wrap1)}`,
-    ).toBeTruthy()
-    expect(
-      getHtmlFromNode(wrap1).endsWith('after'),
-      `wrap1 should end with with "after": ${getHtmlFromNode(wrap1)}`,
-    ).toBeTruthy()
-    expect(getHtmlFromNode(wrap1)).toContain(html1)
+      wfHtml.childNodes,
+      'left/right nodes should be text nodes, middle is original span',
+    ).toHaveLength(3)
+    expect(wfHtml.textContent).toBe('\nfoobar\n')
+    expect(toHtml(wfHtml), '"\\n" characters should be external to <span>').toBe('\n<span>foobar</span>\n')
 
-    expect(
-      getHtmlFromNode(wrap2).startsWith('before'),
-      `wrap2 should start with "before": ${getHtmlFromNode(wrap2)}`,
-    ).toBeTruthy()
-    expect(
-      getHtmlFromNode(wrap2).endsWith('after'),
-      `wrap1 should end with with "after": ${getHtmlFromNode(wrap2)}`,
-    ).toBeTruthy()
-    expect(getHtmlFromNode(wrap2)).toContain(html2)
+    const wSibilings = wrap('\n', '\n')(siblings)
+    expect(wSibilings).toBe(`\n${siblings}\n`)
 
-    expect(
-      getHtmlFromNode(wrap3).startsWith('before'),
-      `wrap3 should start with "before": ${getHtmlFromNode(wrap3)}`,
-    ).toBeTruthy()
-    expect(
-      getHtmlFromNode(wrap3).endsWith('after'),
-      `wrap1 should end with with "after": ${getHtmlFromNode(wrap3)}`,
-    ).toBeTruthy()
-    expect(getHtmlFromNode(wrap3)).toContain(html3)
-    // #endregion
+    const wMiddlings = wrap('\n', '\n')(middling)
+    expect(wMiddlings).toBe(`\n${middling}\n`)
 
-    // #region alt
-    expect(
-      getHtmlFromNode(wrap1alt).startsWith('<div class="wrap">'),
-      `wrap1alt should start with DIV wrapper: ${getHtmlFromNode(wrap1alt)}`,
-    ).toBeTruthy()
-    expect(
-      getHtmlFromNode(wrap1alt).endsWith('</div>'),
-      `wrap1alt should end with with DIV wrapper: ${getHtmlFromNode(wrap1alt)}`,
-    ).toBeTruthy()
-    expect(getHtmlFromNode(wrap1alt)).toContain(html1)
+    const wSpecial = wrap('\n', '\n')(withSpecial)
+    expect(wSpecial).toBe(`\n${withSpecial}\n`)
 
-    expect(
-      getHtmlFromNode(wrap2alt).startsWith('<div class="wrap">'),
-      `wrap2alt should start with DIV wrapper: ${getHtmlFromNode(wrap2alt)}`,
-    ).toBeTruthy()
-    expect(
-      getHtmlFromNode(wrap2alt).endsWith('</div>'),
-      `wrap2alt should end with with DIV wrapper: ${getHtmlFromNode(wrap2alt)}`,
-    ).toBeTruthy()
-    expect(getHtmlFromNode(wrap2alt)).toContain(html2)
+    // indent
+    const iHtml = wrap('\n', '\n', 2)(html)
+    expect(iHtml).toBe(`\n\t\t${html}\n`)
 
-    expect(
-      getHtmlFromNode(wrap3alt).startsWith('<div class="wrap">'),
-      `wrap3alt should start with DIV wrapper: ${getHtmlFromNode(wrap3alt)}`,
-    ).toBeTruthy()
-    expect(
-      getHtmlFromNode(wrap3alt).endsWith('</div>'),
-      `wrap3alt should end with with DIV wrapper: ${getHtmlFromNode(wrap3alt)}`,
-    ).toBeTruthy()
-    expect(getHtmlFromNode(wrap3alt)).toContain(html3)
-    // #endregion alt
+    const iSibilings = wrap('\n', '\n', 2)(siblings)
+    expect(iSibilings).toBe(`\n\t\t${siblings}\n`)
 
-    // #region special
-    const special1 = wrapWithText('\tbefore', 'after\n')(frag1)
-    const special2 = wrapWithText('\tbefore', 'after\n')(frag2)
-    const special3 = wrapWithText('\tbefore', 'after\n', 1)(frag1)
-    const special4 = wrapWithText('\tbefore', 'after\n', 1)(frag2)
+    const iMiddlings = wrap('\n', '\n', 2)(middling)
+    expect(iMiddlings).toBe(`\n\t\t${middling}\n`)
 
-    const sHtml1 = getHtmlFromNode(special1)
-    const sHtml2 = getHtmlFromNode(special2)
-    const sHtml3 = getHtmlFromNode(special3)
-    const sHtml4 = getHtmlFromNode(special4)
-
-    expect(
-      getHtmlFromNode(special1).startsWith('\tbefore'),
-      `special1 should start with "\tbefore" but actual was:\n"${sHtml1}"`,
-    ).toBeTruthy()
-    expect(
-      getHtmlFromNode(special1).endsWith('after\n'),
-      `special1 should have ended with a '\n': ${getHtmlFromNode(special1).slice(-1)}`,
-    ).toBeTruthy()
-    expect(getHtmlFromNode(special1)).toContain(html1)
-    // 2
-    expect(
-      getHtmlFromNode(special2).startsWith('\tbefore'),
-      `special2 should start with "\tbefore" but actual was:\n"${sHtml2}"`,
-    ).toBeTruthy()
-    expect(
-      getHtmlFromNode(special2).endsWith('after\n'),
-      `special2 should have ended with a '\n': ${getHtmlFromNode(special2).slice(-1)}`,
-    ).toBeTruthy()
-    expect(getHtmlFromNode(special2)).toContain(html2)
-    // 3
-    expect(
-      getHtmlFromNode(special3).startsWith('\t\tbefore'),
-      `special3 should start with "\\t\\tbefore" but actual was:\n"${sHtml3}"`,
-    ).toBeTruthy()
-    expect(
-      getHtmlFromNode(special3).endsWith('after\n'),
-      `special3 should have ended with a '\\n': "${getHtmlFromNode(special3)}"`,
-    ).toBeTruthy()
-    expect(getHtmlFromNode(special3)).toContain(html1)
-    // 4
-    expect(
-      getHtmlFromNode(special4).startsWith('\t\tbefore'),
-      `special4 should start with "\\t\\tbefore" but actual was:\n"${sHtml4}"`,
-    ).toBeTruthy()
-    expect(
-      getHtmlFromNode(special4).endsWith('after\n'),
-      `special4 should have ended with a '\\n': "${getHtmlFromNode(special4)}"`,
-    ).toBeTruthy()
-    expect(getHtmlFromNode(special4)).toContain(html2)
-    // 5
-    const html5 = '\n\tHello World\n'
-    const frag5 = htmlToDocFragment(html5)
-    // note: indentation of 2 will add `\t\t` to beginning of "before"
-    const special5 = wrapWithText('before', 'after\n', 2)(frag5)
-    expect(
-      getHtmlFromNode(special5).startsWith('\n\t\t\tbefore'),
-      `special5 should start with "\\n\\t\\t\\tbefore" but actual was:\n"${html5}"`,
-    ).toBeTruthy()
-    expect(
-      getHtmlFromNode(special5).endsWith('after\n\n'),
-      `special5 should have ended with a '\\n\\n': "${getHtmlFromNode(special5)}"`,
-    ).toBeTruthy()
-    expect(getHtmlFromNode(special5), 'special5 contains original html').toContain(html5.trim())
-
-    // #endregion special
+    const iSpecial = wrap('\n', '\n', 2)(withSpecial)
+    expect(iSpecial).toBe(`\n\t\t${withSpecial}\n`)
   })
 
-  it('HappyDom\'s conversion to lines remains consistent', () => {
-    const lines = getCodeLines(tokenizedCode).map(l => getHtmlFromNode(l))
-    expect(lines).toMatchSnapshot()
+  it('wrap() works with fragment wrapper', () => {
+    const html = '<span>foobar</span>'
+    const text = 'foobar'
+    const siblings = '<span>one</span><span>two</span><span>three</span>'
+    const middling = '<span>one</span>two<span>three</span>'
+    const wrapper = createFragment('<div class="wrapper" />')
+
+    const w1 = wrap(wrapper)(html)
+    expect(w1).toBe(`<div class="wrapper">${html}</div>`)
+
+    const w2 = wrap(wrapper)(text)
+    expect(w2).toBe(`<div class="wrapper">${text}</div>`)
+
+    const w3 = wrap(wrapper)(siblings)
+    expect(w3).toBe(`<div class="wrapper">${siblings}</div>`)
+
+    const w4 = wrap(wrapper)(middling)
+    expect(w4).toBe(`<div class="wrapper">${middling}</div>`)
   })
 
-  it('wrapChildNodes() utility wraps parent with multiple child nodes', () => {
-    const wrapper = htmlToDocFragment('<table></table>')
-    const children = [htmlToDocFragment('<foo/>'), htmlToDocFragment('<bar/>'), htmlToDocFragment('<span class="line">const testVariable: Valid = \'foo\'</span>')]
-    const wrapped = pipe(wrapChildNodes(children)(wrapper), getHtmlFromNode)
+  it('setAttribute() utility', () => {
+    const html = '<span>foo</span>'
+    const frag = createFragment('<span>foo</span>')
+    const setFoo = setAttribute('class')('foo')
+    setFoo(frag)
+    const html2 = setFoo(html)
 
-    expect(wrapped).toBe('<table><foo></foo><bar></bar><span class="line">const testVariable: Valid = \'foo\'</span></table>')
+    expect(toHtml(frag)).toBe('<span class="foo">foo</span>')
+    expect(toHtml(html2)).toBe('<span class="foo">foo</span>')
   })
 
-  it('addClassToDoc utility is able to add a class to the top-most node in Document', () => {
-    const starting = htmlToDocument('<div class="foobar">testing</div>')
-    const plusOne = pipe(starting, addClassToNode('one'))
-    const plusTwo = pipe(plusOne, addClassToNode('two'))
+  it('addClass() utility is able to add a class to the top-most node in Document', () => {
+    const html = '<div class="foobar">testing</div>'
+    const frag = createFragment(html)
+    const plusOne = pipe(frag, addClass('one'))
+    const plusOneAlt = pipe(html, addClass('one'))
 
-    expect(pipe(plusOne, getClasslistFromNode)).length(2)
-    expect(pipe(plusOne, getClasslistFromNode)).contains('one')
-    expect(pipe(plusOne, getClasslistFromNode)).not.contains('two')
+    const plusTwo = pipe(plusOne, addClass('two'))
+    const plusTwoAlt = pipe(plusOneAlt, addClass('two'))
 
-    expect(pipe(plusTwo, getClasslistFromNode)).length(3)
-    expect(pipe(plusTwo, getClasslistFromNode)).contains('one')
-    expect(pipe(plusTwo, getClasslistFromNode)).contains('two')
+    expect(pipe(plusOne, getClass), `Class list from Frag input is: ${pipe(plusOne, getClass)}`).length(2)
+    expect(pipe(plusOne, getClass)).contains('one')
+    expect(pipe(plusOne, getClass)).not.contains('two')
+    expect(pipe(plusOneAlt, getClass), `Class list from HTML input is: "${pipe(plusOneAlt, getClass)}"`).length(2)
+    expect(pipe(plusOneAlt, getClass)).contains('one')
+    expect(pipe(plusOneAlt, getClass)).not.contains('two')
+
+    expect(pipe(plusTwo, getClass)).length(3)
+    expect(pipe(plusTwo, getClass)).contains('one')
+    expect(pipe(plusTwo, getClass)).contains('two')
+    expect(pipe(plusTwoAlt, getClass)).length(3)
+    expect(pipe(plusTwoAlt, getClass)).contains('one')
+    expect(pipe(plusTwoAlt, getClass)).contains('two')
   })
 
-  it('addClassToDoc utility is able to add a class to the top-most node in DocumentFragment', () => {
-    const starting = htmlToDocFragment('<div class=\'foobar\'>testing</div>')
-    const plusOne = pipe(starting, addClassToNode('one'))
-    const plusTwo = pipe(plusOne, addClassToNode('two'))
+  it('addClass() utility is able to add a class to the top-most node in DocumentFragment', () => {
+    const starting = createFragment('<div class="foobar">testing</div>')
+    const plusOne = pipe(starting, addClass('one'))
+    const plusTwo = pipe(plusOne, addClass('two'))
 
-    expect(pipe(plusOne, getClasslistFromNode)).length(2)
-    expect(pipe(plusOne, getClasslistFromNode)).contains('one')
-    expect(pipe(plusOne, getClasslistFromNode)).not.contains('two')
+    expect(pipe(plusOne, getClass)).length(2)
+    expect(pipe(plusOne, getClass)).contains('one')
+    expect(pipe(plusOne, getClass)).not.contains('two')
 
-    expect(pipe(plusTwo, getClasslistFromNode)).length(3)
-    expect(pipe(plusTwo, getClasslistFromNode)).contains('one')
-    expect(pipe(plusTwo, getClasslistFromNode)).contains('two')
+    expect(pipe(plusTwo, getClass)).length(3)
+    expect(pipe(plusTwo, getClass)).contains('one')
+    expect(pipe(plusTwo, getClass)).contains('two')
   })
 
   it('removeClassToDoc utility removes classes from DOM tree', () => {
-    const starting = htmlToDocFragment('<div class=\'foobar\'>testing</div>')
-    const falseFlag = pipe(starting, removeClassFromDoc('one'))
-    const empty = pipe(falseFlag, removeClassFromDoc('foobar'))
+    const starting = createFragment('<div class=\'foobar\'>testing</div>')
+    const falseFlag = pipe(starting, removeClass('one'))
+    const empty = pipe(falseFlag, removeClass('foobar'))
 
-    expect(pipe(falseFlag, getClasslistFromNode)).toContain('foobar')
-    expect(pipe(empty, getClasslistFromNode)).lengthOf(0)
+    expect(pipe(falseFlag, getClass)).toContain('foobar')
+    expect(pipe(empty, getClass)).lengthOf(0)
   })
 
   it('safeString', () => {

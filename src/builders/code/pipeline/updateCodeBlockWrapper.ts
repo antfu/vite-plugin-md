@@ -1,7 +1,7 @@
 import { identity, pipe } from 'fp-ts/lib/function'
 import type { CodeBlockMeta, CodeOptions } from '../types'
 import { Modifier } from '../types'
-import { addClassToNode, wrapWithText } from '../utils'
+import { addClass, wrap } from '../utils'
 
 /**
  * Adds classes to the code-block's global wrapper node.
@@ -14,10 +14,10 @@ export const updateCodeBlockWrapper = (o: CodeOptions) =>
       ...fence,
       codeBlockWrapper: pipe(
         fence.codeBlockWrapper,
-        wrapWithText('\n', '\n'),
-        addClassToNode(`language-${fence.lang}`),
+        wrap('\n', '\n', fence.level),
+        addClass(`language-${fence.lang}`),
         o.lineNumbers || fence.modifiers.includes(Modifier['#'])
-          ? addClassToNode('line-numbers-mode')
+          ? addClass('line-numbers-mode')
           : identity,
       ),
     }

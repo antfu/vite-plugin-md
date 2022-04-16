@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { Window } from 'happy-dom'
 import { composeSfcBlocks } from '../src/pipeline'
 import { code } from '../src/index'
-import { queryHtml } from '../src/builders/code/utils'
+import { select, toHtml } from '../src/builders/code/utils'
 
 const window = new Window()
 const document = window.document
@@ -54,17 +54,20 @@ describe('code() builder using Prism (incl generalized tests)', () => {
     const langLine = templateBlock.split('\n').find(i => i.includes('language-markdown'))
     expect(templateBlock.includes('language-bash'), `when no language is stated we configured to have it converted to 'md' but we got:\n${langLine}`).toBeTruthy()
   })
-  it.only('line numbers are displayed when set', async() => {
+  it('line numbers are displayed when set', async() => {
     const { templateBlock, html } = await composeSfcBlocks(
       'test/fixtures/ts-code-block.md',
       await getFixture('ts-code-block.md'),
       { builders: [code({ lineNumbers: true })] },
     )
-    console.log(html)
 
-    const dom = queryHtml(html)
+    // console.log(html)
+
+    const dom = select(html)
 
     const lines = dom.all('.line')
+    console.log({ html: toHtml(html), lines: lines.length })
+
     const codeCols = dom.all('.col-code')
     const lineNumCols = dom.all('.col-line-number')
     const blockLevel = dom.all('.line-numbers-mode')
@@ -89,7 +92,7 @@ describe('code() builder using Prism (incl generalized tests)', () => {
       { builders: [code()] },
     )
 
-    const dom = queryHtml(html)
+    const dom = select(html)
     const lines = dom.all('.line')
     const highlighted = dom.all('.highlight')
 

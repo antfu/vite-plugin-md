@@ -1,6 +1,6 @@
 import { identity, pipe } from 'fp-ts/lib/function'
 import type { CodeBlockMeta } from '../types'
-import { addAttributeToNode, addClassToNode, wrapChildNodes, wrapWithText } from '../utils'
+import { addClass, setAttribute, wrapChildNodes, wrap } from '../utils'
 
 /**
  * updates the `pre` block with classes, style, and adds the code block in as
@@ -11,16 +11,19 @@ export const updatePreWrapper = (fence: CodeBlockMeta<'dom'>): CodeBlockMeta<'do
     ...fence,
     pre: pipe(
       fence.pre,
-      addClassToNode(`language-${fence.lang}`),
+      addClass(`language-${fence.lang}`),
       fence.props.class
-        ? addClassToNode(fence.props.class?.trim())
+        ? addClass(fence.props.class?.trim())
         : identity,
       fence.props.style
-        ? addAttributeToNode('style', fence.props.style)
+        ? setAttribute('style')(fence.props.style)
         : identity,
 
-      wrapChildNodes(fence.code),
-      wrapWithText('\n', '\n'),
+      wrapChildNodes(pipe(
+        fence.code,
+        // wrapWithText('\n'),
+      )),
+      wrap('\n', '\n'),
     ),
   }
 }

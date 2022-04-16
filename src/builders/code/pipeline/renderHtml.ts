@@ -1,7 +1,7 @@
 import { pipe } from 'fp-ts/lib/function'
 import type { DocumentFragment } from 'happy-dom'
 import type { CodeBlockMeta } from '../types'
-import { getHtmlFromNode, wrapChildNodes } from '../utils'
+import { toHtml, wrapChildNodes } from '../utils'
 
 function removeUndefined(items: (DocumentFragment | undefined)[]): DocumentFragment[] {
   return items.filter(i => i) as DocumentFragment[]
@@ -11,15 +11,20 @@ function removeUndefined(items: (DocumentFragment | undefined)[]): DocumentFragm
  * Renders the HTML which results from the code block transform pipeline
  */
 export const renderHtml = (fence: CodeBlockMeta<'dom'>): CodeBlockMeta<'complete'> => {
+  const children = removeUndefined([
+    fence.heading,
+    fence.pre,
+    fence.lineNumbersWrapper,
+    fence.footer,
+  ])
+
   const node = pipe(
     fence.codeBlockWrapper,
-    wrapChildNodes(
-      removeUndefined([fence.heading, fence.pre, fence.lineNumbersWrapper, fence.footer]),
-    ),
+    wrapChildNodes(children),
   )
 
   return {
     ...fence,
-    html: getHtmlFromNode(node),
+    html: toHtml(node),
   }
 }

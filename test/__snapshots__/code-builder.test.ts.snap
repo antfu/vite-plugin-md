@@ -4,14 +4,10 @@ exports[`code() builder using Prism (incl generalized tests) > valid language ch
 "<div class=\\"markdown-body\\"><h1>Code Builder Test</h1>
 <p>This test is intended to validate testing of code blocks; the first test is a typescript block.</p>
 
-<div class=\\"code-block language-typescript\\">
-	<div class=\\"line-numbers-wrapper\\"><span class=\\"line-number odd last-row line-1\\">1</span><span class=\\"line-number even line-2\\">2</span></div></div>
-
+<div class=\\"code-block language-typescript\\"></div>
 <p>But now we have some Rust code too:</p>
 
-<div class=\\"code-block language-rust line-numbers-mode\\">
-	<div class=\\"line-numbers-wrapper\\"><span class=\\"line-number odd line-1\\">1</span></div></div>
-
+<div class=\\"code-block language-rust line-numbers-mode\\"></div>
 <p>The test is now complete; everyone should return to their desks.</p>
 </div>"
 `;

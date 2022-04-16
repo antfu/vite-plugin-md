@@ -1,6 +1,6 @@
 import type { Pipeline, PipelineStage } from '../../../types'
 import type { BlockCallback, CodeBlockMeta, CodeOptions } from '../types'
-import { htmlToDocFragment, queryNode, safeString } from '../utils'
+import { createFragment, safeString, select } from '../utils'
 
 function mergeClasses(
   payload: Pipeline<PipelineStage.parser>,
@@ -22,21 +22,21 @@ function mergeClasses(
 }
 
 export const convertBlocksToDomNodes = (p: Pipeline<PipelineStage.parser>, o: CodeOptions) => (fence: CodeBlockMeta<'code'>): CodeBlockMeta<'dom'> => {
-  const code = htmlToDocFragment(fence.code)
-  const codeLinesCount = queryNode(code).all('.line').length
+  const code = createFragment(fence.code)
+  const codeLinesCount = select(code).all('.line').length
 
-  const pre = htmlToDocFragment(fence.pre)
-  const codeBlockWrapper = htmlToDocFragment(fence.codeBlockWrapper)
-  const lineNumbersWrapper = htmlToDocFragment(fence.lineNumbersWrapper)
+  const pre = createFragment(fence.pre)
+  const codeBlockWrapper = createFragment(fence.codeBlockWrapper)
+  const lineNumbersWrapper = createFragment(fence.lineNumbersWrapper)
 
   const heading = fence.heading
-    ? htmlToDocFragment(
+    ? createFragment(
       `<div ${fence.props.heading ? `class="${mergeClasses(p, o.headingClasses, fence, 'heading')}"` : ''}>${safeString(fence.heading)}</div>`,
     )
     : undefined
 
   const footer = fence.footer
-    ? htmlToDocFragment(
+    ? createFragment(
       `<div ${fence.props.footer ? `class="${mergeClasses(p, o.footerClasses, fence, 'footer')}"` : ''}">${safeString(fence.footer)}</div>`,
     )
     : undefined
