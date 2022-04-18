@@ -9,7 +9,6 @@ import {
   renderHtml,
   resolveLanguage,
   updateCodeBlockWrapper,
-  updateCodeWrapper,
   updateLineNumbers,
   updatePreWrapper,
   useHighlighter, userRules,
@@ -34,7 +33,8 @@ export const fence = async(payload: Pipeline<PipelineStage.parser>, options: Cod
     md.renderer.rules.fence = (state, idx) => {
       // fence mutation pipeline
       const fence = pipe(
-        extractMarkdownItTokens(state[idx]),
+        extractMarkdownItTokens(payload, state[idx]),
+        // trace('tokens'),
         defaultBlocks(options),
         resolveLanguage(options),
 
@@ -46,7 +46,6 @@ export const fence = async(payload: Pipeline<PipelineStage.parser>, options: Cod
         updateCodeBlockWrapper(options),
         updateLineNumbers(options),
         highlightLines(options),
-        updateCodeWrapper,
         updatePreWrapper,
         userRules('after', payload, options),
 

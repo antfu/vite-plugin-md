@@ -28,14 +28,14 @@ export function resolveOptions(userOptions: Options = {}): ResolvedOptions {
   const options = userOptions.frontmatterPreprocess === null
     ? { ...defaultOptions, ...userOptions }
     : {
-      ...defaultOptions,
-      ...userOptions,
-      frontmatterPreprocess: (frontmatter: Frontmatter, options: ResolvedOptions) => {
+        ...defaultOptions,
+        ...userOptions,
+        frontmatterPreprocess: (frontmatter: Frontmatter, options: ResolvedOptions) => {
         // default process; will be removed if using links() builder
-        const head = preprocessHead(frontmatter, options)
-        return { head, frontmatter }
-      },
-    }
+          const head = preprocessHead(frontmatter, options)
+          return { head, frontmatter }
+        },
+      }
 
   options.wrapperClasses = toArray(options.wrapperClasses)
     .filter((i?: string) => i)

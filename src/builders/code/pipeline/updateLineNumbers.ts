@@ -1,48 +1,88 @@
 import { pipe } from 'fp-ts/lib/function'
+import type { DocumentFragment } from 'happy-dom'
 import type { CodeBlockMeta, CodeOptions } from '../types'
 import {
   addClass,
   createFragment,
+  into,
+  select,
+  toHtml,
   wrap,
-  wrapChildNodes,
 } from '../utils'
 
 /**
  * Builds up the full DOM tree for line numbers and puts it back into the
- * `lineNumbersWrapper` property.
+ * `fence.lineNumbersWrapper` property.
  *
- * This is done regardless of whether lineNumbers are turned on, this
- * functions responsibility is only to ensure that if its needed it is ready.
+ * It also adds classes on the code lines in `fence.code` and `fence.aboveTheFoldCode`
  */
 export const updateLineNumbers = (_o: CodeOptions) =>
   (fence: CodeBlockMeta<'dom'>): CodeBlockMeta<'dom'> => {
-    for (let lineNumber = 1; fence.codeLinesCount >= lineNumber; lineNumber++) {
-      const evenOdd = lineNumber % 2 === 0 ? 'even' : 'odd'
-      const firstLast = lineNumber === 0
+    // indent the wrapper 1 tab stop
+    // fence.lineNumbersWrapper = wrap('\n', '\n', fence.level + 1)(fence.lineNumbersWrapper)
+
+    const applyLineClasses = (
+      genericLineClass: string,
+      specificPrefix: string,
+    ) => (section: DocumentFragment) => {
+      const dom = select(section)
+      const generics = dom.all(`.${genericLineClass.replace(/^\./, '')}`)
+      const evenOdd = (lineNumber: number) => lineNumber % 2 === 0 ? 'even' : 'odd'
+      const firstLast = (lineNumber: number) => lineNumber === 0
         ? 'first-row'
-        : lineNumber === fence.codeLinesCount - 1
+        : lineNumber === fence.codeLinesCount
           ? 'last-row'
           : undefined
 
-      const classes = [
-        'line-number',
-        evenOdd,
-        firstLast,
-        `line-${lineNumber}`,
-      ].filter(i => i) as string[]
+      generics.forEach((el, idx) => {
+        const classes = [
+          `${specificPrefix}-${idx + 1}`,
+          evenOdd(idx + 1),
+          firstLast(idx + 1),
+        ].filter(i => i) as string[]
 
-      fence.lineNumbersWrapper = pipe(
-        fence.lineNumbersWrapper,
-        wrap('\n', '\n', fence.level + 1),
-        wrap(
+        el.replaceWith(
           pipe(
-            createFragment(`<span>${lineNumber}</span>`),
+            el,
             addClass(classes),
-            wrap('\n', '\n', fence.level + 2),
           ),
-        ),
-      )
+        )
+      })
+
+      return section
     }
 
-    return fence
+    const addLines = () => {
+      const siblings: DocumentFragment[] = []
+      for (let lineNumber = 1; fence.codeLinesCount >= lineNumber; lineNumber++) {
+        siblings.push(
+          pipe(
+            createFragment(`<span class="line-number">${lineNumber}</span>`),
+            wrap('\n', undefined, fence.level + 2),
+          ),
+        )
+      }
+      return siblings
+    }
+
+    const aboveTheFoldCode = fence.aboveTheFoldCode
+      ? pipe(fence.aboveTheFoldCode, applyLineClasses('line-above', 'above-line'))
+      : undefined
+
+    return {
+      ...fence,
+      trace: `Processed ${fence.codeLinesCount} lines and put into fence.lineNumbersWrapper [the level was at ${fence.level}]`,
+
+      code: pipe(
+        fence.code,
+        applyLineClasses('line', 'line'),
+      ),
+      aboveTheFoldCode,
+      lineNumbersWrapper: pipe(
+        addLines(),
+        into(fence.lineNumbersWrapper),
+        applyLineClasses('line-number', 'line'),
+        wrap('\n', '\n'),
+      ),
+    }
   }

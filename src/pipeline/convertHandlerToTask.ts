@@ -32,44 +32,44 @@ export const getBuilderTask = <S extends IPipelineStage>(
   stage: S,
   options: ResolvedOptions,
 ) => (payload: Pipeline<S>): PipeTask<S> => {
-  const builders = getBuilders(stage, options)
-  if (builders.length === 0) {
+    const builders = getBuilders(stage, options)
+    if (builders.length === 0) {
     // if no builders then just return payload as-is
-    return TE.right(payload)
-  }
-
-  // convert handlers to tasks
-  // const tasks = builders.reduce(
-  //   (acc, b) => {
-  //     const task = TE.tryCatch(
-  //       () => b.handler(payload, options),
-  //       e =>
-  //         `During the "${stage}" stage, the builder API "${b.name}" was unable to transform the payload. It received the following error message: ${e instanceof Error ? e.message : String(e)}`
-  //       ,
-  //     )
-  //     return [...acc, task]
-  //   },
-  //   [] as PipeTask<S>[],
-  // )
-  // }
-
-  const asyncApi = async(payload: Pipeline<S>) => {
-    for (const b of builders) {
-      try {
-        payload = await b.handler(payload, b.options)
-      }
-      catch (e) {
-        throw new Error(`During the "${stage}" stage, the builder API "${b.name}" was unable to transform the payload. It received the following error message: ${e instanceof Error ? e.message : String(e)}`)
-      }
+      return TE.right(payload)
     }
 
-    return payload
+    // convert handlers to tasks
+    // const tasks = builders.reduce(
+    //   (acc, b) => {
+    //     const task = TE.tryCatch(
+    //       () => b.handler(payload, options),
+    //       e =>
+    //         `During the "${stage}" stage, the builder API "${b.name}" was unable to transform the payload. It received the following error message: ${e instanceof Error ? e.message : String(e)}`
+    //       ,
+    //     )
+    //     return [...acc, task]
+    //   },
+    //   [] as PipeTask<S>[],
+    // )
+    // }
+
+    const asyncApi = async(payload: Pipeline<S>) => {
+      for (const b of builders) {
+        try {
+          payload = await b.handler(payload, b.options)
+        }
+        catch (e) {
+          throw new Error(`During the "${stage}" stage, the builder API "${b.name}" was unable to transform the payload. It received the following error message: ${e instanceof Error ? e.message : String(e)}`)
+        }
+      }
+
+      return payload
+    }
+
+    const taskApi = TE.tryCatchK(asyncApi, reason => `${reason}`)
+
+    return taskApi(payload)
   }
-
-  const taskApi = TE.tryCatchK(asyncApi, reason => `${reason}`)
-
-  return taskApi(payload)
-}
 
 /**
  * A higher order function which starts by taking the `options` for this plugin

@@ -2,15 +2,20 @@ import { pipe } from 'fp-ts/lib/function'
 import { describe, expect, it } from 'vitest'
 import type { DocRoot } from '../src/builders/code/utils/happyDom'
 import {
+  TAB_SPACE,
   addClass,
   createDocument,
+  createElementNode,
   createFragment,
   createTextNode,
   getAttribute,
+  into,
+  isElementLike,
   nodeBoundedByElements,
   nodeChildrenAllElements,
   removeClass,
   safeString,
+  select,
   setAttribute,
   toHtml,
   wrap,
@@ -61,13 +66,20 @@ describe('HappyDom\'s can be idempotent', () => {
   })
 
   it('basics', () => {
+    const open = '<div class="wrapper">'
     const html = '<span>foobar</span>'
     const frag = createFragment(html)
+    const openFrag = createFragment(open)
+
+    expect(isElementLike(frag)).toBeTruthy()
+    expect(isElementLike(openFrag)).toBeTruthy()
+
     expect(toHtml(frag.firstElementChild)).toBe(html)
     expect(frag.textContent).toBe('foobar')
     expect(frag.childNodes.length, 'HTML results in single child node').toBe(1)
     expect(frag.firstElementChild).not.toBeNull()
     expect(frag.firstElementChild).toBe(frag.lastElementChild)
+    expect(frag.firstElementChild.tagName).toBe('SPAN')
     expect(frag.firstChild, 'node and element are equivalent').toBe(frag.firstElementChild)
 
     const text = 'hello world'
@@ -117,50 +129,92 @@ describe('HappyDom\'s can be idempotent', () => {
     expect(tnode.hasChildNodes()).toBeFalsy()
   })
 
+  it('select() utility', () => {
+    const html = '<span class="foo bar">foobar</span>'
+    const frag = createFragment(html)
+    const missing = select(frag).first('.nonsense')
+
+    expect(missing).toBe(null)
+  })
+
+  it('createFragment() utility', () => {
+    const text = 'foobar'
+    const html = '<span>foobar</span>'
+
+    expect(toHtml(createFragment(html)), 'plain html').toBe(html)
+    expect(toHtml(createFragment(createElementNode(html))), 'html as element').toBe(html)
+    expect(toHtml(createFragment(text)), 'plain text').toBe(text)
+    expect(toHtml(createFragment(createTextNode(text))), 'text as text node').toBe(text)
+  })
+
+  it('into() with multiple nodes injected', () => {
+    const indent = '\n\t'
+    const text = 'hello'
+    const element = '<span>world</span>'
+    const closeout = '\n'
+    const html = `${indent}${text}${element}${closeout}`
+
+    expect(toHtml(into()(indent, text, element, closeout))).toBe(html)
+    expect(toHtml(into()([indent, text, element, closeout]))).toBe(html)
+
+    expect(into()(indent, text, element, closeout).childNodes).toHaveLength(4)
+
+    expect(
+      toHtml(into('<div class="wrapper">')(indent, text, element, closeout)),
+    ).toBe(`<div class="wrapper">${html}</div>`)
+  })
+
   it('wrap() utility can add text around using before/after and indent', () => {
     const html = '<span>foobar</span>'
     const text = 'foobar'
     const siblings = '<span>one</span><span>two</span><span>three</span>'
     const middling = '<span>one</span>two<span>three</span>'
-    const withSpecial = 'hey ho<span>\n\tlet\'s go\n</span>'
+    const withSpecial = 'hey ho<span>\nlet\'s go\n</span>'
 
     const fHtml = createFragment(html)
 
     const wText = wrap('\n', '\n')(text)
     expect(wText, 'text passed into wrap returns html').toBe('\nfoobar\n')
 
-    const wHtml = wrap('\n', '\n')(html)
-    expect(wHtml, 'html passed into wrap returns html new text outside span').toBe('\n<span>foobar</span>\n')
+    expect(wrap('\n', '\n')(html)).toBe('\n<span>foobar\n</span>')
 
     const wfHtml = wrap('\n', '\n')(fHtml)
-    expect(
-      wfHtml.childNodes,
-      'left/right nodes should be text nodes, middle is original span',
-    ).toHaveLength(3)
     expect(wfHtml.textContent).toBe('\nfoobar\n')
-    expect(toHtml(wfHtml), '"\\n" characters should be external to <span>').toBe('\n<span>foobar</span>\n')
+    expect(toHtml(wfHtml), 'before "\\n" character should be external to <span> but after is inside').toBe('\n<span>foobar\n</span>')
 
-    const wSibilings = wrap('\n', '\n')(siblings)
-    expect(wSibilings).toBe(`\n${siblings}\n`)
+    expect(
+      wrap('\n', '\n')(siblings),
+    ).toBe(`\n${siblings}\n`)
 
-    const wMiddlings = wrap('\n', '\n')(middling)
-    expect(wMiddlings).toBe(`\n${middling}\n`)
-
-    const wSpecial = wrap('\n', '\n')(withSpecial)
-    expect(wSpecial).toBe(`\n${withSpecial}\n`)
+    expect(
+      wrap(undefined, '\n')(siblings),
+      'undefined before works',
+    ).toBe(`${siblings}\n`)
+    expect(wrap('\n', undefined)(siblings)).toBe(`\n${siblings}`)
+    expect(wrap('\n', TAB_SPACE)(siblings)).toBe(`\n${siblings}${TAB_SPACE}`)
+    expect(wrap('\n', '\n')(middling)).toBe(`\n${middling}\n`)
+    expect(
+      wrap('\n', '\n')(withSpecial),
+    ).toEqual(`\n${withSpecial}\n`) // sibling nodes wrap after at end
 
     // indent
-    const iHtml = wrap('\n', '\n', 2)(html)
-    expect(iHtml).toBe(`\n\t\t${html}\n`)
+    expect(
+      wrap('\n', '\n', 2)(html),
+    ).toBe(
+      `\n${TAB_SPACE}${TAB_SPACE}${TAB_SPACE}${TAB_SPACE}${html.replace('</span>', '\n</span>')}`,
+    )
 
     const iSibilings = wrap('\n', '\n', 2)(siblings)
-    expect(iSibilings).toBe(`\n\t\t${siblings}\n`)
+    expect(iSibilings).toBe(`\n${TAB_SPACE}${TAB_SPACE}${TAB_SPACE}${TAB_SPACE}${siblings}\n`)
 
     const iMiddlings = wrap('\n', '\n', 2)(middling)
-    expect(iMiddlings).toBe(`\n\t\t${middling}\n`)
+    expect(iMiddlings).toBe(`\n${TAB_SPACE}${TAB_SPACE}${TAB_SPACE}${TAB_SPACE}${middling}\n`)
 
-    const iSpecial = wrap('\n', '\n', 2)(withSpecial)
-    expect(iSpecial).toBe(`\n\t\t${withSpecial}\n`)
+    expect(
+      wrap('\n', '\n', 2)(withSpecial),
+    ).toBe(
+      `\n${TAB_SPACE}${TAB_SPACE}${TAB_SPACE}${TAB_SPACE}${withSpecial}\n`,
+    )
   })
 
   it('wrap() works with fragment wrapper', () => {

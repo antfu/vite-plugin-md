@@ -55,6 +55,8 @@ export interface CommonOptions {
    */
   lineClass?: string | false | LineCallback
 
+  layoutStructure: 'flex-lines' | 'tabular' | 'none'
+
   /**
    * Any default classes to add to the header region (when region is found to exist)
    */
@@ -96,16 +98,16 @@ export interface PrismOptions extends CommonOptions {
   /**
    * The language to use for code blocks that specify a language that Prism does not know.
    */
-  defaultLanguageForUnknown?: PrismLanguage
+  defaultLanguageForUnknown?: string
   /**
    * The language to use for code blocks that do not specify a language.
    */
-  defaultLanguageForUnspecified: PrismLanguage
+  defaultLanguageForUnspecified: string
   /**
    * Shorthand to set both {@code defaultLanguageForUnknown} and {@code defaultLanguageForUnspecified} to the same value. Will be copied
    * to each option if it is set to {@code undefined}.
    */
-  defaultLanguage?: PrismLanguage
+  defaultLanguage?: string
 }
 
 /**
@@ -157,6 +159,65 @@ export type TokenType = 'keyword' | 'operator' | 'punctuation' | 'interpolation-
 
 export type CodeParsingStage = 'code' | 'dom' | 'complete'
 
+export type HighlightKind = 'range' | 'line' | 'symbol'
+
+export interface HighlightLine {
+  kind: 'line'
+  line: number
+}
+export interface HighlightRange {
+  kind: 'range'
+  from: number
+  to: number
+}
+export interface HighlightSymbol {
+  kind: 'symbol'
+  symbol: string
+}
+
+/**
+ * Tokens representing intent to highlight code; originating from any source
+ * [highlight prop, csv, VuePress/Vitepress syntax]
+ */
+export type HighlightToken = HighlightLine | HighlightRange | HighlightSymbol
+
+export type RangeExpression = `${string}-${string}`
+/** the ways in which the user might express the "highlight" property */
+export type HighlightExpression = number | RangeExpression | { symbol: string } | { from: number; to: number }
+
+export interface CodeBlockProperties {
+  /**
+   * Indicates what lines to highlight, this can be:
+   * - a single line number
+   * - a line range
+   * - a line with a give token block (TODO: figure out how to model)
+   */
+  highlight?: HighlightExpression | HighlightExpression[]
+  /**
+   * Allows pointing to an external file as the code source
+   */
+  filename?: string
+
+  /** classes to add to the heading section */
+  heading?: string
+  /** classes to add to the footer section */
+  footer?: string
+
+  /** classes to add to the codeblock section */
+  class?: string
+  /** style properties to add to the codeblock section */
+  style?: string
+  width?: number | string
+  height?: number | string
+  alt?: string
+  tooltip?: any
+  'data-codeLines'?: number
+
+  [key: string]: any
+}
+
+export type CodeFilename = boolean | 'filename' | 'with-path' | `name:${string}`
+
 /**
  * When a fence block is encountered it will be parsed
  * into the following structure for evaluation.
@@ -170,6 +231,36 @@ export interface CodeBlockMeta<S extends CodeParsingStage> {
   pre: S extends 'code' ? string : DocumentFragment
   lineNumbersWrapper: S extends 'code' ? string : DocumentFragment
   codeBlockWrapper: S extends 'code' ? string : DocumentFragment
+
+  /**
+   * All highlightlighting information will be captured as
+   * an array of `HighlightToken` tokens.
+   */
+  highlightTokens: HighlightToken[]
+
+  /**
+   * The external filename which the code block is importing (`null` if code is
+   * not external).
+   */
+  externalFile: string | null
+
+  /**
+   * Specifies whether the filename should be displayed above the code block.
+   * With _external code references_ the boolean turns this on/off and when
+   * "on" it displays just the filename. You may also be more explicit by using
+   * the `filename` or `with-path` string literals.
+   *
+   * Finally, should you want to explicitly state a filename -- useful for
+   * non-external code -- you can put in a string value prefixed with `name:`.
+   * If you are using an external file, this will override the actual file name.
+   */
+  showFilename: CodeFilename
+
+  /**
+   * Typically not used but when a code block references an external file
+   * AND the local code block _also_ has code, then it will be placed here
+   */
+  aboveTheFoldCode?: S extends 'code' ? string : DocumentFragment
 
   /**
    * The code block; represented as either a string or a DOM tree
@@ -204,35 +295,17 @@ export interface CodeBlockMeta<S extends CodeParsingStage> {
    * The identified language in the code block
    */
   lang: string
+
+  /**
+   * An optional message that a pipeline function can export and will
+   * be picked up by trace() utility
+   */
+  trace?: string
   /**
    * The properties found on the top line (to right of language and backticks), these
    * key/value pairs will be assigned to the
    */
-  props: {
-    /**
-     * Indicates what lines to highlight, this can be:
-     * - a single line number
-     * - a line range
-     * - a line with a give token block (TODO: figure out how to model)
-     */
-    highlight?: number | [from: number, to: number] | { kind?: TokenType; name: string }
-    /** classes to add to the heading section */
-    heading?: string
-    /** classes to add to the footer section */
-    footer?: string
-
-    /** classes to add to the codeblock section */
-    class?: string
-    /** style properties to add to the codeblock section */
-    style?: string
-    width?: number | string
-    height?: number | string
-    alt?: string
-    tooltip?: any
-    'data-codeLines'?: number
-
-    [key: string]: any
-  }
+  props: CodeBlockProperties
   modifiers: Modifier[]
   /**
    * not sure how useful this is yet ... currently always evaluates to three

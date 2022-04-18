@@ -1,62 +1,58 @@
+import type { DocumentFragment, IElement } from 'happy-dom'
 import type { CodeBlockMeta, CodeOptions } from '../types'
-import { Modifier } from '../types'
+import { getClassList, select } from '../utils'
 
-function isRangeTuple(value: unknown): value is [from: number, to: number] {
-  return Array.isArray(value) && value.length === 2 && value.every(i => typeof i === 'number')
-}
+/** converts HighlightTokens to lines of code */
+function linesToHighlight(fence: CodeBlockMeta<'dom'>): number[] {
+  const lines: number[] = []
 
-function linesToHighlight(info: CodeBlockMeta<'dom'>['props']['hightlight']): number[] {
-  switch (typeof info) {
-    case 'number':
-      return [info]
-    case 'object':
-      if (isRangeTuple(info)) {
-        const values = []
-        // eslint-disable-next-line prefer-const
-        let [from, to] = info
-        while (from <= to)
-          values.push(from++)
-        return values
-      }
-      else if (Array.isArray(info)) {
-        return info.flatMap(i => linesToHighlight(i as CodeBlockMeta<'dom'>['props']['hightlight']))
-      }
-      else if ('kind' in info && 'name' in info) {
-        // TODO: build out
-        return []
-      }
-      throw new Error(`Problems using the highlight information provided: ${JSON.stringify(info)}`)
-    default:
-      return []
-  }
+  fence.highlightTokens.forEach((t) => {
+    switch (t.kind) {
+      case 'line':
+        lines.push(t.line)
+        break
+      case 'range':
+        {
+          let i = t.from
+          while (i <= t.to) {
+            lines.push(i)
+            i++
+          }
+        }
+        break
+      case 'symbol':
+        // TODO: need to implement this
+    }
+  })
+
+  return lines
 }
 
 /**
  * If highlighted line numbers are configured, will add "highlight" class to lines specified
  * using both traditional Vuepress/Vitepress nomenclature or attribute/object notation
  */
-export const highlightLines = (_o: CodeOptions) => (fence: CodeBlockMeta<'dom'>) => {
-  const hl = linesToHighlight(fence.props.highlight)
-  if (fence.props.hightlight) {
-    fence.code.querySelectorAll('.line').forEach((line, idx) => {
-      if (hl.includes(idx)) {
-        line.setAttribute(
-          'class',
-          [line.getAttribute('class').split(/\s+/g), 'highlight'].join(' ').trim(),
-        )
-      }
-    })
+export const highlightLines = (_o: CodeOptions) => (fence: CodeBlockMeta<'dom'>): CodeBlockMeta<'dom'> => {
+  const hl = linesToHighlight(fence)
 
-    // if (o.lineNumbers || fence.modifiers.includes(Modifier['#'])) {
-    fence.code.querySelectorAll('.line-number').forEach((line, idx) => {
-      if (hl.includes(idx)) {
-        line.setAttribute(
-          'class',
-          [line.getAttribute('class').split(/\s+/g), 'highlight'].join(' ').trim(),
-        )
-      }
-    })
+  const highlight = (doc: DocumentFragment, sel: string) => {
+    const cb = (el: IElement) => {
+      const classes = getClassList(el)
+      let highlight = false
+      hl.forEach((l) => {
+        if (classes.includes(`line-${l}`))
+          highlight = true
+      })
+      return highlight
+    }
+    return select(doc).addClassToEach('highlight')(sel, cb)
   }
 
-  return fence
+  return {
+    ...fence,
+    trace: `Highlighted line(s) were: ${hl.join(', ')}`,
+
+    code: highlight(fence.code, '.line').toContainer(),
+    lineNumbersWrapper: highlight(fence.lineNumbersWrapper, '.line-number').toContainer(),
+  }
 }

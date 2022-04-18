@@ -1,7 +1,7 @@
-import { pipe } from 'fp-ts/lib/function'
 import type { DocumentFragment } from 'happy-dom'
-import type { CodeBlockMeta } from '../types'
-import { toHtml, wrapChildNodes } from '../utils'
+import type { CodeBlockMeta, CodeOptions } from '../types'
+import { Modifier } from '../types'
+import { into, select, toHtml } from '../utils'
 
 function removeUndefined(items: (DocumentFragment | undefined)[]): DocumentFragment[] {
   return items.filter(i => i) as DocumentFragment[]
@@ -10,21 +10,25 @@ function removeUndefined(items: (DocumentFragment | undefined)[]): DocumentFragm
 /**
  * Renders the HTML which results from the code block transform pipeline
  */
-export const renderHtml = (fence: CodeBlockMeta<'dom'>): CodeBlockMeta<'complete'> => {
+export const renderHtml = (o: CodeOptions) => (fence: CodeBlockMeta<'dom'>): CodeBlockMeta<'complete'> => {
   const children = removeUndefined([
     fence.heading,
     fence.pre,
-    fence.lineNumbersWrapper,
-    fence.footer,
+    o.lineNumbers || fence.modifiers.includes(Modifier['#'])
+      ? fence.lineNumbersWrapper
+      : undefined,
+    // fence.footer,
   ])
-
-  const node = pipe(
-    fence.codeBlockWrapper,
-    wrapChildNodes(children),
-  )
+  const block = select(fence.codeBlockWrapper).first('.code-block')
+  if (block)
+    block.replaceWith(into(block)(children))
+  if (fence.footer)
+    fence.codeBlockWrapper.lastElementChild.append(fence.footer)
 
   return {
     ...fence,
-    html: toHtml(node),
+    trace: `Finalized HTML is:\n${toHtml(fence.codeBlockWrapper)}`,
+
+    html: toHtml(fence.codeBlockWrapper),
   }
 }

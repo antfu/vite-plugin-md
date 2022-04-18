@@ -1,0 +1,155 @@
+<head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/themes/prism-tomorrow.min.css"
+    integrity="sha512-vswe+cgvic/XBoF1OcM/TeJ2FW0OofqAVdCZiEYkd6dwGXthvkSFWOoGGJgS2CW70VK5dQM5Oh+7ne47s74VTg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <style>
+    .code-block {
+      position: relative;
+      border-radius: 6px;
+      overflow: hidden;
+      background-color: #282c34;
+      font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .code-block .heading {
+      background-color: rgba(255, 255, 255, 0.15);
+      color: white;
+      padding: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .code-block .footer {
+      background-color: rgba(255, 255, 255, 0.25);
+      padding: 0.25rem;
+    }
+
+    .code-block::before {
+      content: "ts";
+      position: absolute;
+      z-index: 3;
+      top: 0.8em;
+      right: 1em;
+      font-size: 0.75rem;
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .code-block .highlight {
+      background-color: rgba(0, 0, 0, 1.0);
+    }
+
+    .code-block .code-wrapper {
+      display: flex;
+      flex-direction: row-reverse;
+      padding: 0;
+      width: 100%;
+    }
+
+    .code-block .code-wrapper pre[class*="language-"] {
+      flex-grow: 1;
+      padding: 0;
+      margin: 0;
+      line-height: 1.2;
+      width: 100%;
+      white-space: normal;
+    }
+
+    .code-block .line-numbers-wrapper {
+      display: flex;
+      flex-direction: column;
+      text-align: center;
+      min-width: 3rem;
+      color: rgba(255, 255, 255, 0.3);
+      padding: 0;
+      border-right: 1px solid black;
+    }
+
+    .code-block .line-number {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+      opacity: 1;
+    }
+
+    .code-block .line-number.negative {
+      opacity: 0.5;
+    }
+
+    .code-block .line,
+    .code-block .line-above,
+    .code-block .line-number {
+      line-height: 1.2;
+      font-size: 0.85rem;
+      padding-top: 0.25rem;
+      padding-bottom: 0.25rem;
+    }
+
+    .code-block .line,
+    .code-block .line-above {
+      width: 100%;
+      white-space: pre;
+      padding-left: 0.75rem;
+      margin-left: 0;
+    }
+
+    .code-block .code-wrapper pre[class*="language-"],
+    .code-block .line-numbers-wrapper {
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+
+    .footer {
+      padding-top: 0.15rem;
+      padding-left: 0.5rem;
+      margin-top: 0.25rem;
+      margin-left: 0.5rem;
+      border-left: 4px solid gray;
+    }
+
+    /* .code-block .line::before,
+    .code-block .line-above::before {
+      content: '\n'
+    } */
+  </style>
+</head>
+
+<div class="markdown-body">
+  <h1>External Referencing with CSV</h1>
+  <p>When referencing external code it’s not uncommon to want to annotate something about it and while the <code
+      v-pre>heading</code> and <code v-pre>footer</code> are the most common means of doing this … you can also add
+    content <em>into</em> the code block and this code will be added ABOVE the code which is imported.</p>
+  <blockquote>
+    <p>Note: highlighting will use the imported code as the beginning of the line numbers, whereas the inline code will
+      have negative line numbers</p>
+  </blockquote>
+  <p>Below is an example of using CSV format to bring in external code <em>and</em> add in code of our own:</p>
+
+  <div class="code-wrapper">
+    <div class="code-block language-typescript line-numbers-mode external-ref with-inline-content">
+      <div class="heading">Heading for a code block</div>
+      <div class="code-wrapper">
+        <pre class="language-typescript"><div class="line-above"><span class="token comment">// the code below was brought in from an external file ...</span></div>
+  <div class="line-above"><span class="token comment">// pretty great, eh?</span></div><div class="line line-1 odd"><span class="token comment">/** this is one impressive function */</span></div>
+  <div class="line line-2 even highlight"><span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">code</span><span class="token punctuation">(</span>value<span class="token operator">:</span> <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token punctuation">{</span></div>
+  <div class="line line-3 odd">  <span class="token comment">// do some amazing stuff</span></div>
+  <div class="line line-4 even">  <span class="token keyword">return</span> value</div>
+  <div class="line line-5 odd last-row"><span class="token punctuation">}</span></div></pre>
+
+        <div class="line-numbers-wrapper">
+          <div class="line-number negative line--1 odd">-1</div>
+          <div class="line-number negative line-0 odd">0</div>
+          <div class="line-number line-1 odd">1</div>
+          <div class="line-number line-2 even highlight">2</div>
+          <div class="line-number line-3 odd">3</div>
+          <div class="line-number line-4 even">4</div>
+          <div class="line-number line-5 odd last-row">5</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">footer text</div>
+  </div>
+
+</div>

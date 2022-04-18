@@ -4,6 +4,8 @@ import type { Document, DocumentFragment, IElement, INode, IText, Node } from 'h
 import { flow, identity, pipe } from 'fp-ts/lib/function'
 import type { HTML } from '../types'
 
+export const TAB_SPACE = ' '
+
 /**
  * Converts an HTML string into a Happy DOM document tree
  */
@@ -14,31 +16,40 @@ export function createDocument(html: string): Document {
   return document
 }
 
-export function createFragment(html: HTML): DocumentFragment {
+export function createFragment(content?: Container | HTML): DocumentFragment {
   const window = new Window()
   const document = window.document
   const fragment = document.createDocumentFragment() as DocumentFragment
-  fragment.append(html)
+  if (content)
+    fragment.append(clone(content))
 
   return fragment
 }
 
 export function createTextNode(text: string): IText {
-  const window = new Window()
-  const document = window.document
-  return document.createTextNode(text)
+  const frag = createFragment(text)
+  if (isTextNodeLike(frag))
+    return frag.firstChild as IText
+  else
+    throw new Error(`the HTML passed in cannot be converted to a single text node: ${text}`)
 }
 
-export function createElementNode(text: string): IElement {
-  const window = new Window()
-  const document = window.document
-  return document.createElement(text)
+export function createElementNode(html: string): IElement {
+  const frag = createFragment(html)
+  if (isElementLike(frag))
+    return frag.firstElementChild
+  else
+    throw new Error(`the HTML passed in cannot be converted to a single element node: ${html}`)
 }
 
-export function isTextNode(node: INode | string): node is IText {
-  if (typeof node === 'string')
-    node = createFragment(node)
-  return !('firstElementChild' in node) && !node.hasChildNodes()
+export function isTextNode(node: Container | HTML): node is IText {
+  if (typeof node === 'string') {
+    const test = createFragment(node)
+    return isTextNodeLike(test)
+  }
+  else {
+    return typeof node === 'object' && !('firstElementChild' in (node as any))
+  }
 }
 
 /**
@@ -61,11 +72,11 @@ export function htmlToElement(html: HTML): IElement {
     throw new Error('ambiguous convertion to element')
 }
 
-function isDocument(dom: Document | DocumentFragment | IElement | IText | INode): dom is Document {
-  return !isElement(dom) && 'body' in dom
+function isDocument(dom: Container | HTML): dom is Document {
+  return typeof dom === 'object' && !isElement(dom) && 'body' in dom
 }
-function isFragment(dom: Document | DocumentFragment | IElement | IText | INode): dom is DocumentFragment {
-  return !isElement(dom) && !isTextNode(dom) && dom.isConnected === false
+function isFragment(dom: Container | HTML): dom is DocumentFragment {
+  return typeof dom === 'object' && !isElement(dom) && !isTextNode(dom) && dom.isConnected === false
 }
 
 export type NodeType = 'html' | 'text' | 'element' | 'node' | 'document' | 'fragment'
@@ -96,7 +107,7 @@ export interface NodeSolverDict<O> {
  * A fully configured solver which is ready to convert a node into type `O`; if `O` is never
  * then it will mirror the input type as the output type
  */
-export type NodeSolverReady<E extends NodeType, O> = <N extends Exclude<Container | HTML, E>>(node: N) => O extends 'mirror'
+export type NodeSolverReady<E extends NodeType, O> = <N extends Exclude<Container | HTML | null, E>>(node: N) => O extends 'mirror'
   ? N
   : O
 
@@ -124,13 +135,25 @@ export const solveForNodeType: NodeSolver = (_ = undefined as never) => {
   const solver = <EE extends NodeType, OO>(): NodeSolverReceiver<EE, OO> => ({
     solver: solver =>
       (node) => {
+        if (!node)
+          throw new Error('Node passed in was NULL')
+
         const type = getNodeType(node)
         if (type in solver) {
           const fn = (solver as any)[type]
           return fn(node)
         }
         else {
-          throw new Error(`Problem finding "${type}" in solver`)
+          if (type === 'node' && 'element' in solver && isElement(node)) {
+            const fn = (solver as any).element
+            return fn(node)
+          }
+          else if (type === 'node' && 'text' in solver && isTextNode(node)) {
+            const fn = (solver as any).text
+            return fn(node)
+          }
+
+          throw new Error(`Problem finding "${type}" in solver; had the following methods: ${Object.keys(solver)}`)
         }
       }
     ,
@@ -207,16 +230,54 @@ export function toHtml<D extends Container | HTML>(node: D | D[]): HTML {
 }
 
 /**
+ * Wraps one or more content items _into_ a parent fragment (while optionally
+ * allowing you to decorate the parent container ... by default it is an
+ * empty shell)
+ */
+export const into = (parent?: DocRoot | IElement | HTML) => <C extends Container | HTML | Array<Container | HTML>>(...content: C[]): DocumentFragment => {
+  const p = parent ? createFragment(parent) : createFragment()
+  const flat = content.flatMap(c => c as Container | string)
+
+  if (isTextNode(p) || isTextNodeLike(p)) {
+    throw new Error(
+      `The wrapper HTML is wrapping a text node; this is not allowed: ${toHtml(p)}`,
+    )
+  }
+
+  const parentHasWrapper = p.hasChildNodes()
+
+  flat.forEach((c) => {
+    if (parentHasWrapper)
+      p.firstElementChild.append(createFragment(c))
+    else
+      p.append(createFragment(c))
+  })
+
+  return p
+}
+
+/**
+ * Allows various content-types to be wrapped into a single
+ * DocumentFragment which contains each element as a sibling
+ */
+export const siblings = <
+  C extends Container | HTML | Array<Container | HTML>,
+>(...content: C[]) => {
+  return into()(...content)
+}
+
+/**
  * Clones most DOM types
  */
 export function clone<T extends Container | HTML>(container: T): T {
-  const clone = solveForNodeType('node')
+  const clone = solveForNodeType()
     .mirror()
     .solver({
       html: h => `${h}`,
       fragment: flow(toHtml, createFragment),
       document: flow(toHtml, createDocument),
       element: flow(toHtml, createElementNode),
+      node: flow(toHtml, createFragment, f => f.firstElementChild ? f.firstElementChild : f.firstChild),
       text: flow(toHtml, createTextNode),
     })
 
@@ -244,20 +305,80 @@ export const select = <D extends Container | HTML>(node: D) => {
 
   const n = getDoc(node)
 
-  return {
+  const api = {
+
+    /**
+     * query for _all_ nodes with given selector
+     */
     all: (sel: string) => {
-      return n.querySelectorAll(sel) as ReturnType<Document['querySelectorAll']>
+      return n.querySelectorAll(sel) as IElement[]
     },
-    first: (sel: string) => {
-      return n.querySelector(sel) as ReturnType<Document['querySelector']>
+    /**
+     * query for the _first_ node with the given selector
+     */
+    first: (sel: string): IElement | null => {
+      return n.querySelector(sel) as IElement | null
     },
     contains: (sel: INode) => {
       return n.contains(sel) as ReturnType<Document['contains']>
     },
+    /**
+     * Boolean check on whether the node has child nodes
+     */
     hasChildNodes: () => {
       return n.hasChildNodes()
     },
+    /**
+     * Wrap each selected node with either a fragment or a `BeforeAfterWrapper`
+     */
+    wrapEach: <
+      W extends FragWrapper | BeforeAfterWrapper,
+    >(sel: string, ...wrapper: W) => {
+      const found = n.querySelectorAll(sel) as IElement[]
+      found.forEach(e => wrap(...wrapper)(e))
+    },
+
+    /**
+     * Adds a class (or set of classes) to each item selected with the
+     * selector string.
+     *
+     * Optionally allows providing a callback to each match found.
+     * The callback will recieve the Node on callback. Returning `false`
+     * removes it from consideration. Alternatively, returning the node
+     * will allow the callback to modify it how it sees fit.
+     *
+     * Returning `undefined` or `true` accepts this node for consideration.
+     */
+    addClassToEach: (...klass: string[] | string[][]) =>
+      (sel: string, cb?: ((el: IElement) => IElement | boolean | undefined)) => {
+        const k = klass.flatMap(i => i).join(' ').split(/s+/g).filter(i => i)
+        const found = n.querySelectorAll(sel)
+        found.forEach((el) => {
+          let verdict = true
+          if (cb) {
+            const result = cb(el)
+            if (result === false)
+              verdict = false
+            else if (isElement(result))
+              el = result
+          }
+          if (verdict)
+            el.replaceWith(addClass(k)(el))
+        })
+
+        return api
+      },
+
+    toHTML: () => {
+      return toHtml(n)
+    },
+
+    toContainer: () => {
+      return n as D
+    },
   }
+
+  return api
 }
 
 export const setAttribute = (attr: string) => (value: string) => {
@@ -299,6 +420,14 @@ export const getAttribute = (attr: string) => {
 }
 
 /**
+ * Provides the classes defined on a given container's top level
+ * element as an array of strings
+ */
+export const getClassList = (container: Container | HTML | null) => {
+  return getAttribute('class')(container).split(/\s+/)
+}
+
+/**
  * Removes a class from the top level node of a container's body.
  *
  * Note: if the class wasn't present then no change is performed
@@ -337,17 +466,7 @@ export const addClass = (add: string | string[]) => <D extends DocRoot | IElemen
 
   const resultant = Array.from(new Set<string>([...current, ...add]))
 
-  return setClass(resultant.join(' '))(doc)
-}
-
-/**
- * Provides one or more "child" nodes and then add a wrapper element
- * ```ts
- * const wrapped = wrapChildNodes(child1, child2)(parent)
- * ```
- */
-export const wrapChildNodes = (children: DocumentFragment | DocumentFragment[]) => (wrapper: DocumentFragment) => {
-  return _nest(wrapper, children) as DocumentFragment
+  return setClass(resultant.join(' ').trim())(doc)
 }
 
 /**
@@ -394,7 +513,7 @@ export const nodeBoundedByElements = <
 export const nodeChildrenAllElements = <
   D extends DocRoot,
 >(node: D) => {
-  return !!node.childNodes.every(n => isElement(n))
+  return node.childNodes.every(n => isElement(n))
 }
 
 /**
@@ -407,25 +526,25 @@ export const hasSingularElement = <
   return nodeBoundedByElements(node) && node.childNodes.length === 1
 }
 
-export function isElement(frag: Document | DocumentFragment | IElement | INode | HTML): frag is IElement {
-  return typeof frag === 'object' && 'outerHTML' in frag
+export function isElement(frag: unknown): frag is IElement {
+  return typeof frag === 'object' && 'outerHTML' in (frag as Object) && 'previousElementSibling' in (frag as Object)
 }
 
 /**
  * determines if a Doc/Doc Fragment is a wrapper for only a singular
  * `IElement` node
  */
-export const isElementLike = (
-  frag: DocumentFragment | Document,
-) => {
+export const isElementLike = <D extends DocRoot>(
+  frag: D,
+): boolean => {
   return typeof frag !== 'string' && frag.childNodes.length === 1 && nodeStartsWithElement(frag as any)
 }
 
 type FragWrapper = [DocumentFragment]
-type BeforeAfterWrapper = [before: string, after: string, indent?: number]
+type BeforeAfterWrapper = [before?: string, after?: string, indent?: number]
 
 function isBeforeAfterWrapper(args: FragWrapper | BeforeAfterWrapper): args is BeforeAfterWrapper {
-  return !!(Array.isArray(args) && args.length > 1 && typeof args[0] === 'string')
+  return !!(Array.isArray(args) && args.length > 1)
 }
 
 export type NodeTypeInput<T extends ReturnType<typeof getNodeType>> = T extends 'html'
@@ -445,40 +564,49 @@ export const wrap = <
 >(content: C): C => {
   const tab = (count = 1) => count === 0
     ? ''
-    : ''.padStart(count, '\t')
+    : ''.padStart(count * 2, TAB_SPACE)
 
   if (isBeforeAfterWrapper(wrapper)) {
     // eslint-disable-next-line prefer-const
     let [before, after, indent] = wrapper
 
     if (indent && indent !== 0)
-      before = `${before}${tab(indent)}`
+      before = `${before || ''}${tab(indent)}`
 
-    const html = (h: HTML) => pipe(h, createFragment, convert, toHtml)
+    const html = (h: HTML) => pipe(h, createFragment, wrap(...wrapper), toHtml)
     const text = (t: IText) => createTextNode(`${before}${t.textContent}${after}`)
 
     const fragment = (f: DocumentFragment) => {
-      if (isElementLike(f) || nodeBoundedByElements(f)) {
-        f.prepend(createTextNode(before))
-        f.append(createTextNode(after))
-      }
-      else if (isTextNodeLike(f)) {
+      const children = f.childNodes.length
+      if (isTextNodeLike(f)) {
         const text = f.textContent
         return createFragment(`${before}${text}${after}`)
       }
       else {
         const first = f.firstChild
         const last = f.lastChild
+        if (before) {
+          if (isElement(first))
+            f.prepend(createTextNode(before))
+          else
+            f.replaceChild(createTextNode(`${before}${first.textContent}`), first)
+        }
 
-        if (isElement(first))
-          f.prepend(createTextNode(before))
-        else
-          f.replaceChild(createTextNode(`${before}${first.textContent}`), first)
-
-        if (isElement(last))
-          f.append(createTextNode(after))
-        else
-          f.replaceChild(createTextNode(`${last.textContent}${last}`), last)
+        if (after) {
+          if (children > 1) {
+            // sibling nodes will have after added as new child node
+            f.append(createTextNode(after))
+          }
+          else {
+            if (isElement(last)) { last.append(createTextNode(after)) }
+            else {
+              f.lastChild.replaceChild(
+                createTextNode(`${f.lastChild.textContent}${after}`),
+                f.lastChild,
+              )
+            }
+          }
+        }
       }
       return f
     }

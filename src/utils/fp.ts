@@ -21,15 +21,15 @@ export const transformer = <F extends IPipelineStage, T extends IPipelineStage>(
   to: T,
   fn: (p: Pipeline<F>) => Pipeline<T>,
 ) => (payload: PipeTask<F>): PipeTask<T> => pipe(
-  payload,
-  TE.map(
-    p => TE.tryCatch(
-      () => Promise.resolve(fn(p)),
-      e => `There was a problem using "${name}" to transform the pipeline: ${e instanceof Error ? e.message : String(e)}`,
+    payload,
+    TE.map(
+      p => TE.tryCatch(
+        () => Promise.resolve(fn(p)),
+        e => `There was a problem using "${name}" to transform the pipeline: ${e instanceof Error ? e.message : String(e)}`,
+      ),
     ),
-  ),
-  TE.flatten,
-)
+    TE.flatten,
+  )
 
 export function isPipeTask<S extends IPipelineStage>(payload: PipeTask<S> | PipeEither<S>): payload is PipeTask<S> {
   return typeof payload === 'function'

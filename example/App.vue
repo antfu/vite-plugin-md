@@ -1,3 +1,9 @@
+<script setup lang='ts'>
+import { ref } from 'vue'
+import ComponentA from '../README.md'
+const current = ref()
+</script>
+
 <template>
   <router-view v-slot="{ Component }">
     <component :is="Component" ref="current" />
@@ -8,9 +14,3 @@
   </div>
   <ComponentA style="padding: 20px 40px" />
 </template>
-
-<script setup lang='ts'>
-import { ref } from 'vue'
-import ComponentA from '../README.md'
-const current = ref()
-</script>
