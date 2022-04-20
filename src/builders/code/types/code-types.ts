@@ -55,7 +55,7 @@ export interface CommonOptions {
    */
   lineClass?: string | false | LineCallback
 
-  layoutStructure: 'flex-lines' | 'tabular' | 'none'
+  layoutStructure: 'flex-lines' | 'tabular' | 'vuepress' |'none'
 
   /**
    * Any default classes to add to the header region (when region is found to exist)

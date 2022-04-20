@@ -10,7 +10,7 @@ When referencing external code it's not uncommon to want to annotate something a
 
 Below is an example of using CSV format to bring in external code _and_ add in code of our own:
 
-```#ts filename="./foo/code.ts", heading="Using CSV format", highlight=2
+```#ts filename="./foo/code.ts", heading="Using CSV format", highlight=2, footer="to be or not to be"
 // the code below was brought in from an external file ...
 // pretty great, eh?
 ```

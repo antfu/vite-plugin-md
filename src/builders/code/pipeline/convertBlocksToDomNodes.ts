@@ -23,7 +23,7 @@ function mergeClasses(
 
 export const convertBlocksToDomNodes = (p: Pipeline<PipelineStage.parser>, o: CodeOptions) => (fence: CodeBlockMeta<'code'>): CodeBlockMeta<'dom'> => {
   const code = createFragment(fence.code)
-  const codeLinesCount = select(code).all('.line').length
+  const codeLinesCount = select(code).findAll('.line').length
 
   const pre = createFragment(fence.pre)
   const codeBlockWrapper = createFragment(fence.codeBlockWrapper)

@@ -33,6 +33,7 @@ export const code = createBuilder('code', PipelineStage.parser)
       highlightLines: true,
       lineNumbers: false,
       showLanguage: true,
+      layoutStructure: 'flex-lines',
       ...(o.engine === Highlighter.shiki
         ? SHIKI_DEFAULTS
         : PRISM_DEFAULTS

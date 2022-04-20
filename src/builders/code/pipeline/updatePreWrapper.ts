@@ -1,6 +1,6 @@
 import { identity, pipe } from 'fp-ts/lib/function'
 import type { CodeBlockMeta } from '../types'
-import { addClass, into, setAttribute, toHtml, wrap } from '../utils'
+import { addClass, into, setAttribute, toHtml } from '../utils'
 
 /**
  * updates the `pre` block with classes, style, and adds the code block in as
@@ -22,7 +22,7 @@ export const updatePreWrapper = (fence: CodeBlockMeta<'dom'>): CodeBlockMeta<'do
           : identity,
       ),
     )(code),
-    wrap('\n', '\n', fence.level + 1),
+    // wrap('\n', '\n', fence.level + 1),
   )
 
   return {

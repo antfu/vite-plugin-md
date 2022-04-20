@@ -34,7 +34,6 @@ export const fence = async(payload: Pipeline<PipelineStage.parser>, options: Cod
       // fence mutation pipeline
       const fence = pipe(
         extractMarkdownItTokens(payload, state[idx]),
-        // trace('tokens'),
         defaultBlocks(options),
         resolveLanguage(options),
 
@@ -49,7 +48,7 @@ export const fence = async(payload: Pipeline<PipelineStage.parser>, options: Cod
         updatePreWrapper,
         userRules('after', payload, options),
 
-        renderHtml(options),
+        renderHtml(payload, options),
       )
 
       return fence.html

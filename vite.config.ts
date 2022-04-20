@@ -14,6 +14,6 @@ export default defineConfig(() => ({
       extensions: ['vue', 'md'],
     }),
     Layouts(),
-    Markdown({ linkTransforms: link(), frontmatterPreprocess: meta() }),
+    Markdown({ builders: [link(), meta()] }),
   ],
 }))

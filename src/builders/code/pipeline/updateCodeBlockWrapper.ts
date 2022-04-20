@@ -10,7 +10,7 @@ import { addClass, select } from '../utils'
  */
 export const updateCodeBlockWrapper = (o: CodeOptions) =>
   (fence: CodeBlockMeta<'dom'>): CodeBlockMeta<'dom'> => {
-    const block = select(fence.codeBlockWrapper).first('.code-block')
+    const block = select(fence.codeBlockWrapper).findFirst('.code-block')
     if (block) {
       block.replaceWith(pipe(
         block,
@@ -31,15 +31,4 @@ export const updateCodeBlockWrapper = (o: CodeOptions) =>
     }
 
     return fence
-    // return {
-    //   ...fence,
-    //   codeBlockWrapper: pipe(
-    //     fence.codeBlockWrapper,
-    //     wrap('\n', '\n', fence.level),
-    //     addClass(`language-${fence.lang}`),
-    //     o.lineNumbers || fence.modifiers.includes(Modifier['#'])
-    //       ? addClass('line-numbers-mode')
-    //       : identity,
-    //   ),
-    // }
   }

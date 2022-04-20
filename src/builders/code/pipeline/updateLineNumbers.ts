@@ -5,10 +5,41 @@ import {
   addClass,
   createFragment,
   into,
+  removeClass,
   select,
-  toHtml,
-  wrap,
 } from '../utils'
+
+const applyLineClasses = (
+  fence: CodeBlockMeta<'dom'>,
+  genericLineClass: string,
+  specificPrefix: string,
+) => (section: DocumentFragment) => {
+  const dom = select(section)
+  const generics = dom.findAll(`.${genericLineClass.replace(/^\./, '')}`)
+  const evenOdd = (lineNumber: number) => lineNumber % 2 === 0 ? 'even' : 'odd'
+  const firstLast = (lineNumber: number) => lineNumber === 0
+    ? 'first-row'
+    : lineNumber === fence.codeLinesCount
+      ? 'last-row'
+      : undefined
+
+  generics.forEach((el, idx) => {
+    const classes = [
+          `${specificPrefix}-${idx + 1}`,
+          evenOdd(idx + 1),
+          firstLast(idx + 1),
+    ].filter(i => i) as string[]
+
+    el.replaceWith(
+      pipe(
+        el,
+        addClass(classes),
+      ),
+    )
+  })
+
+  return section
+}
 
 /**
  * Builds up the full DOM tree for line numbers and puts it back into the
@@ -16,57 +47,33 @@ import {
  *
  * It also adds classes on the code lines in `fence.code` and `fence.aboveTheFoldCode`
  */
-export const updateLineNumbers = (_o: CodeOptions) =>
+export const updateLineNumbers = (o: CodeOptions) =>
   (fence: CodeBlockMeta<'dom'>): CodeBlockMeta<'dom'> => {
-    // indent the wrapper 1 tab stop
-    // fence.lineNumbersWrapper = wrap('\n', '\n', fence.level + 1)(fence.lineNumbersWrapper)
-
-    const applyLineClasses = (
-      genericLineClass: string,
-      specificPrefix: string,
-    ) => (section: DocumentFragment) => {
-      const dom = select(section)
-      const generics = dom.all(`.${genericLineClass.replace(/^\./, '')}`)
-      const evenOdd = (lineNumber: number) => lineNumber % 2 === 0 ? 'even' : 'odd'
-      const firstLast = (lineNumber: number) => lineNumber === 0
-        ? 'first-row'
-        : lineNumber === fence.codeLinesCount
-          ? 'last-row'
-          : undefined
-
-      generics.forEach((el, idx) => {
-        const classes = [
-          `${specificPrefix}-${idx + 1}`,
-          evenOdd(idx + 1),
-          firstLast(idx + 1),
-        ].filter(i => i) as string[]
-
-        el.replaceWith(
-          pipe(
-            el,
-            addClass(classes),
-          ),
-        )
-      })
-
-      return section
-    }
-
     const addLines = () => {
       const siblings: DocumentFragment[] = []
       for (let lineNumber = 1; fence.codeLinesCount >= lineNumber; lineNumber++) {
+        const tagName = o.layoutStructure === 'flex-lines' ? 'div' : 'span'
         siblings.push(
-          pipe(
-            createFragment(`<span class="line-number">${lineNumber}</span>`),
-            wrap('\n', undefined, fence.level + 2),
-          ),
+          createFragment(`<${tagName} class="line-number">${lineNumber}</${tagName}>`),
         )
       }
       return siblings
     }
 
     const aboveTheFoldCode = fence.aboveTheFoldCode
-      ? pipe(fence.aboveTheFoldCode, applyLineClasses('line-above', 'above-line'))
+      ? pipe(
+        fence.aboveTheFoldCode,
+        applyLineClasses(fence, 'line-above', 'above-line'),
+        select,
+        s => s.updateAll('.line-above')((el, idx, total) => {
+          return pipe(
+            el,
+            addClass(['line']),
+            addClass(`negative-line-${total - idx - 1}`),
+            removeClass('line-above'),
+          )
+        }).toContainer(),
+      )
       : undefined
 
     return {
@@ -75,14 +82,13 @@ export const updateLineNumbers = (_o: CodeOptions) =>
 
       code: pipe(
         fence.code,
-        applyLineClasses('line', 'line'),
+        applyLineClasses(fence, 'line', 'line'),
       ),
       aboveTheFoldCode,
       lineNumbersWrapper: pipe(
         addLines(),
         into(fence.lineNumbersWrapper),
-        applyLineClasses('line-number', 'line'),
-        wrap('\n', '\n'),
+        applyLineClasses(fence, 'line-number', 'line'),
       ),
     }
   }

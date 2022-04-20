@@ -18,13 +18,13 @@ function loadFile(codeFile: string, pipeline: Pipeline<PipelineStage.parser>) {
   codeFile = codeFile.replace(/^[@~]\//, '/')
 
   const pathToCode = codeFile.startsWith('/')
-    ? join(__dirname, codeFile)
+    ? join(process.cwd(), codeFile)
     : join(dirname(fileName), codeFile)
   try {
     return readFileSync(pathToCode, 'utf-8')
   }
   catch (e) {
-    throw new Error(`Problem loading external code file: \'${pathToCode}\' which was composed of [ \'${codeFile.startsWith('/') ? __dirname : dirname(fileName)}\', \'${codeFile}\' ]`)
+    throw new Error(`Problem loading external code file: \'${pathToCode}\' which was composed of [ \'${codeFile.startsWith('/') ? process.cwd() : dirname(fileName)}\', \'${codeFile}\' ]`)
   }
 }
 

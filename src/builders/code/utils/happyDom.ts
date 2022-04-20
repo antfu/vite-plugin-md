@@ -1,10 +1,123 @@
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import { Window } from 'happy-dom'
-import type { Document, DocumentFragment, IElement, INode, IText, Node } from 'happy-dom'
+import type {
+  Document,
+  DocumentFragment,
+  IElement,
+  INode,
+  IText,
+  Node,
+} from 'happy-dom'
+import {
+  Text,
+  Window,
+} from 'happy-dom'
 import { flow, identity, pipe } from 'fp-ts/lib/function'
-import type { HTML } from '../types'
+import type { Container, DocRoot, FragWrapper, HTML, NodeSolver, NodeSolverReady, NodeSolverReceiver, BeforeAfterWrapper as TextWrapper, ToHtmlOptions, Tree, TreeSummary, UpdateCallback } from '../types'
 
 export const TAB_SPACE = ' '
+
+export const isContainer = (thing: unknown): thing is Container => {
+  return isDocument(thing) || isFragment(thing) || isElement(thing) || isTextNode(thing)
+}
+
+type InspectionTuple = [msg: string, item: unknown]
+
+const isInspectionTuple = (thing: unknown): thing is InspectionTuple => {
+  return Array.isArray(thing) && thing.length === 2 && typeof thing[0] === 'string' && !Array.isArray(thing[1])
+}
+
+export function isHappyWrapperError(err: unknown): err is HappyMishap {
+  return typeof err === 'object' && (err as any).kind === 'HappyWrapper'
+}
+export class HappyMishap extends Error {
+  public name = 'HappyWrapper'
+  public readonly kind: 'HappyWrapper' = 'HappyWrapper'
+  public trace: string[] = []
+  constructor(
+    message: string,
+    options: {
+      error?: unknown
+      inspect?: unknown
+      name?: string
+    } = {}) {
+    super()
+    this.message = `\n${message}`
+    if (options.name)
+      this.name = `HappyWrapper::${options.name}`
+
+    // proxy if already a HappyWrapper
+    if (isHappyWrapperError(options.error))
+      this.name = `HappyWrapper::${options.name || options.error.name}`
+
+    if (options.error) {
+      const name = options.error instanceof Error
+        ? options.error.name.replace('HappyWrapper::', '')
+        : 'unknown'
+      const underlying = `\n\nThe underlying error message [${name}] was:\n${options.error instanceof Error ? options.error.message : String(options.error)}`
+      this.message = `${this.message}${underlying}`
+      this.trace = [...this.trace, name]
+    }
+    else {
+      if (options.inspect) {
+        const inspections = isInspectionTuple(options.inspect)
+          ? [options.inspect]
+          : Array.isArray(options.inspect)
+            ? options.inspect
+            : [options.inspect]
+
+        inspections.forEach((i, idx) => {
+          const intro = isInspectionTuple(i) ? `${i[0]}\n` : `${[idx]}:\n`
+          const container = isInspectionTuple(i) ? i[1] : i
+
+          this.message = `${this.message}\n\n${intro}${JSON.stringify(inspect(container), null, 2)}`
+        })
+      }
+      if (this.trace.length > 1)
+        this.message = `${this.message}\n\nTrace:${this.trace.map((i, idx) => `${idx}. ${i}`)}`
+    }
+  }
+}
+
+/**
+ * A helper utility to help convert DOM nodes or HTML to common type.
+ *
+ * Start by providing the _exclusions_ you want to make for input. By default, all
+ * `Container` types are allowed along with `HTML`
+ */
+export const solveForNodeType: NodeSolver = (_ = undefined as never) => {
+  const solver = <EE extends NodeType, OO>(): NodeSolverReceiver<EE, OO> => ({
+    solver: solver =>
+      (node, parent) => {
+        if (node === null)
+          throw new Error('Value passed into solver was NULL!')
+        if (node === undefined)
+          throw new Error('Value passed into solver was UNDEFINED!')
+
+        const type = getNodeType(node)
+        if (type in solver) {
+          const fn = (solver as any)[type]
+          return fn(node, parent)
+        }
+        else {
+          if (type === 'node' && 'element' in solver && isElement(node)) {
+            const fn = (solver as any).element
+            return fn(node, parent)
+          }
+          else if (type === 'node' && 'text' in solver && isTextNode(node)) {
+            const fn = (solver as any).text
+            return fn(node)
+          }
+
+          throw new HappyMishap(`Problem finding "${type}" in solver; had the following methods: ${Object.keys(solver)}`)
+        }
+      }
+    ,
+  })
+  return {
+    outputType: () => solver(),
+    mirror: () => solver(),
+  }
+}
 
 /**
  * Converts an HTML string into a Happy DOM document tree
@@ -27,28 +140,57 @@ export function createFragment(content?: Container | HTML): DocumentFragment {
 }
 
 export function createTextNode(text: string): IText {
+  if (!text) {
+    console.warn('An empty string was passed into createTextNode(); will be ignored but probably a mistake')
+    return new Text('')
+  }
+
   const frag = createFragment(text)
   if (isTextNodeLike(frag))
     return frag.firstChild as IText
   else
-    throw new Error(`the HTML passed in cannot be converted to a single text node: ${text}`)
+    throw new HappyMishap(`The HTML passed in cannot be converted to a single text node: "${text}".`, { name: 'createTextNode(text)', inspect: frag })
 }
 
-export function createElementNode(html: string): IElement {
-  const frag = createFragment(html)
-  if (isElementLike(frag))
-    return frag.firstElementChild
-  else
-    throw new Error(`the HTML passed in cannot be converted to a single element node: ${html}`)
-}
+export const createElementNode = solveForNodeType()
+  .outputType<IElement>()
+  .solver({
+    node: (n) => {
+      if (isElement(n))
+        return createElementNode(n) as IElement
+      else
+        throw new HappyMishap('can\'t create an IElement from an INode node because it doesn\'t have a tagName property', { inspect: n })
+    },
+    html: (h) => {
+      const frag = createFragment(h)
+      if (isElementLike(frag))
+        return frag.firstElementChild
+      else
+        throw new HappyMishap('The HTML passed into createElementNode() is not convertable to a IElement node!', { name: 'createElementNode(html)', inspect: frag })
+    },
+    element: identity,
+    text: (t) => {
+      throw new HappyMishap('An IElement can not be created from a IText node because element\'s require a wrapping tag name!', { name: 'createElementNode(text)', inspect: t })
+    },
+    fragment: (f) => {
+      if (isElementLike(f))
+        return f.firstElementChild
 
-export function isTextNode(node: Container | HTML): node is IText {
+      else
+        throw new HappyMishap('Can not create an Element from passed in fragment', { name: 'createElementNode(fragment)', inspect: f })
+    },
+    document: (d) => {
+      return createElementNode(createFragment(d.body.outerHTML))
+    },
+  })
+
+export function isTextNode(node: unknown): node is IText {
   if (typeof node === 'string') {
     const test = createFragment(node)
     return isTextNodeLike(test)
   }
   else {
-    return typeof node === 'object' && !('firstElementChild' in (node as any))
+    return typeof node === 'object' && node !== null && !('firstElementChild' in (node as any))
   }
 }
 
@@ -56,7 +198,7 @@ export function isTextNode(node: Container | HTML): node is IText {
  * Tests whether a doc type is wrapping only a text node
  */
 export function isTextNodeLike(node: DocRoot) {
-  return node.childNodes.length === 1 && isTextNode(node.firstChild)
+  return node?.childNodes?.length === 1 && isTextNode(node.firstChild)
 }
 
 export function htmlToNode(html: HTML) {
@@ -72,11 +214,11 @@ export function htmlToElement(html: HTML): IElement {
     throw new Error('ambiguous convertion to element')
 }
 
-function isDocument(dom: Container | HTML): dom is Document {
-  return typeof dom === 'object' && !isElement(dom) && 'body' in dom
+function isDocument(dom: unknown): dom is Document {
+  return typeof dom === 'object' && dom !== null && !isElement(dom) && 'body' in dom
 }
-function isFragment(dom: Container | HTML): dom is DocumentFragment {
-  return typeof dom === 'object' && !isElement(dom) && !isTextNode(dom) && dom.isConnected === false
+function isFragment(dom: unknown): dom is DocumentFragment {
+  return typeof dom === 'object' && dom !== null && !isElement(dom) && !isTextNode(dom) && !('body' in dom)
 }
 
 export type NodeType = 'html' | 'text' | 'element' | 'node' | 'document' | 'fragment'
@@ -93,76 +235,6 @@ export type NodeSolverInput<T extends NodeType> = T extends 'html'
           : T extends 'fragment'
             ? DocumentFragment
             : unknown
-
-export interface NodeSolverDict<O> {
-  html: (input: HTML) => O extends 'mirror' ? HTML : O
-  text: (input: IText) => O extends 'mirror' ? IText : O
-  element: (input: IElement) => O extends 'mirror' ? IElement : O
-  node: (input: INode) => O extends 'mirror' ? INode : O
-  document: (input: Document) => O extends 'mirror' ? Document : O
-  fragment: (input: DocumentFragment) => O extends 'mirror' ? DocumentFragment : O
-}
-
-/**
- * A fully configured solver which is ready to convert a node into type `O`; if `O` is never
- * then it will mirror the input type as the output type
- */
-export type NodeSolverReady<E extends NodeType, O> = <N extends Exclude<Container | HTML | null, E>>(node: N) => O extends 'mirror'
-  ? N
-  : O
-
-export interface NodeSolverReceiver<E extends NodeType, O> {
-  /** provide a solver dictionary */
-  solver: (solver: Omit<NodeSolverDict<O>, E>) => NodeSolverReady<E, O>
-}
-
-export interface NodeSolverWithExclusions<E extends NodeType> {
-  /** provide a type which all solvers will convert to */
-  outputType: <O>() => NodeSolverReceiver<E, O>
-  /** the input type should be maintained as the output type */
-  mirror: () => NodeSolverReceiver<E, 'mirror'>
-}
-
-export type NodeSolver = <E extends NodeType = never>(...exclude: E[]) => NodeSolverWithExclusions<E>
-
-/**
- * A helper utility to help convert DOM nodes or HTML to common type.
- *
- * Start by providing the _exclusions_ you want to make for input. By default, all
- * `Container` types are allowed along with `HTML`
- */
-export const solveForNodeType: NodeSolver = (_ = undefined as never) => {
-  const solver = <EE extends NodeType, OO>(): NodeSolverReceiver<EE, OO> => ({
-    solver: solver =>
-      (node) => {
-        if (!node)
-          throw new Error('Node passed in was NULL')
-
-        const type = getNodeType(node)
-        if (type in solver) {
-          const fn = (solver as any)[type]
-          return fn(node)
-        }
-        else {
-          if (type === 'node' && 'element' in solver && isElement(node)) {
-            const fn = (solver as any).element
-            return fn(node)
-          }
-          else if (type === 'node' && 'text' in solver && isTextNode(node)) {
-            const fn = (solver as any).text
-            return fn(node)
-          }
-
-          throw new Error(`Problem finding "${type}" in solver; had the following methods: ${Object.keys(solver)}`)
-        }
-      }
-    ,
-  })
-  return {
-    outputType: () => solver(),
-    mirror: () => solver(),
-  }
-}
 
 /**
  * Determines the "content-type" of a given node
@@ -182,51 +254,330 @@ export const getNodeType = (node: Container | HTML): NodeType => {
           : 'node'
 }
 
-export type DocRoot = Document | DocumentFragment
-export type DomNode = IElement | IText | INode
-export type Container = DocRoot | DomNode
+export const inspect = (item?: unknown) => {
+  const solver = solveForNodeType()
+    .outputType<Record<string, any>>()
+    .solver({
+      html: h => pipe(h, createFragment, inspect),
+      fragment: x => ({
+        kind: 'DocumentFragment',
+        children: `${x.children.length} / ${x.childNodes.length}`,
+        ...(x.childNodes.length > 1
+          ? {
+              leadsWith: isElement(x.firstChild)
+                ? 'element'
+                : isTextNode(x.firstChild)
+                  ? 'text'
+                  : 'other',
+              endsWith: isElement(x.lastChild)
+                ? 'element'
+                : isTextNode(x.lastChild)
+                  ? 'text'
+                  : 'other',
+            }
+          : {
+              childNode: inspect(x.firstChild),
+            }),
+        content: x.textContent,
+        childHtml: x.childNodes.map((i) => {
+          try {
+            return toHtml(i)
+          }
+          catch {
+            return 'N/A'
+          }
+        }),
+        html: toHtml(x),
+      }),
+      document: x => ({
+        kind: 'Document',
+        headerChildren: x.head.childNodes?.length,
+        bodyChildren: x.body.childNodes?.length,
+        body: toHtml(x.body),
+        children: `${x.body.children?.length} / ${x.body.childNodes?.length}`,
+        childContent: x.body.childNodes.map(i => i.textContent),
+        childHtml: x.childNodes.map((i) => {
+          try {
+            return toHtml(i)
+          }
+          catch {
+            return 'N/A'
+          }
+        }),
+      }),
+      text: x => ({
+        kind: 'IText node',
+        content: x.textContent,
+        children: x.childNodes?.length,
+        childContent: x.childNodes?.map(i => i.textContent),
+      }),
+      element: x => ({
+        kind: 'IElement node',
+        tagName: x.tagName,
+        /**
+         * in functions like wrap and pretty print, a "parent element" is provided
+         * as a synthetic parent but if this flag indicates whether the flag has
+         * a connected parent in a DOM tree.
+         */
+        hasNaturalParent: !!x.parentElement,
+        textContent: x.textContent,
+        children: `${x.children.length} / ${x.childNodes.length}`,
+        childContent: x.childNodes?.map(i => i.textContent),
+        childHtml: x.childNodes?.map((i) => {
+          try {
+            return toHtml(i)
+          }
+          catch {
+            return 'N/A'
+          }
+        }),
+        html: toHtml(x),
+      }),
+      node: n => ({
+        kind: 'INode (generic)',
+        looksLike: isElement(n) ? 'element' : isTextNode(n) ? 'text' : 'unknown',
+        children: `${n.childNodes?.length}`,
+        childContent: n.childNodes?.map(i => i.textContent),
+        html: n.toString(),
+      }),
+    })
+  return isContainer(item) || typeof item === 'string'
+    ? solver(item)
+    : {
+        result: 'not found',
+        type: typeof item,
+        ...(typeof item === 'object' ? { keys: Object.keys(item as Object) } : { value: JSON.stringify(item) }),
+      }
+}
+
+const removeSpecialChars = (input: string) => input.replace(/\\t/g, '').replace(/\\n/g, '').trim()
+const truncate = (maxLength: number) => (input: string) => input.slice(0, maxLength)
+
+export const tree = (node: Container | HTML): Tree => {
+  const summarize = (tree: Omit<Tree, 'summary'>): Tree => {
+    const summary = (n: Omit<Tree, 'summary'>): TreeSummary => {
+      let ts: TreeSummary
+      switch (n.type) {
+        case 'text':
+          ts = {
+            node: `t(${pipe(n.node.textContent, removeSpecialChars, truncate(10))})`,
+            children: n.children.map(c => summary(c)),
+          }
+          break
+        case 'element':
+        {
+          const el = n.node as IElement
+          ts = {
+            node: `el(${el.tagName.toLowerCase()})`,
+            children: n.children.map(c => summary(c)),
+          }
+          break
+        }
+        case 'node':
+        {
+          const node = n.node as INode
+          ts = {
+            node: `n(${pipe(node.nodeName, removeSpecialChars, truncate(10)) || pipe(node.textContent, removeSpecialChars, truncate(10))}`,
+            children: n.children.map(c => summary(c)),
+          }
+          break
+        }
+        case 'fragment':
+        {
+          const f = n.node as DocumentFragment
+          ts = {
+            node: `frag(${f.firstElementChild ? f.firstElementChild.tagName.toLowerCase() : removeSpecialChars(f.textContent).trim().slice(0, 10)})`,
+            children: n.children.map(c => summary(c)),
+          }
+          break
+        }
+        case 'document':
+        {
+          const d = n.node as Document
+          ts = {
+            node: `doc(${isElementLike(d) ? d.body.firstElementChild.tagName.toLowerCase() : d.textContent.slice(0, 10)})`,
+            children: n.children.map(c => summary(c)),
+          }
+          break
+        }
+        default:
+          ts = {
+            node: 'u(?)',
+            children: n.children.map(c => summary(c)),
+          }
+          break
+      }
+      return ts
+    }
+
+    const recurse = (level = 0) => (node: TreeSummary): string => {
+      const indent = `${''.padStart(level * 6, ' ')}${level > 0 ? `${level}) ` : 'ROOT: '}`
+      return `${indent}${node.node} ${node.children.length > 0 ? '⤵' : '↤'}\n${node.children.map(i => recurse(level + 1)(i))}`
+    }
+
+    return {
+      ...tree,
+      summary: () => summary(tree),
+      toString: () => {
+        const describe = summary(tree)
+        return `\nTree Summary: ${describe.node}\n${''.padStart(40, '-')}\n${recurse(0)(describe)}`
+      },
+    }
+  }
+
+  const convert = (level: number): NodeSolverReady<never, Tree> => solveForNodeType()
+    .outputType<Tree>()
+    .solver({
+      html: flow(createFragment, tree),
+      text: t => summarize({
+        type: 'text',
+        node: t,
+        level,
+        children: t.childNodes.map(c => convert(level + 1)(c)),
+      }),
+      element: e => summarize({
+        type: 'element',
+        node: e,
+        level,
+        children: e.childNodes.map(c => convert(level + 1)(c)),
+      }),
+      node: n => summarize({
+        type: 'node',
+        node: n,
+        level,
+        children: n.childNodes.map(c => convert(level + 1)(c)),
+      }),
+      fragment: f => summarize({
+        type: 'fragment',
+        node: f,
+        level,
+        children: f.childNodes.map(c => convert(level + 1)(c)),
+      }),
+      document: d => summarize({
+        type: 'document',
+        node: d,
+        level,
+        children: d.childNodes.map(c => convert(level + 1)(c)),
+      }),
+    })
+
+  return convert(0)(node)
+}
+
+export const prettyPrint = (level = 0): NodeSolverReady<never, string> => solveForNodeType()
+  .outputType<string>()
+  .solver({
+    html: h => pipe(h, createFragment, prettyPrint(level)),
+    element: (el, parent) => {
+      const wrapConfig: TextWrapper = { before: '\n', close: '\n', indent: level }
+      // use prettyPrint on child nodes
+      const childHtml: string | undefined = el.hasChildNodes()
+        ? el.childNodes.map(c => prettyPrint(level + 1)(c, clone(el))).join('')
+        : undefined
+
+      if (childHtml) {
+        try {
+          el.replaceChildren(childHtml)
+        }
+        catch (e) {
+          throw new HappyMishap(`Problem replacing the "child html" of an element which is being run through prettyPrint: ${e instanceof Error ? e.message : String(e)}.\n The Child HTML was:\n${childHtml}\n`, { inspect: el, error: e })
+        }
+
+        if (level === 0 && !parent)
+          parent = createElementNode('<div></div>')
+        try {
+          const wrapped = wrap(wrapConfig)(el, parent)
+          const { before, after } = wrapConfig
+
+          return `${before || ''}${tab(level)}${toHtml(wrapped)}${after || ''}`
+        }
+        catch (e) {
+          throw new HappyMishap(`The IElement passed into prettyPrint() had child nodes whose HTML was:\n"${childHtml}"\n\nbut ran into problems when trying to wrap the IElement with the following wrap config:\n\n${JSON.stringify(wrapConfig)}`, { error: e, inspect: ['The parent element was', el], name: 'prettyPrint()' })
+        }
+      }
+      else { return pipe(el, wrap(wrapConfig), toHtml) }
+    },
+    node: n => toHtml(n),
+    text: t => toHtml(pipe(t, wrap({ open: '\n', indent: level }))),
+
+    fragment: (f) => {
+      // get child content as HTML
+      const innerHTML = f.childNodes.map(
+        child => prettyPrint(level)(child, f),
+      ).join('')
+
+      // replace old children with this HTML
+      f.replaceChildren(innerHTML)
+
+      // add indent to start and CR at end of HTML
+      return toHtml(wrap({ indent: level, after: '\n' })(f))
+    },
+    document: (d) => {
+      const head = prettyPrint(level)(createFragment(d.head))
+      const body = prettyPrint(level)(createFragment(d.body))
+
+      return `${head}\n${body}`
+    },
+  })
 
 /**
  * Ensures any Container, array of Containers, or even HTML or HTML[] are all
- * normalized down to just HTML
+ * normalized down to just HTML.
+ *
+ * Options allow for:
+ * - `pretty` - make children indented from parent nodes
+ * - `indent` - the base level of indentation for the block of HTML
  */
-export function toHtml<D extends Container | HTML>(node: D | D[]): HTML {
+export function toHtml<D extends Container | HTML>(node: D | D[], options: ToHtmlOptions = {}): HTML {
   if (!Array.isArray(node))
     node = [node]
+  try {
+    const results = node.map((i) => {
+      const convert = solveForNodeType()
+        .outputType<HTML>()
+        .solver({
+          html: h => h,
+          text: t => t.textContent,
+          element: e => options.pretty
+            ? prettyPrint(options.indent || 0)(e)
+            : e.outerHTML,
+          node: (n) => {
+            if (isElement(n))
+              convert(n)
+            if (isTextNode(n))
+              convert(n)
 
-  const results = node.map((i) => {
-    const convert = solveForNodeType()
-      .outputType<HTML>()
-      .solver({
-        html: h => h,
-        text: t => t.textContent,
-        element: e => e.outerHTML,
-        node: (n) => {
-          if (isElement(n))
-            convert(n)
-          if (isTextNode(n))
-            convert(n)
+            throw new Error(
+              `Unknown node type detected while converting to HTML: [ name: ${n.nodeName}, type: ${n.nodeType}, value: ${n.nodeValue} ]`,
+            )
+          },
+          document: d => d.body.outerHTML || '',
+          fragment: (f) => {
+            if (options.pretty)
+              return prettyPrint(options.indent || 0)(f)
 
-          throw new Error(
-            `Unknown node type detected while converting to HTML: [ name: ${n.nodeName}, type: ${n.nodeType}, value: ${n.nodeValue} ]`,
-          )
-        },
-        document: d => d.body.outerHTML,
-        fragment: (f) => {
-          if (isElementLike(f)) {
-            return f.firstElementChild.outerHTML
-          }
-          else {
-            const children = f.childNodes
-            return children.map(c => convert(c)).join('')
-          }
-        },
-      })
+            if (isElementLike(f)) {
+              return f.firstElementChild.outerHTML
+            }
+            else {
+              const children = f.childNodes
+              return children.map(c => convert(c, f)).join('')
+            }
+          },
+        })
 
-    return convert(i)
-  })
+      return convert(i)
+    })
 
-  return results.join('')
+    return results.join('')
+  }
+  catch (e) {
+    if (Array.isArray(node))
+      throw new HappyMishap(`Problem converting an array of nodes [${node.length}: ${node.map(i => getNodeType(i)).join(', ')}] to HTML`, { name: 'toHTML([...])', inspect: ['first node', node[0]], error: e })
+
+    else
+      throw new HappyMishap(`Problem converting "${getNodeType(node)}" to HTML!`, { name: 'toHTML(getNodeType(node))', inspect: node, error: e })
+  }
 }
 
 /**
@@ -239,8 +590,14 @@ export const into = (parent?: DocRoot | IElement | HTML) => <C extends Container
   const flat = content.flatMap(c => c as Container | string)
 
   if (isTextNode(p) || isTextNodeLike(p)) {
-    throw new Error(
-      `The wrapper HTML is wrapping a text node; this is not allowed: ${toHtml(p)}`,
+    throw new HappyMishap(
+      `The wrapper HTML is wrapping a text node; this is not allowed: ${toHtml(p)}`, {
+        name: 'into()',
+        inspect: [
+          ['parent', parent],
+          ['content', content],
+        ],
+      },
     )
   }
 
@@ -285,6 +642,52 @@ export function clone<T extends Container | HTML>(container: T): T {
 }
 
 /**
+ * Changes the tag name for the top level container element passed in.
+ * ```ts
+ * // <div>hi</div>
+ * const html = changeTagName('div')(`<span>hi</span`)
+ * ```
+ */
+export const changeTagName = (tagName: string) => {
+  const replacer = (h: HTML, before: string, after: string) => {
+    const open = new RegExp(`^<${before.toLocaleLowerCase()}`)
+    const close = new RegExp(`<\/${before.toLocaleLowerCase()}>$`)
+    return h
+      .replace(open, `<${after}`)
+      .replace(close, `</${after}>`)
+  }
+
+  const areTheSame = (before: string, after: string) => before.toLocaleLowerCase() === after.toLocaleLowerCase()
+
+  return solveForNodeType('text', 'node')
+    .mirror()
+    .solver({
+      html: (h) => {
+        const before = createFragment(h).firstElementChild.tagName
+        return areTheSame(before, tagName)
+          ? h
+          : replacer(h, before, tagName)
+      },
+      element: el => areTheSame(el.tagName, tagName)
+        ? el
+        : createElementNode(replacer(toHtml(el), el.tagName, tagName)),
+
+      fragment: (f) => {
+        f.firstElementChild.replaceWith(
+          pipe(clone(f.firstElementChild), changeTagName(tagName)),
+        )
+        return f
+      },
+      document: (d) => {
+        d.body.firstElementChild.replaceWith(
+          pipe(clone(d.body.firstElementChild), changeTagName(tagName)),
+        )
+        return d
+      },
+    })
+}
+
+/**
  * ensures that a given string doesn't have any HTML inside of it
  */
 export function safeString(str: string): string {
@@ -310,18 +713,50 @@ export const select = <D extends Container | HTML>(node: D) => {
     /**
      * query for _all_ nodes with given selector
      */
-    all: (sel: string) => {
+    findAll: (sel: string) => {
       return n.querySelectorAll(sel) as IElement[]
     },
     /**
      * query for the _first_ node with the given selector
      */
-    first: (sel: string): IElement | null => {
+    findFirst: (sel: string): IElement | null => {
       return n.querySelector(sel) as IElement | null
     },
-    contains: (sel: INode) => {
-      return n.contains(sel) as ReturnType<Document['contains']>
-    },
+
+    /**
+     * mutate _all_ nodes with given selector; if no selector provided then
+     * all child nodes will be selected.
+     *
+     * Note: when passing in a selector you will get back an array of `IElement`
+     * but if you're iterating over over all children the type will be `INode`
+     * but you can use the `isElement` and `isTextNode` type guards to narrow types.
+     */
+    updateAll: <S extends string | undefined>(selection?: S) =>
+      <N extends S extends string ? IElement : INode>(mutate: UpdateCallback<N>) => {
+        const elements: N[] = (
+          selection
+            ? n.querySelectorAll(selection)
+            : n.childNodes
+        ) as N[]
+
+        elements.forEach((el, idx) => {
+          if (isElement(el) || isTextNode(el)) {
+            try {
+              el.replaceWith(
+                mutate(el, idx, elements.length),
+              )
+            }
+            catch (e) {
+              throw new Error(`updateAll(): problem updating an element with the passed in callback function:  \n\t${mutate.toString()}\n\n${e instanceof Error ? e.message : String(e)}.\n${JSON.stringify(inspect(el), null, 2)}\n\nThe callback function was:`)
+            }
+          }
+          else {
+            throw new Error(`Ran into an unknown node type while running updateAll(): ${JSON.stringify(inspect(el), null, 2)}`)
+          }
+        })
+        return api
+      },
+
     /**
      * Boolean check on whether the node has child nodes
      */
@@ -329,13 +764,15 @@ export const select = <D extends Container | HTML>(node: D) => {
       return n.hasChildNodes()
     },
     /**
-     * Wrap each selected node with either a fragment or a `BeforeAfterWrapper`
+     * Wrap each selected node with either a Fragment or a `BeforeAfterWrapper`
      */
-    wrapEach: <
-      W extends FragWrapper | BeforeAfterWrapper,
-    >(sel: string, ...wrapper: W) => {
-      const found = n.querySelectorAll(sel) as IElement[]
-      found.forEach(e => wrap(...wrapper)(e))
+    wrapEach: (selection?: string) => <W extends FragWrapper | TextWrapper>(wrapper: W) => {
+      const found = selection
+        ? n.querySelectorAll(selection)
+        : n.childNodes.filter(i => isElement(i))
+      found.forEach(e => wrap(wrapper)(e, n))
+
+      return api
     },
 
     /**
@@ -351,7 +788,12 @@ export const select = <D extends Container | HTML>(node: D) => {
      */
     addClassToEach: (...klass: string[] | string[][]) =>
       (sel: string, cb?: ((el: IElement) => IElement | boolean | undefined)) => {
-        const k = klass.flatMap(i => i).join(' ').split(/s+/g).filter(i => i)
+        const k = klass
+          .flatMap(i => i)
+          .join(' ')
+          .split(/s+/g)
+          .filter(i => i)
+
         const found = n.querySelectorAll(sel)
         found.forEach((el) => {
           let verdict = true
@@ -374,7 +816,7 @@ export const select = <D extends Container | HTML>(node: D) => {
     },
 
     toContainer: () => {
-      return n as D
+      return (typeof node === 'string' ? toHtml(n) : n) as D
     },
   }
 
@@ -412,7 +854,7 @@ export const getAttribute = (attr: string) => {
   return solveForNodeType('text', 'node')
     .outputType<string>()
     .solver({
-      html: flow(createFragment, f => f.firstElementChild.getAttribute(attr), toHtml),
+      html: flow(createFragment, f => f.firstElementChild.getAttribute(attr)),
       fragment: flow(f => f.firstElementChild.getAttribute(attr)),
       document: flow(f => f.body.firstElementChild.getAttribute(attr)),
       element: flow(f => f.getAttribute(attr)),
@@ -526,8 +968,8 @@ export const hasSingularElement = <
   return nodeBoundedByElements(node) && node.childNodes.length === 1
 }
 
-export function isElement(frag: unknown): frag is IElement {
-  return typeof frag === 'object' && 'outerHTML' in (frag as Object) && 'previousElementSibling' in (frag as Object)
+export function isElement(el: unknown): el is IElement {
+  return typeof el === 'object' && el !== null && 'outerHTML' in (el as Object) && 'previousElementSibling' in (el as Object)
 }
 
 /**
@@ -537,14 +979,15 @@ export function isElement(frag: unknown): frag is IElement {
 export const isElementLike = <D extends DocRoot>(
   frag: D,
 ): boolean => {
-  return typeof frag !== 'string' && frag.childNodes.length === 1 && nodeStartsWithElement(frag as any)
+  return typeof frag !== 'string' && frag.childNodes.length === 1 && frag.firstChild === frag.firstElementChild
 }
 
-type FragWrapper = [DocumentFragment]
-type BeforeAfterWrapper = [before?: string, after?: string, indent?: number]
-
-function isBeforeAfterWrapper(args: FragWrapper | BeforeAfterWrapper): args is BeforeAfterWrapper {
-  return !!(Array.isArray(args) && args.length > 1)
+function isTextWrapper(
+  args: FragWrapper | TextWrapper,
+): args is TextWrapper {
+  return typeof args === 'object' && (
+    ('before' in args) || ('after' in args) || ('indent' in args) || ('open' in args) || ('close' in args)
+  )
 }
 
 export type NodeTypeInput<T extends ReturnType<typeof getNodeType>> = T extends 'html'
@@ -557,75 +1000,119 @@ export type NodeTypeInput<T extends ReturnType<typeof getNodeType>> = T extends 
         ? Document
         : T
 
+export const tab = (count = 1) => count === 0
+  ? ''
+  : ''.padStart(count * 2, TAB_SPACE)
 export const wrap = <
-  W extends FragWrapper | BeforeAfterWrapper,
->(...wrapper: W) => <
+  W extends FragWrapper | TextWrapper,
+>(wrapper: W) => <
   C extends Container | HTML,
->(content: C): C => {
-  const tab = (count = 1) => count === 0
-    ? ''
-    : ''.padStart(count * 2, TAB_SPACE)
-
-  if (isBeforeAfterWrapper(wrapper)) {
+  P extends IElement | DocRoot,
+>(content: C, parent?: P): C => {
+  if (isTextWrapper(wrapper)) {
     // eslint-disable-next-line prefer-const
-    let [before, after, indent] = wrapper
+    let { open, before, close, after, indent } = wrapper
 
-    if (indent && indent !== 0)
+    if (indent && indent !== 0) {
+      // before the tag starts
       before = `${before || ''}${tab(indent)}`
-
-    const html = (h: HTML) => pipe(h, createFragment, wrap(...wrapper), toHtml)
-    const text = (t: IText) => createTextNode(`${before}${t.textContent}${after}`)
-
-    const fragment = (f: DocumentFragment) => {
-      const children = f.childNodes.length
-      if (isTextNodeLike(f)) {
-        const text = f.textContent
-        return createFragment(`${before}${text}${after}`)
-      }
-      else {
-        const first = f.firstChild
-        const last = f.lastChild
-        if (before) {
-          if (isElement(first))
-            f.prepend(createTextNode(before))
-          else
-            f.replaceChild(createTextNode(`${before}${first.textContent}`), first)
-        }
-
-        if (after) {
-          if (children > 1) {
-            // sibling nodes will have after added as new child node
-            f.append(createTextNode(after))
-          }
-          else {
-            if (isElement(last)) { last.append(createTextNode(after)) }
-            else {
-              f.lastChild.replaceChild(
-                createTextNode(`${f.lastChild.textContent}${after}`),
-                f.lastChild,
-              )
-            }
-          }
-        }
-      }
-      return f
+      // before the closing tag but on the interior of tag
+      close = close ? `${close}${tab(indent)}` : undefined
     }
 
+    const html = (h: HTML) => pipe(h, createFragment, wrap(wrapper), toHtml)
+
+    /**
+     * An `IText` node will be wrapped with open, before, and after but NOT _close_.
+     * This is because a text node has no **tag** and therefore `close` no longer
+     * really makes sense.
+     */
+    const text = (t: IText) => {
+      const node = createTextNode(`${open || ''}${before || ''}${t.textContent}${after || ''}`)
+      return node
+    }
+
+    /**
+     * **IElement** handler for content wrapping
+     */
+    const element = (el: IElement, parent?: IElement | DocRoot): IElement => {
+      try {
+        if (open)
+          el.replaceChildren(createTextNode(open), ...el.childNodes)
+
+        if (close)
+          el.replaceChildren(...el.childNodes, createTextNode(close))
+
+        if (before && parent)
+          parent.prepend(createTextNode(before))
+        if (before && !parent) {
+          const warn = 'An IElement was passed into wrap() which had a "before" wrapping but no parent was passed in.'
+          if (indent === 0) { console.warn(`${warn}. Because there is no indent level, we will ignore this and continue.`) }
+          else {
+            throw new HappyMishap('An IElement was passed into wrap() which had a "before" wrapping but no parent was passed in. This is not allowed!', {
+              inspect: [
+                ['element was: ', el],
+                ['parent was:', parent],
+              ],
+              name: 'wrap() -> element',
+            })
+          }
+        }
+
+        if (after && parent)
+          parent.append(createTextNode(after))
+        if (after && !parent)
+          throw new HappyMishap('An IElement was passed into wrap() which had an "after" wrapping but no parent was passed in. This is not allowed!', { inspect: el })
+
+        return el
+      }
+      catch (e) {
+        throw new HappyMishap(`Problem wrapping an IElement[${el.tagName.toLowerCase()}] with a wrap config of:\n\t${JSON.stringify(wrapper)}`, { inspect: el, error: e })
+      }
+    }
+
+    /**
+     * Handle `DocumentFragment` containers.
+    */
+    const fragment = (f: DocumentFragment) => {
+      if (isElementLike(f) && (open || close)) {
+        wrap(wrapper)(f.firstElementChild, f)
+      }
+      else if (isTextNodeLike(f) && (open || close)) {
+        wrap(wrapper)(f.firstChild, f)
+      }
+      else {
+        if (before)
+          f.prepend(createTextNode(before))
+        if (after)
+          f.append(createTextNode(after))
+      }
+
+      return f
+    }
+    // CONVERT when using TextWrapper structure
     const convert = solveForNodeType()
       .mirror()
       .solver({
         html,
         text,
-        element: e => pipe(e),
-        node: n => n,
+        element,
+        node: (n) => {
+          throw new HappyMishap('Can not wrap() a bare INode node', { name: 'wrap(INode)', inspect: n })
+        },
         fragment,
         document: d => d,
       })
 
-    return convert(content)
+    return convert(content, parent)
   }
+  // Wrapping a Fragment
   else {
-    const w = clone(wrapper[0])
+    const w = typeof wrapper === 'string'
+      ? createFragment(wrapper) as DocumentFragment
+      : isFragment(wrapper)
+        ? clone(wrapper)
+        : createFragment(wrapper)
     const html = (h: HTML) => {
       return pipe(h, createFragment, fragment, toHtml)
     }
@@ -649,11 +1136,11 @@ export const wrap = <
         fragment,
         document,
         element,
-        text: () => {
-          throw new Error('Can\'t wrap a Text Node with anything and resolve to a Text Node!')
+        text: (t) => {
+          throw new HappyMishap('Can\'t wrap a Text Node with anything and resolve to a Text Node!', { name: 'wrap(text)', inspect: t })
         },
-        node: () => {
-          throw new Error('Nodes which aren\'t IElement nodes can not be wrapped')
+        node: (n) => {
+          throw new HappyMishap('Generic INode nodes can not be wrapped (only IElement)!', { name: 'wrap(INode)', inspect: n })
         },
       })
 

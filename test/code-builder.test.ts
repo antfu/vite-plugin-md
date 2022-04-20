@@ -59,12 +59,12 @@ describe('code() builder using Prism (incl generalized tests)', () => {
 
     const dom = select(html)
 
-    const lines = dom.all('.line')
+    const lines = dom.findAll('.line')
 
-    const lineNumCols = dom.all('.line-number')
-    const lineNumberMode = dom.all('.line-numbers-mode')
-    const linesWrapper = dom.all('.line-numbers-wrapper')
-    const block = dom.all('.code-block')
+    const lineNumCols = dom.findAll('.line-number')
+    const lineNumberMode = dom.findAll('.line-numbers-mode')
+    const linesWrapper = dom.findAll('.line-numbers-wrapper')
+    const block = dom.findAll('.code-block')
 
     expect(lines.length).toBe(5)
     expect(lineNumCols.length, 'each line should have a .line-numbers-mode').toBe(5)
@@ -86,9 +86,9 @@ describe('code() builder using Prism (incl generalized tests)', () => {
     )
 
     const dom = select(html)
-    const lines = dom.all('.line')
-    const linesWrapper = dom.all('.line-numbers-wrapper')
-    const highlighted = dom.all('.highlight')
+    const lines = dom.findAll('.line')
+    const linesWrapper = dom.findAll('.line-numbers-wrapper')
+    const highlighted = dom.findAll('.highlight')
 
     expect(lines.length).toBe(5)
     expect(linesWrapper.length).toBe(1)
@@ -105,7 +105,7 @@ describe('code() builder using Prism (incl generalized tests)', () => {
       { builders: [code()] },
     )
 
-    const highlighted = select(html).all('.highlight')
+    const highlighted = select(html).findAll('.highlight')
 
     expect(highlighted.length, 'there should be three lines highlighted').toBe(3)
     highlighted.map(el =>
@@ -124,12 +124,12 @@ describe('code() builder using Prism (incl generalized tests)', () => {
       { builders: [code()] },
     )
 
-    const highlighted = select(html).all('.highlight')
-    const line1 = select(html).first('.line-1')
-    const line2 = select(html).first('.line-2')
-    const line3 = select(html).first('.line-3')
-    const line4 = select(html).first('.line-4')
-    const line5 = select(html).first('.line-5')
+    const highlighted = select(html).findAll('.highlight')
+    const line1 = select(html).findFirst('.line-1')
+    const line2 = select(html).findFirst('.line-2')
+    const line3 = select(html).findFirst('.line-3')
+    const line4 = select(html).findFirst('.line-4')
+    const line5 = select(html).findFirst('.line-5')
 
     expect(highlighted.length, 'there should be three lines highlighted').toBe(3)
     expect(getClassList(line1)).toContain('highlight')
@@ -147,12 +147,12 @@ describe('code() builder using Prism (incl generalized tests)', () => {
       { builders: [code()] },
     )
 
-    const highlighted = select(html).all('.highlight')
-    const line1 = select(html).first('.line-1')
-    const line2 = select(html).first('.line-2')
-    const line3 = select(html).first('.line-3')
-    const line4 = select(html).first('.line-4')
-    const line5 = select(html).first('.line-5')
+    const highlighted = select(html).findAll('.highlight')
+    const line1 = select(html).findFirst('.line-1')
+    const line2 = select(html).findFirst('.line-2')
+    const line3 = select(html).findFirst('.line-3')
+    const line4 = select(html).findFirst('.line-4')
+    const line5 = select(html).findFirst('.line-5')
 
     expect(highlighted.length, 'there should be three lines highlighted').toBe(3)
     expect(getClassList(line1)).toContain('highlight')
@@ -169,7 +169,7 @@ describe('code() builder using Prism (incl generalized tests)', () => {
       { builders: [code()] },
     )
 
-    const highlighted = select(html).all('.highlight')
+    const highlighted = select(html).findAll('.highlight')
     expect(highlighted).toHaveLength(1)
     expect(getClassList(highlighted[0])).toContain('line')
   })
@@ -180,7 +180,7 @@ describe('code() builder using Prism (incl generalized tests)', () => {
       { builders: [code()] },
     )
 
-    const highlighted = select(html).all('.highlight')
+    const highlighted = select(html).findAll('.highlight')
     expect(highlighted, 'explict array elements are highlighted').toHaveLength(2)
     highlighted.forEach(el => expect(getClassList(el)).toContain('line'))
 
@@ -190,7 +190,7 @@ describe('code() builder using Prism (incl generalized tests)', () => {
       { builders: [code()] },
     )
 
-    const highlighted2 = select(html2).all('.highlight')
+    const highlighted2 = select(html2).findAll('.highlight')
     expect(highlighted2, 'array syntax is interpreted correctly').toHaveLength(2)
     highlighted2.forEach(el => expect(getClassList(el)).toContain('line'))
   })
@@ -202,7 +202,7 @@ describe('code() builder using Prism (incl generalized tests)', () => {
       { builders: [code()] },
     )
 
-    const pre = select(html).first('pre')
+    const pre = select(html).findFirst('pre')
     expect(pre).not.toBeNull()
     expect(getClassList(pre)).toContain('classy')
   })
@@ -213,7 +213,7 @@ describe('code() builder using Prism (incl generalized tests)', () => {
       { builders: [code()] },
     )
 
-    const pre = select(html).first('pre')
+    const pre = select(html).findFirst('pre')
     expect(getAttribute('style')(pre)).toBe('text-color: green')
   })
 
@@ -225,8 +225,8 @@ describe('code() builder using Prism (incl generalized tests)', () => {
     )
 
     const sel = select(html)
-    expect(getClassList(sel.first('.code-block'))).toContain('external-ref')
-    expect(sel.first('.comment')?.textContent).toContain('this is one impressive function')
+    expect(getClassList(sel.findFirst('.code-block'))).toContain('external-ref')
+    expect(sel.findFirst('.comment')?.textContent).toContain('this is one impressive function')
   })
   it('code content loaded from file using object notation', async() => {
     const { html } = await composeSfcBlocks(
@@ -236,8 +236,8 @@ describe('code() builder using Prism (incl generalized tests)', () => {
     )
 
     const sel = select(html)
-    expect(getClassList(sel.first('.code-block'))).toContain('external-ref')
-    expect(sel.first('.comment')?.textContent).toContain('this is one impressive function')
+    expect(getClassList(sel.findFirst('.code-block'))).toContain('external-ref')
+    expect(sel.findFirst('.comment')?.textContent).toContain('this is one impressive function')
   })
 
   it('code content loaded from file using CSV notation', async() => {
@@ -248,8 +248,8 @@ describe('code() builder using Prism (incl generalized tests)', () => {
     )
 
     const sel = select(html)
-    expect(getClassList(sel.first('.code-block'))).toContain('external-ref')
-    expect(sel.first('.comment')?.textContent).toContain('this is one impressive function')
+    expect(getClassList(sel.findFirst('.code-block'))).toContain('external-ref')
+    expect(sel.findFirst('.comment')?.textContent).toContain('this is one impressive function')
   })
 
   it('highlighting imported code, while also using inline code', async() => {
@@ -260,17 +260,32 @@ describe('code() builder using Prism (incl generalized tests)', () => {
       { builders: [code()] },
     )
 
-    console.log(html)
-
     const sel = select(html)
-    expect(getClassList(sel.first('.code-block'))).toContain('external-ref')
-    expect(getClassList(sel.first('.code-block'))).toContain('with-inline-content')
+    expect(getClassList(sel.findFirst('.code-block'))).toContain('external-ref')
+    expect(getClassList(sel.findFirst('.code-block'))).toContain('with-inline-content')
     // the first comment should now come from the inline comment
-    expect(sel.first('.comment')?.textContent).not.toContain('this is one impressive function')
+    expect(sel.findFirst('.comment')?.textContent).not.toContain('this is one impressive function')
+    expect(sel.findFirst('.comment')?.textContent).toContain('the code below was brought in from an external file')
   })
 
   // TODO: add this when symbol highlighting is ready
   it.todo('highlighting code symbol\'s block from imported code')
+
+  it('adding a heading in props creates proper HTML output', async() => {
+    const { html } = await composeSfcBlocks(
+      'test/fixtures/external-reference-obj.md',
+      (await getFixture('external-reference-inline.md')),
+      { builders: [code()] },
+    )
+    console.log(html)
+
+    const heading = select(html).findFirst('.heading')
+    expect(heading).not.toBeNull()
+    expect(heading?.textContent).toBe('Using CSV format')
+    const footer = select(html).findFirst('.footer')
+    expect(footer).not.toBeNull()
+    expect(footer?.textContent).toBe('to be or not to be')
+  })
 })
 
 describe('code() builder using Shiki', () => {
