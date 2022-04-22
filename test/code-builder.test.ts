@@ -1,13 +1,8 @@
-import { readFile } from 'fs/promises'
 import { describe, expect, it } from 'vitest'
 import { composeSfcBlocks } from '../src/pipeline'
 import { code } from '../src/index'
 import { getAttribute, getClassList, select } from '../src/builders/code/utils'
-
-async function getFixture(file: string): Promise<string> {
-  const content = await readFile(`test/fixtures/${file}`, 'utf-8')
-  return content
-}
+import { getFixture } from './utils'
 
 describe('code() builder using Prism (incl generalized tests)', () => {
   it('valid language choice is rendered', async() => {
@@ -271,18 +266,21 @@ describe('code() builder using Prism (incl generalized tests)', () => {
   // TODO: add this when symbol highlighting is ready
   it.todo('highlighting code symbol\'s block from imported code')
 
-  it('adding a heading in props creates proper HTML output', async() => {
+  it.only('adding a heading and footer in props creates proper HTML output', async() => {
     const { html } = await composeSfcBlocks(
       'test/fixtures/external-reference-obj.md',
       (await getFixture('external-reference-inline.md')),
       { builders: [code()] },
     )
-    console.log(html)
+    const sel = select(html)
 
-    const heading = select(html).findFirst('.heading')
+    const heading = sel.findFirst('.heading')
     expect(heading).not.toBeNull()
-    expect(heading?.textContent).toBe('Using CSV format')
-    const footer = select(html).findFirst('.footer')
+    expect(
+      heading?.textContent,
+      `\ntext content of header was incorrect, value: "${heading?.textContent}"\n`,
+    ).toBe('Using CSV format')
+    const footer = sel.findFirst('.footer')
     expect(footer).not.toBeNull()
     expect(footer?.textContent).toBe('to be or not to be')
   })

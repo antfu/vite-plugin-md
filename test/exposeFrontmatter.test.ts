@@ -1,6 +1,10 @@
 import { readFile } from 'fs/promises'
 import { beforeAll, describe, expect, it } from 'vitest'
+import { code } from '../src'
+import { select } from '../src/builders/code/utils'
 import { composeSfcBlocks } from '../src/pipeline'
+import { composeFixture, getFixture } from './utils'
+// import MD, { frontmatter } from './test/fixtures/using-frontmatter.md'
 
 let md = ''
 const defineExposeFound = /defineExpose\({ frontmatter }\)/
@@ -15,6 +19,29 @@ describe('exposeFrontmatter property', () => {
     expect(defineExposeFound.test(scriptBlock)).toBeTruthy()
     expect(vue2ExposeFound.test(scriptBlock)).toBeFalsy()
     expect(scriptBlock).toMatchSnapshot()
+  })
+
+  // it('markdown files offer frontmatter properties for import', async() => {
+  //   const { frontmatter: fm } = await composeFixture('using-frontmatter')
+  //   const { frontmatter: fm } = await composeSfcBlocks(
+  //     'test/fixtures/use-markdown.md',
+  //     (await getFixture('using-frontmatter.md')),
+  //     { builders: [code()] },
+  //   )
+
+  //   expect(MD).toBeDefined()
+  //   expect(frontmatter).toBe(fm)
+  // })
+
+  it('headings and image source can be taken from frontmatter properties', async() => {
+    const { html } = await composeSfcBlocks(
+      'test/fixtures/use-markdown.md',
+      (await getFixture('external-reference-inline.md')),
+      { builders: [code()] },
+    )
+
+    const sel = select(html)
+    expect(sel.findFirst('image')?.getAttribute('src')).toBe('/images/foobar.jpg')
   })
 
   it('Vue3 -- when exposeFrontmatter set to false -- does NOT use defineExpose to expose frontmatter', async() => {

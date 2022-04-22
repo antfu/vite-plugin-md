@@ -9,6 +9,8 @@ import {
   createFragment,
   createTextNode,
   getAttribute,
+  getChildren,
+  getNodeType,
   inspect,
   into,
   isElementLike,
@@ -183,11 +185,9 @@ describe('HappyDom\'s can be idempotent', () => {
     tags.forEach(t => expect(t).toBe('div'))
   })
 
-  it.only('prettyPrint()', () => {
+  it('prettyPrint()', () => {
     const html = '<div class="wrapper"><span>one</span><span>two</span></div>'
-    const expected = `<div class="wrapper">\n${tab(1)}<span>\n${tab(2)}one\n${tab(1)}</span>\n${tab(1)}<span>\n${tab(2)}two\n${tab(2)}</span>\n</div>\n`
-    const printed = prettyPrint()(html)
-    console.log(printed)
+    const expected = `\n<div class="wrapper">\n${tab(1)}<span>\n${tab(2)}one\n${tab(1)}</span>\n${tab(1)}<span>\n${tab(2)}two\n${tab(1)}</span>\n</div>\n`
 
     expect(
       prettyPrint()(html),
@@ -206,16 +206,41 @@ describe('HappyDom\'s can be idempotent', () => {
   })
 
   it('into() with multiple nodes injected', () => {
+    const wrapper = '<div class="my-wrapper"></div>'
     const indent = '\n\t'
     const text = 'hello'
     const element = '<span>world</span>'
     const closeout = '\n'
     const html = `${indent}${text}${element}${closeout}`
 
-    expect(toHtml(into()(indent, text, element, closeout))).toBe(html)
-    expect(toHtml(into()([indent, text, element, closeout]))).toBe(html)
+    expect(
+      into(wrapper)(indent, text, element, closeout),
+      'HTML wrapper passed in returns HTML with children inside',
+    ).toBe(`<div class="my-wrapper">${html}</div>`)
+    expect(
+      into(wrapper)([indent, text, element, closeout]),
+      'Children can be passed as an array too with no change in behavior',
+    ).toBe(`<div class="my-wrapper">${html}</div>`)
+    // try as a fragment
+    const f = into(createFragment(wrapper))(indent, text, element, closeout)
+    expect(
+      toHtml(f),
+      `HTML wrapper passed in returns HTML with children inside, instead got:\n${inspect(f, true)}`,
+    ).toBe(`<div class="my-wrapper">${html}</div>`)
+    // try as an IElement
+    const el = into(createElementNode(wrapper))(indent, text, element, closeout)
+    expect(
+      toHtml(el),
+      `HTML wrapper passed in returns HTML with children inside, instead got:\n${inspect(el, true)}`,
+    ).toBe(`<div class="my-wrapper">${html}</div>`)
 
-    expect(into()(indent, text, element, closeout).childNodes).toHaveLength(4)
+    const emptyParent = into()(indent, text, element, closeout)
+    expect(toHtml(emptyParent)).toBe(html)
+    // first two text elements are folded into one
+    expect(
+      emptyParent.childNodes,
+      `\nchild nodes were: ${getChildren(emptyParent).map(c => getNodeType(c)).join(', ')}\n`,
+    ).toHaveLength(3)
 
     expect(
       toHtml(into('<div class="wrapper">')(indent, text, element, closeout)),

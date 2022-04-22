@@ -7,10 +7,6 @@ import { addClass, into, setAttribute, toHtml } from '../utils'
  * a child element.
  */
 export const updatePreWrapper = (fence: CodeBlockMeta<'dom'>): CodeBlockMeta<'dom'> => {
-  const code = fence.aboveTheFoldCode
-    ? into()(fence.aboveTheFoldCode, fence.code)
-    : fence.code
-
   const pre = pipe(
     into(
       pipe(
@@ -21,8 +17,7 @@ export const updatePreWrapper = (fence: CodeBlockMeta<'dom'>): CodeBlockMeta<'do
           ? setAttribute('style')(fence.props.style)
           : identity,
       ),
-    )(code),
-    // wrap('\n', '\n', fence.level + 1),
+    )(fence.code),
   )
 
   return {
