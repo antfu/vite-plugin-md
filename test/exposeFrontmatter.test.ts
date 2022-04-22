@@ -6,8 +6,8 @@ let md = ''
 const defineExposeFound = /defineExpose\({ frontmatter }\)/
 const vue2ExposeFound = /export default { data\(\) { return { frontmatter } } }/
 
-const extractScriptSetup = (component: string) => component.replace(/.*(<script setup.*>.*<\/script>).*<script.*$/s, "$1")
-const extractScriptBlock = (component: string) => component.replace(/.*(<script setup.*<script.*)$/s, "$1")
+const extractScriptSetup = (component: string) => component.replace(/.*(<script setup.*>.*<\/script>).*<script.*$/s, '$1')
+const extractScriptBlock = (component: string) => component.replace(/.*(<script setup.*<script.*)$/s, '$1')
 
 describe('exposeFrontmatter exposes "frontmatter" property', () => {
   beforeAll(async() => {
@@ -17,10 +17,10 @@ describe('exposeFrontmatter exposes "frontmatter" property', () => {
     const { scriptBlock } = composeSfcBlocks('test/fixtures/simple.md', md, { exposeFrontmatter: true })
     const scriptSetup = extractScriptSetup(scriptBlock)
     const script = extractScriptBlock(scriptBlock)
-    
-    expect(scriptSetup).toContain("const title")    
-    expect(scriptSetup).not.toContain("export const title")
-    expect(scriptSetup).toContain("const description")
+
+    expect(scriptSetup).toContain('const title')
+    expect(scriptSetup).not.toContain('export const title')
+    expect(scriptSetup).toContain('const description')
 
     expect(script).toContain('export const frontmatter')
   })
@@ -30,9 +30,9 @@ describe('exposeFrontmatter exposes "frontmatter" property', () => {
 
     const scriptSetup = extractScriptSetup(scriptBlock)
     const script = extractScriptBlock(scriptBlock)
-    expect(scriptSetup).toContain("const title")    
-    expect(scriptSetup).not.toContain("export const title")
-    expect(scriptSetup).toContain("const description")
+    expect(scriptSetup).toContain('const title')
+    expect(scriptSetup).not.toContain('export const title')
+    expect(scriptSetup).toContain('const description')
     expect(script).not.toContain('export const frontmatter')
   })
 
@@ -40,16 +40,16 @@ describe('exposeFrontmatter exposes "frontmatter" property', () => {
     const { scriptBlock } = composeSfcBlocks('test/fixtures/simple.md', md, { exposeFrontmatter: true, vueVersion: '2.0' })
 
     const script = extractScriptBlock(scriptBlock)
-    expect(script).toContain("export const title")
-    expect(script).toContain("export const description")
+    expect(script).toContain('export const title')
+    expect(script).toContain('export const description')
     expect(script).toContain('export const frontmatter')
   })
 
   it('Vue2/expose false', () => {
     const { scriptBlock } = composeSfcBlocks('test/fixtures/simple.md', md, { exposeFrontmatter: false, vueVersion: '2.0' })
     const script = extractScriptBlock(scriptBlock)
-    expect(script).toContain("export const title")
-    expect(script).toContain("export const description")
+    expect(script).toContain('export const title')
+    expect(script).toContain('export const description')
     expect(script).not.toContain('export const frontmatter')
   })
 })
