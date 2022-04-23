@@ -1,0 +1,8 @@
+{
+  "kind": "project",
+  "projectConfig": true,
+  "general": {
+    "pkgManager": "pnpm"
+  },
+  "aws": {}
+}

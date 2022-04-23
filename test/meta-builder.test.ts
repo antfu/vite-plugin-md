@@ -46,7 +46,7 @@ describe('use "meta" builder for frontmatterPreprocess', () => {
 
     expect(
       sfc.frontmatter.description,
-      'default value should have presented',
+      `default value should have presented, found: ${sfc.frontmatter}`,
     ).toBe('there I was, there I was')
 
     expect(
@@ -64,8 +64,8 @@ describe('use "meta" builder for frontmatterPreprocess', () => {
     expect(output.includes('const image')).toBeTruthy()
 
     expect(output.includes('const frontmatter')).toBeTruthy()
-    expect(output.includes('export const frontmatter')).toBeFalsy()
-    expect(output.includes('defineExpose({ frontmatter })')).toBeTruthy()
+    expect(output.includes('export const frontmatter')).toBeTruthy()
+    expect(output.includes('defineExpose({ ')).toBeTruthy()
   })
 })
 
