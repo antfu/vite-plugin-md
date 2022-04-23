@@ -1,92 +1,9 @@
 // Vitest Snapshot v1
 
-exports[`exposeFrontmatter snapshots > vue2 (no expose) 1`] = `
-"
-<template>
-  <div class=\\"markdown-body\\"><h1>My H1</h1>
-<p>lorem ipsum</p>
-<h2>Transformed</h2>
-<p>base: {{ title }}</p>
-</div>
-</template>
+exports[`exposeFrontmatter snapshots > vue2 (no expose) 1`] = `undefined`;
 
-<script>
-  
-export const title = \\"Hello World\\"
-export const description = \\"testing is the path to true happiness\\"
-export const excerpt = undefined
+exports[`exposeFrontmatter snapshots > vue2 1`] = `undefined`;
 
-export default { data() { return { frontmatter } } }
-</script>
-"
-`;
+exports[`exposeFrontmatter snapshots > vue3 (no expose) 1`] = `undefined`;
 
-exports[`exposeFrontmatter snapshots > vue2 1`] = `
-"
-<template>
-  <div class=\\"markdown-body\\"><h1>My H1</h1>
-<p>lorem ipsum</p>
-<h2>Transformed</h2>
-<p>base: {{ title }}</p>
-</div>
-</template>
-
-<script>
-  
-export const title = \\"Hello World\\"
-export const description = \\"testing is the path to true happiness\\"
-export const excerpt = undefined
-export const frontmatter = {\\"title\\":\\"Hello World\\",\\"description\\":\\"testing is the path to true happiness\\"}
-export default { data() { return { frontmatter } } }
-</script>
-"
-`;
-
-exports[`exposeFrontmatter snapshots > vue3 (no expose) 1`] = `
-"
-<template>
-  <div class=\\"markdown-body\\"><h1>My H1</h1>
-<p>lorem ipsum</p>
-<h2>Transformed</h2>
-<p>base: {{ title }}</p>
-</div>
-</template>
-
-<script setup>
-  
- const title = \\"Hello World\\"
- const description = \\"testing is the path to true happiness\\"
- const excerpt = undefined
-</script>
-    
-<script>
-  
-</script>
-    
-"
-`;
-
-exports[`exposeFrontmatter snapshots > vue3 1`] = `
-"
-<template>
-  <div class=\\"markdown-body\\"><h1>My H1</h1>
-<p>lorem ipsum</p>
-<h2>Transformed</h2>
-<p>base: {{ title }}</p>
-</div>
-</template>
-
-<script setup>
-  defineExpose({ frontmatter: {\\"title\\":\\"Hello World\\",\\"description\\":\\"testing is the path to true happiness\\"} })
-  
- const title = \\"Hello World\\"
- const description = \\"testing is the path to true happiness\\"
- const excerpt = undefined
-</script>
-    
-<script>
-  export const frontmatter = {\\"title\\":\\"Hello World\\",\\"description\\":\\"testing is the path to true happiness\\"}
-</script>
-    
-"
-`;
+exports[`exposeFrontmatter snapshots > vue3 1`] = `undefined`;

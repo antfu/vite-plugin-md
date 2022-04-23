@@ -2,7 +2,7 @@ import { readFile } from 'fs/promises'
 import { beforeAll, describe, expect, it } from 'vitest'
 import { composeSfcBlocks } from '../src/pipeline'
 import { composeFixture, getFixture } from './utils'
-// import MD, { frontmatter } from './test/fixtures/using-frontmatter.md'
+import MD, { frontmatter } from './test/fixtures/using-frontmatter.md'
 
 let md = ''
 
