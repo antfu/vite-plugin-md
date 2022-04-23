@@ -21,10 +21,16 @@ exports[`excerpt snapshots > frontmatter is consistent 1`] = `
 `;
 
 exports[`excerpt snapshots > script blocks are consistent 1`] = `
-"<script setup>const frontmatter = {\\"title\\":\\"Excerpt with default separator\\"}
+"
+<script setup>
+  defineExpose({ frontmatter: {\\"title\\":\\"Excerpt with default separator\\"} })
+  
  const title = \\"Excerpt with default separator\\"
  const excerpt = undefined
-defineExpose({ frontmatter })
-const head = {\\"title\\":\\"Excerpt with default separator\\"}
-</script>"
+</script>
+    
+<script>
+  export const frontmatter = {\\"title\\":\\"Excerpt with default separator\\"}
+</script>
+    "
 `;
