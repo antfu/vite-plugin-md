@@ -6,8 +6,8 @@ exports[`meta() snapshots > HTML is consistent 1`] = `
 <p>{{ byline }}</p>
 </blockquote>
 <p>This is a markdown file intended for testing meta data.</p>
-<p><img src=\\"%7B%7Bimage%7D%7D\\" alt=\\"image\\">
-<img src=\\"{{ image }}\\" /></p>
+<p><img src=\\"{{image}}\\" alt=\\"image\\"/>
+<img src=\\"{{ image }}\\"/></p>
 </div>"
 `;
 
@@ -36,6 +36,7 @@ exports[`meta() snapshots > script blocks are consistent 1`] = `
 </script>
     
 <script>
+  /** frontmatter meta-data for MD page **/
   export const frontmatter = {\\"title\\":\\"Metadata Rules\\",\\"byline\\":\\"who loves ya baby?\\",\\"layout\\":\\"yowza\\",\\"image\\":\\"facebook.png\\"}
 </script>
     "

@@ -3,9 +3,7 @@ import type {
   Document,
   DocumentFragment,
   IElement,
-  IHTMLCollection,
   INode,
-  INodeList,
   IText,
   Node,
 } from 'happy-dom'
@@ -376,7 +374,7 @@ export const inspect = <T extends boolean>(item?: unknown, toJSON: T = false as 
         type: typeof item,
         ...(typeof item === 'object' ? { keys: Object.keys(item as Object) } : { value: JSON.stringify(item) }),
       }
-  return toJSON ? JSON.stringify(result, null, 2) : result
+  return (toJSON ? JSON.stringify(result, null, 2) : result) as false extends T ? Record<string, any> : string
 }
 
 const removeSpecialChars = (input: string) => input.replace(/\\t/g, '').replace(/\\n/g, '').trim()
@@ -605,7 +603,7 @@ export function toHtml<D extends Container | HTML | null>(node: D | D[], options
   }
   catch (e) {
     if (Array.isArray(node))
-      throw new HappyMishap(`Problem converting an array of nodes [${node.length}: ${node.map(i => getNodeType(i)).join(', ')}] to HTML`, { name: 'toHTML([...])', inspect: ['first node', node[0]], error: e })
+      throw new HappyMishap(`Problem converting an array of nodes [${node.length}: ${node.map(i => getNodeType(i as any)).join(', ')}] to HTML`, { name: 'toHTML([...])', inspect: ['first node', node[0]], error: e })
 
     else
       throw new HappyMishap(`Problem converting "${getNodeType(node)}" to HTML!`, { name: 'toHTML(getNodeType(node))', inspect: node, error: e })

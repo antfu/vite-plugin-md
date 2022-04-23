@@ -1,6 +1,6 @@
 import { transformer } from '../utils'
 
-const codeTagRe = /<code(?:.*?language-([!]{0,1})(\w+))?(.*?)>/g
+const codeTagRe = /<code([^>]*language-([!]{0,1})(\w+)[^>]*>)/g
 
 /**
  * Modifies the HTML based on the configuration of `options.
@@ -19,20 +19,20 @@ export const escapeCodeTagInterpolation = transformer('escapeCodeTagInterpolatio
 
   // identify targets for interpolation in <code>, #14
   for (const m of match) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [codeTag, negation, lang] = m
+    // eslint-disable-next-line prefer-const
+    let [, codeTag, negation, lang] = m
+    console.log({ codeTag, negation, lang })
+
+    if (
+      (escapeCodeTagInterpolation && !negation)
+      || (!escapeCodeTagInterpolation && negation)
+    ) {
+      replacements.set(codeTag, codeTag.replace('>', ' v-pre>'))
+      replacements.set(codeTag, codeTag.replace(`!${lang}`, `${lang}`))
+    }
+
     if (lang)
       fencedLanguages.add(lang)
-    if (escapeCodeTagInterpolation) {
-      if (negation !== '!')
-        replacements.set(codeTag, codeTag.replace('>', ' v-pre>'))
-      else
-        replacements.set(codeTag, codeTag.replace(`!${lang}`, `${lang}`))
-    }
-    else {
-      if (negation === '!')
-        replacements.set(codeTag, codeTag.replace(`!${lang}`, `${lang}`).replace('>', ' v-pre>'))
-    }
   }
 
   // iterate over interpolation replacements

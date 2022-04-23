@@ -8,6 +8,6 @@ export default defineConfig(() => ({
     dir: 'test',
   },
   plugins: [
-    Markdown(),
+    Markdown({ exposeFrontmatter: true }),
   ],
 }))

@@ -87,7 +87,7 @@ export const gatherBuilderEvents = (options: ResolvedOptions) =>
    * which should be executed at this point in time and
    */
   <S extends IPipelineStage>(stage: S) => {
-    const task = (payload: PipeTask<S>) => {
+    const task = (payload: PipeTask<S>): PipeTask<S> => {
       const bt = getBuilderTask(stage, options)
       return pipe(
         payload,

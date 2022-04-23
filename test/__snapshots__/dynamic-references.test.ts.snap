@@ -1,0 +1,11 @@
+// Vitest Snapshot v1
+
+exports[`loading images and links from frontmatter props > snapshot test 1`] = `
+"<div class=\\"markdown-body\\"><h2>A Local Cat</h2>
+<p><img src=\\"{{localCat}}\\" alt=\\"local cat\\"/></p>
+<h2>A Remote Cat</h2>
+<p><img src=\\"{{remoteCat}}\\" alt=\\"remote cat\\"/></p>
+<p>for more on cats, check out this link: <a href=\\"{{catLink}}\\">link</a></p>
+<p>{{catLink}}</p>
+</div>"
+`;

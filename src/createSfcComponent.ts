@@ -6,7 +6,8 @@ import { composeSfcBlocks } from './pipeline/index'
  */
 export const createSfcComponent = (options: Options = {}) => (config: ViteConfig) => {
   // callback called for each Markdown file
-  return (id: string, raw: string) => {
-    return composeSfcBlocks(id, raw, options, config).component
+  return async(id: string, raw: string) => {
+    const pipeline = await composeSfcBlocks(id, raw, options, config)
+    return pipeline.component
   }
 }

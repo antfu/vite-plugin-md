@@ -154,6 +154,7 @@ export interface PipelineProperties {
 
   /** the finalized component in string form */
   component: string
+
 }
 
 export type InitializedOmissions = 'md'
@@ -201,15 +202,6 @@ export type ParsedOmissions =
   | 'component'
 
 export type SfcBlockOmissions = 'component'
-
-// export type PipelineAvail<S extends IPipelineStage> = S extends 'initialize'
-//   ? Omit<PipelineProperties, InitializedOmissions>
-//   : S extends 'metaExtracted' ? Omit<PipelineProperties, MetaOmissions>
-//     : S extends 'parser' ? Omit<PipelineProperties, ParserOmissions>
-//       : S extends 'parsed' ? Omit<PipelineProperties, ParsedOmissions>
-//         : S extends 'sfcBlocksExtracted' ? Omit<PipelineProperties, SfcBlockOmissions>
-//           : S extends 'closeout' ? PipelineProperties
-//             : never
 
 /**
  * The _state/payload_ that is available at a given stage in the pipeline process.

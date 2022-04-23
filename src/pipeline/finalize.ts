@@ -1,10 +1,18 @@
 import { transformer, wrap } from '../utils'
 
 /**
- * Wraps the different SFC blocks into a single string as the `component` property
- * and thereby completes the _payload_ of this pipeline
+ * Wraps up all the content section into the final Vue SFC component syntax and then
+ * provides this to the `options.transforms.after` callback if provided.
  */
-export const finalize = transformer('finalize', 'sfcBlocksExtracted', 'closeout', payload => ({
-  ...payload,
-  component: `${wrap('template', payload.templateBlock)}\n${payload.scriptBlock}\n${payload.customBlocks.join('\n')}`,
-}))
+export const finalize = transformer('finalize', 'sfcBlocksExtracted', 'closeout', (payload) => {
+  const { options: { transforms: { after } } } = payload
+
+  const component = `${wrap('template', payload.templateBlock)}\n${payload.scriptBlock}\n${payload.customBlocks.join('\n')}`
+
+  return {
+    ...payload,
+    component: after
+      ? after(component, payload.fileName)
+      : component,
+  }
+})

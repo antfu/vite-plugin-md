@@ -4,7 +4,6 @@ import type {
 import { isVue2, transformer, wrap } from '../utils'
 
 const scriptSetupRE = /<\s*script[^>]*\bsetup\b[^>]*>([\s\S]*)<\/script>/mg
-const defineExposeRE = /defineExpose\s*\(/mg
 
 /**
  * Finds any references to `<script>` blocks and extracts it
@@ -60,7 +59,7 @@ export const extractBlocks = transformer('extractBlocks', 'parsed', 'sfcBlocksEx
       : '',
     /** variable declaration which must be placed in a manner that external actors can reach it */
     frontmatter: options.frontmatter && options.exposeFrontmatter
-      ? `export const frontmatter = ${JSON.stringify(frontmatter)}`
+      ? `/** frontmatter meta-data for MD page **/\n  export const frontmatter = ${JSON.stringify(frontmatter)}`
       : '',
     /** returning the 'frontmatter' property for external actors using Vue3 */
     vue3CompositionReturn: options.frontmatter ? 'return { frontmatter }' : '',

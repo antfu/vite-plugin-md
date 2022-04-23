@@ -1,9 +1,0 @@
-// Vitest Snapshot v1
-
-exports[`exposeFrontmatter snapshots > vue2 (no expose) 1`] = `undefined`;
-
-exports[`exposeFrontmatter snapshots > vue2 1`] = `undefined`;
-
-exports[`exposeFrontmatter snapshots > vue3 (no expose) 1`] = `undefined`;
-
-exports[`exposeFrontmatter snapshots > vue3 1`] = `undefined`;

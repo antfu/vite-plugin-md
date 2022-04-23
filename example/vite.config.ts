@@ -1,27 +1,59 @@
-import type { UserConfig } from 'vite'
-import Vue from '@vitejs/plugin-vue'
-import Markdown from 'vite-plugin-md'
-import prism from 'markdown-it-prism'
-import Pages from 'vite-plugin-pages'
+import path from 'path'
+import AutoImport from 'unplugin-auto-import/vite'
+import Components from 'unplugin-vue-components/vite'
 import Inspect from 'vite-plugin-inspect'
+import Layouts from 'vite-plugin-vue-layouts'
+import Markdown, { link, meta } from 'vite-plugin-md'
+import Pages from 'vite-plugin-pages'
+import prism from 'markdown-it-prism'
+import Unocss from 'unocss/vite'
+import Vue from '@vitejs/plugin-vue'
+import { defineConfig } from 'vite'
 
-const config: UserConfig = {
+const config = defineConfig({
+  resolve: {
+    alias: {
+      '~/': `${path.resolve(__dirname, 'src')}/`,
+    },
+  },
   plugins: [
     Vue({
       include: [/\.vue$/, /\.md$/],
+      reactivityTransform: true,
     }),
+
+    // https://github.com/hannoeru/vite-plugin-pages
+    Pages({
+      // pagesDir: 'src/pages',
+      extensions: ['vue', 'md'],
+    }),
+    // https://github.com/JohnCampionJr/vite-plugin-vue-layouts
+    Layouts(),
+
+    AutoImport({
+      imports: ['vue', 'vue-router', '@vueuse/head', '@vueuse/core'],
+      dts: 'src/auto-imports.d.ts',
+    }),
+    Components({
+      // allow auto load markdown components under `./src/components/`
+      extensions: ['vue', 'md'],
+
+      // allow auto import and register components used in markdown
+      include: [/\.vue$/, /\.vue\?vue/, /\.md$/],
+      dts: 'src/components.d.ts',
+    }),
+    Unocss(),
+
     Markdown({
       headEnabled: true,
       markdownItUses: [
         prism,
       ],
+      builders: [meta(), link()],
     }),
-    Pages({
-      pagesDir: 'pages',
-      extensions: ['vue', 'md'],
-    }),
+
     Inspect(),
   ],
-}
+})
 
 export default config

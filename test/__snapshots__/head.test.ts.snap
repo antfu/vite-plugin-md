@@ -11,6 +11,7 @@ exports[`using HEAD variables > when headEnabled property is set to \`false\`, b
 </script>
     
 <script>
+  /** frontmatter meta-data for MD page **/
   export const frontmatter = {\\"title\\":\\"Hello World\\",\\"description\\":\\"testing is the path to true happiness\\"}
 </script>
     "
@@ -31,6 +32,7 @@ exports[`using HEAD variables > when the headEnabled property is set to \`true\`
 </script>
     
 <script>
+  /** frontmatter meta-data for MD page **/
   export const frontmatter = {\\"title\\":\\"Hello World\\",\\"description\\":\\"testing is the path to true happiness\\",\\"meta\\":[{\\"property\\":\\"og:title\\",\\"content\\":\\"Hello World\\"},{\\"property\\":\\"og:description\\",\\"content\\":\\"testing is the path to true happiness\\"},{\\"name\\":\\"description\\",\\"content\\":\\"testing is the path to true happiness\\"}]}
 </script>
     "

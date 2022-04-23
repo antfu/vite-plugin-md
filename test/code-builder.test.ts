@@ -267,12 +267,13 @@ describe('code() builder using Prism (incl generalized tests)', () => {
   it.todo('highlighting code symbol\'s block from imported code')
 
   it.only('adding a heading and footer in props creates proper HTML output', async() => {
-    const { html } = await composeSfcBlocks(
+    const { html, component } = await composeSfcBlocks(
       'test/fixtures/external-reference-obj.md',
       (await getFixture('external-reference-inline.md')),
       { builders: [code()] },
     )
     const sel = select(html)
+    console.log(component)
 
     const heading = sel.findFirst('.heading')
     expect(heading).not.toBeNull()
