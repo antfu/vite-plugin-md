@@ -24,13 +24,19 @@ exports[`meta() snapshots > frontmatter is consistent 1`] = `
 `;
 
 exports[`meta() snapshots > script blocks are consistent 1`] = `
-"<script setup>const frontmatter = {\\"title\\":\\"Metadata Rules\\",\\"byline\\":\\"who loves ya baby?\\",\\"layout\\":\\"yowza\\",\\"image\\":\\"facebook.png\\"}
+"
+<script setup>
+  defineExpose({ frontmatter: {\\"title\\":\\"Metadata Rules\\",\\"byline\\":\\"who loves ya baby?\\",\\"layout\\":\\"yowza\\",\\"image\\":\\"facebook.png\\"} })
+  
  const title = \\"Metadata Rules\\"
  const byline = \\"who loves ya baby?\\"
  const layout = \\"yowza\\"
  const image = \\"facebook.png\\"
  const excerpt = undefined
-defineExpose({ frontmatter })
-const head = {\\"title\\":\\"Metadata Rules\\",\\"byline\\":\\"who loves ya baby?\\",\\"layout\\":\\"yowza\\",\\"image\\":\\"facebook.png\\"}
-</script>"
+</script>
+    
+<script>
+  export const frontmatter = {\\"title\\":\\"Metadata Rules\\",\\"byline\\":\\"who loves ya baby?\\",\\"layout\\":\\"yowza\\",\\"image\\":\\"facebook.png\\"}
+</script>
+    "
 `;

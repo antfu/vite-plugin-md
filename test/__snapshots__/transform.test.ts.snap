@@ -49,15 +49,18 @@ import Foo from './Foo.vue'
 exports[`transform snapshots > meta props remains the same 1`] = `[]`;
 
 exports[`transform snapshots > script blocks remain the same 1`] = `
-"<script setup>
-import Foo from './Foo.vue'
-
-const frontmatter = {\\"title\\":\\"transform tests\\",\\"description\\":\\"hello world\\",\\"hello\\":\\"how friendly\\"}
+"
+<script setup>
+  defineExpose({ frontmatter: {\\"title\\":\\"transform tests\\",\\"description\\":\\"hello world\\",\\"hello\\":\\"how friendly\\"} })
+  
  const title = \\"transform tests\\"
  const description = \\"hello world\\"
  const hello = \\"how friendly\\"
  const excerpt = undefined
-defineExpose({ frontmatter })
-const head = {\\"title\\":\\"transform tests\\",\\"description\\":\\"hello world\\",\\"hello\\":\\"how friendly\\"}
-</script>"
+</script>
+    
+<script>
+  export const frontmatter = {\\"title\\":\\"transform tests\\",\\"description\\":\\"hello world\\",\\"hello\\":\\"how friendly\\"}
+</script>
+    "
 `;

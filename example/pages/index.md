@@ -5,7 +5,6 @@ meta:
     content: Hello World
 test: test
 ---
-
 # Hello world!
 
 Frontmatter: {{ frontmatter }}
