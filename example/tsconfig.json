@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "target": "es2017",
+    "lib": [
+      "ESNext",
+      "DOM"
+    ],
+    "esModuleInterop": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "types": [
+      "vite/client",
+      "vite-plugin-pages/client"
+    ]
+  },
+  "include": [
+    "src",
+    "test"
+  ],
+  "exclude": [
+    "**/dist",
+    "**/node_modules"
+  ]
+}

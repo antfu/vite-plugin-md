@@ -1,0 +1,24 @@
+// Vitest Snapshot v1
+
+exports[`loading images from frontmatter props > snapshot test 1`] = `
+"<template><div class=\\"markdown-body\\"><h2>A Local Cat</h2>
+<p><img src=\\"%7B%7Bcat1%7D%7D\\" alt=\\"local cat\\"></p>
+<h2>A Remote Cat</h2>
+<p><img src=\\"%7B%7Bcat2%7D%7D\\" alt=\\"remote cat\\"></p>
+<p>for more on cats, check out this link: <a href=\\"%7B%7BcatLink%7D%7D\\">link</a></p>
+<p>{{catLink}}</p>
+</div></template>
+<script setup>
+const frontmatter = {\\"title\\":\\"Get the Picture\\",\\"description\\":\\"used for testing images in this plugin\\",\\"cat1\\":\\"images/cat1.jpg\\",\\"cat2\\":\\"https://cats-are-us.com/cat-o-rama.jpg\\",\\"catLink\\":\\"https://all-about-cats.com/\\"}
+defineExpose({ frontmatter })
+</script>
+<script>
+export const title = \\"Get the Picture\\"
+export const description = \\"used for testing images in this plugin\\"
+export const cat1 = \\"images/cat1.jpg\\"
+export const cat2 = \\"https://cats-are-us.com/cat-o-rama.jpg\\"
+export const catLink = \\"https://all-about-cats.com/\\"
+</script>
+
+"
+`;

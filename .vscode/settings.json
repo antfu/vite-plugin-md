@@ -1,4 +1,10 @@
 {
   "prettier.enable": false,
-  "prettier": false
+  "prettier": false,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true
+  },
+  "eslint.validate": [
+    "typescript"
+  ]
 }
