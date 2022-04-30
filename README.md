@@ -20,8 +20,9 @@ npm i vite-plugin-md -D # yarn add vite-plugin-md -D
 ### TypeScript Shim
 _where needed:_
 ```ts
+import type { ComponentOptions } from 'vue'
+
 declare module '*.vue' {
-  import type { ComponentOptions, ComponentOptions } from 'vue'
   const Component: ComponentOptions
   export default Component
 }
