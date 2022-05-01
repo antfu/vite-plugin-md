@@ -21,12 +21,13 @@ npm i vite-plugin-md -D # yarn add vite-plugin-md -D
 _where needed:_
 ```ts
 declare module '*.vue' {
-  import type { ComponentOptions, ComponentOptions } from 'vue'
+  import type { ComponentOptions } from 'vue'
   const Component: ComponentOptions
   export default Component
 }
 
 declare module '*.md' {
+  import type { ComponentOptions } from 'vue'
   const Component: ComponentOptions
   export default Component
 }
