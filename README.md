@@ -96,7 +96,7 @@ app.mount()
 
 ```html
 <script setup>
-import { Counter } from './Counter.vue
+import { Counter } from './Counter.vue'
 </script>
 
 <Counter :init='5'/>
