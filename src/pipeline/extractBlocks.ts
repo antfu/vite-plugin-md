@@ -82,8 +82,14 @@ export function extractBlocks(payload: Pipeline<PipelineStage.parsed>): Pipeline
   }
 
   const scriptBlock = isVue2(options)
-    ? wrap('script', [blocks.localVariables, blocks.frontmatter, blocks.vue2DataExport].join('\n'))
+    ? wrap('script', [
+      ...hoistedScripts,
+      blocks.localVariables,
+      blocks.frontmatter,
+      blocks.vue2DataExport,
+    ].join('\n'))
     : `${wrap('script setup', [
+      ...hoistedScripts,
       blocks.useHead,
       blocks.exposeFrontmatter,
       blocks.localVariables,
