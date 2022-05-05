@@ -1,9 +1,9 @@
 import { readFileSync } from 'fs'
 import { dirname, join } from 'path'
 import type Token from 'markdown-it/lib/token'
+import { toHtml } from 'happy-wrapper'
 import type { Pipeline, PipelineStage } from '../../../types'
 import type { CodeBlockMeta, Modifier } from '../types'
-import { toHtml } from '../utils'
 import { parseObjectSyntax } from './markdownItTokens.ts/parseObjectSyntax'
 import { parseCSVSyntax } from './markdownItTokens.ts/parseCSVSyntax'
 
@@ -33,8 +33,8 @@ function loadFile(codeFile: string, pipeline: Pipeline<PipelineStage.parser>) {
  * which includes the language, modifiers, props, and code block.
  */
 export function extractMarkdownItTokens(p: Pipeline<PipelineStage.parser>, t: Token): CodeBlockMeta<'code'> {
-  const [info, vpressFile] = extractVPressFileSyntax(t.info)
-  const matches = info.trim().match(/((!|#|\*){0,2})(\w+)\s+({.*}){0,1}(.*)$/)
+  const [info, vuepressFile] = extractVPressFileSyntax(t.info)
+  const matches = info.trim().match(/((!|#|\*){0,2})(\w+)\s*({.*}){0,1}(.*)$/)
 
   let fence = {
     pre: '',
@@ -45,9 +45,9 @@ export function extractMarkdownItTokens(p: Pipeline<PipelineStage.parser>, t: To
     level: t.level,
     tag: t.tag,
     highlightTokens: [],
-    externalFile: vpressFile || null,
+    externalFile: vuepressFile || null,
     showFilename: false,
-    lang: t.info,
+    lang: info,
     props: {},
     modifiers: [],
     markup: t.markup,
@@ -56,8 +56,8 @@ export function extractMarkdownItTokens(p: Pipeline<PipelineStage.parser>, t: To
   // match on meta-data found to the right of language
   if (matches) {
     const [, modifiers, , lang, obj, csv] = matches
-    if (obj) { fence = parseObjectSyntax(obj, p, fence) }
 
+    if (obj) { fence = parseObjectSyntax(obj, p, fence) }
     else if (csv) {
       fence = parseObjectSyntax(undefined, p,
         parseCSVSyntax(csv, p, fence),

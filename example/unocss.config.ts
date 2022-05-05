@@ -15,7 +15,7 @@ export default defineConfig({
     ['icon-btn', 'inline-block cursor-pointer select-none opacity-75 transition duration-200 ease-in-out hover:opacity-100 hover:text-teal-600'],
     [
       /^tag(-red|-blue|-green|-yellow){0,1}(-[0-9]00){0,1}(\:.*){0,1}$/,
-      ([b, c, i, v]) => `bg${c || '-gray'}${i || '-500'} py-${b.includes(':lg') ? 1 : 0.5} px-${b.includes(':lg') ? 2.5 : 1.5} rounded-lg cursor-pointer mx-0.5 text-${i ? Number(i.slice(1)) < 500 ? 'black' : 'white' : 'white'}`,
+      ([b, c, i, _v]) => `bg${c || '-gray'}${i || '-500'} py-${b.includes(':lg') ? 1 : 0.5} px-${b.includes(':lg') ? 2.5 : 1.5} rounded-lg cursor-pointer mx-0.5 text-${i ? Number(i.slice(1)) < 500 ? 'black' : 'white' : 'white'}`,
     ],
   ],
   rules: [

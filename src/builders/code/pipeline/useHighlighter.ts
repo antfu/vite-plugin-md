@@ -33,7 +33,7 @@ export const useHighlighter = (
 ) => (fence: CodeBlockMeta<'code'>): CodeBlockMeta<'code'> => {
   return {
     ...fence,
-    code: h(fence.code, fence.lang, klass('line', o, fence)),
+    code: h(fence.code, fence.lang, klass('code-line', o, fence)),
     aboveTheFoldCode: fence.aboveTheFoldCode
       ? pipe(
         h(fence.aboveTheFoldCode, fence.lang, klass('line-above', o, fence)),

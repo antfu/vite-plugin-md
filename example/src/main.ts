@@ -17,8 +17,6 @@ import 'prismjs/components/prism-markup-templating'
 App.name = 'Example App'
 
 const routes = setupLayouts(generatedRoutes)
-// eslint-disable-next-line no-console
-console.log({ generatedRoutes, routes })
 
 const app = createApp(App)
 const head = createHead()

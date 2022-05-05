@@ -1,6 +1,7 @@
-import type { DocumentFragment, IElement } from 'happy-dom'
+import { identity, pipe } from 'fp-ts/lib/function'
+import type { IElement } from 'happy-dom'
+import { addClass, select } from 'happy-wrapper'
 import type { CodeBlockMeta, CodeOptions } from '../types'
-import { getClassList, select } from '../utils'
 
 /** converts HighlightTokens to lines of code */
 function linesToHighlight(fence: CodeBlockMeta<'dom'>): number[] {
@@ -35,24 +36,22 @@ function linesToHighlight(fence: CodeBlockMeta<'dom'>): number[] {
 export const highlightLines = (_o: CodeOptions) => (fence: CodeBlockMeta<'dom'>): CodeBlockMeta<'dom'> => {
   const hl = linesToHighlight(fence)
 
-  const highlight = (doc: DocumentFragment, sel: string) => {
-    const cb = (el: IElement) => {
-      const classes = getClassList(el)
-      let highlight = false
-      hl.forEach((l) => {
-        if (classes.includes(`line-${l}`))
-          highlight = true
-      })
-      return highlight
-    }
-    return select(doc).addClassToEach('highlight')(sel, cb)
-  }
+  const highlight = (el: IElement, idx: number) => pipe(
+    el,
+    hl.includes(idx + 1)
+      ? addClass('highlight')
+      : identity,
+  )
 
   return {
     ...fence,
     trace: `Highlighted line(s) were: ${hl.join(', ')}`,
 
-    code: highlight(fence.code, '.line').toContainer(),
-    lineNumbersWrapper: highlight(fence.lineNumbersWrapper, '.line-number').toContainer(),
+    code: select(fence.code)
+      .updateAll('.code-line')((el, idx) => highlight(el, idx as number))
+      .toContainer(),
+    lineNumbersWrapper: select(fence.lineNumbersWrapper)
+      .updateAll('.line-number')((el, idx) => highlight(el, idx as number))
+      .toContainer(),
   }
 }

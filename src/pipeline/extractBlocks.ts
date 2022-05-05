@@ -1,22 +1,23 @@
+import { extract, select, toHtml } from 'happy-wrapper'
+import type { IElement } from 'happy-dom'
+import type { HTML } from 'happy-wrapper'
+import { isVue2, transformer, wrap } from '../utils'
 import type {
   ResolvedOptions,
 } from '../types'
-import { isVue2, transformer, wrap } from '../utils'
-
-const scriptSetupRE = /<\s*script[^>]*\bsetup\b[^>]*>([\s\S]*)<\/script>/mg
 
 /**
  * Finds any references to `<script>` blocks and extracts it
  * from the html portion.
  */
-function extractScriptBlocks(html: string) {
-  const scripts: string[] = []
-  html = html.replace(scriptSetupRE, (_, script) => {
-    scripts.push(script)
-    return ''
-  })
+function extractScriptBlocks(html: HTML) {
+  const scripts: IElement[] = []
+  const extractor = extract(scripts)
+  html = select(html)
+    .updateAll('script')(extractor)
+    .toContainer()
 
-  return { html, scripts }
+  return { html, scripts: scripts.map(el => toHtml(el)) }
 }
 
 /**
@@ -36,19 +37,23 @@ function extractCustomBlock(html: string, options: ResolvedOptions) {
 }
 
 /**
- * Converts the markdown content to an HTML template and extracts both
- * the HTML and scripts.
+ * Separates the various "blocks" in an SFC component. This includes the
+ * template and script section(s) but can also include custom blocks (which
+ * typically is the Router metadata being moved into the route's meta prop)
  */
-export const extractBlocks = transformer('extractBlocks', 'parsed', 'sfcBlocksExtracted', (payload) => {
+export const extractBlocks = transformer('extractBlocks', 'dom', 'sfcBlocksExtracted', (payload) => {
   // eslint-disable-next-line prefer-const
-  let { html, options, frontmatter, head, routeMeta } = payload
+  let { options, frontmatter, head, routeMeta } = payload
+
+  /** HTML converted back to a string */
+  let html = toHtml(payload.html)
   // extract script blocks, adjust HTML
   const hoistScripts = extractScriptBlocks(html)
   html = hoistScripts.html
   const hoistedScripts: string[] = hoistScripts.scripts
 
   const { templateBlock, customBlocks } = extractCustomBlock(html, options)
-  const blocks = {
+  const templateBlocks = {
     /** adds the lines needed to include useHead() */
     useHead: head && options.headEnabled
       ? `import { useHead } from "@vueuse/head"\n  const head = ${JSON.stringify(head)}\n  useHead(head)`
@@ -78,17 +83,58 @@ export const extractBlocks = transformer('extractBlocks', 'parsed', 'sfcBlocksEx
       : '',
   }
 
-  const scriptBlock = isVue2(options)
-    ? wrap('script', [blocks.localVariables, blocks.frontmatter, blocks.vue2DataExport].join('\n'))
-    : `${wrap('script setup', [
-      blocks.useHead,
-      blocks.exposeFrontmatter,
-      blocks.localVariables,
-    ].filter(i => i).join('\n  '))}
-    ${wrap('script', [
-    blocks.frontmatter,
-  ].filter(i => i).join('\n  '))}
-    ${blocks.routeMeta}`
+  const regularScriptBlocks = hoistScripts.scripts.map(
+    s => select(s).filterAll('script[setup]').toContainer(),
+  ).filter(i => i).join('\n')
+  /** all `<setup script>` blocks */
+  const scriptSetupBlocks = hoistScripts.scripts.map(
+    s => select(s)
+      // unwrap the <script>...</script> tag and return only interior content
+      .mapAll('script[setup]')(el => el.innerHTML),
+  ).join('\n')
+  /** userland `<setup script>` import directives */
+  const importDirectives: string[] = []
 
-  return { ...payload, hoistedScripts, templateBlock, scriptBlock, customBlocks }
+  /** all userland non-import lines in `<setup script>` blocks */
+  const nonImportDirectives = scriptSetupBlocks.split('\n').map((line) => {
+    if (/^import/.test(line)) {
+      importDirectives.push(line)
+      return ''
+    }
+    else { return line }
+  }).filter(i => i).join('\n')
+
+  const scriptBlock = isVue2(options)
+    ? [
+        wrap('script', [
+          templateBlocks.localVariables,
+          templateBlocks.frontmatter,
+          templateBlocks.vue2DataExport,
+        ].join('\n')),
+        hoistScripts.scripts.join('\n'),
+      ].filter(i => i).join('\n')
+    // Vue3
+    : [
+        wrap('script setup', [
+          importDirectives,
+          templateBlocks.useHead,
+          templateBlocks.exposeFrontmatter,
+          templateBlocks.localVariables,
+          nonImportDirectives,
+        ].filter(i => i).join('\n  ')),
+        wrap('script', templateBlocks.frontmatter),
+        regularScriptBlocks,
+      ].filter(i => i).join('\n')
+
+  if (templateBlocks.routeMeta)
+    customBlocks.push(templateBlocks.routeMeta)
+
+  return {
+    ...payload,
+    html,
+    hoistedScripts,
+    templateBlock,
+    scriptBlock,
+    customBlocks,
+  }
 })

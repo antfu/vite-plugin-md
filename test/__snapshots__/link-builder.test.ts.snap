@@ -13,7 +13,7 @@ exports[`link testing > component snapshot is consistent 1`] = `
 <h2>Markdown file in a link</h2>
 <ul>
 <li>When we reference an index MD file the <router-link class=\\" internal-link router-link\\" to=\\"/foobar/\\">index route</router-link> is left with just the path component, no file component</li>
-<li>Similarly if an <em>internal</em> link to a <router-link class=\\" internal-link router-link\\" to=\\"/foo/bar\\">non-index route</router-link> has a <code v-pre>.md</code> reference in it … this is cleaned up.</li>
+<li>Similarly if an <em>internal</em> link to a <router-link class=\\" internal-link router-link\\" to=\\"/foo/bar\\">non-index route</router-link> has a <code class=\\"\\">.md</code> reference in it … this is cleaned up.</li>
 <li>NOTE: <em>external</em> links for both <a href=\\"https://dev.null/foo/index.md\\" class=\\" external-link\\" target=\\"_blank\\" rel=\\"noreferrer noopenner\\">external index routes</a> and <a href=\\"https://dev.null/foo/bar.md\\" class=\\" external-link\\" target=\\"_blank\\" rel=\\"noreferrer noopenner\\">external non-index routes</a> are not changed (but shouldn’t really be happening a lot)</li>
 </ul>
 <h2>Content Types</h2>
@@ -23,7 +23,7 @@ exports[`link testing > component snapshot is consistent 1`] = `
 </ul>
 <h2>Router Awareness</h2>
 <ul>
-<li>we can convert all internal links from normal <code v-pre>&lt;a href=&quot;xyz&quot;&gt;</code> tags to <code v-pre>&lt;router-link to=&quot;xyz&quot;&gt;</code> tags instead; this feature is on by default</li>
+<li>we can convert all internal links from normal <code class=\\"\\">&lt;a href=&quot;xyz&quot;&gt;</code> tags to <code class=\\"\\">&lt;router-link to=&quot;xyz&quot;&gt;</code> tags instead; this feature is on by default</li>
 <li>this is helpful for a PWA as you get the benefits of</li>
 </ul>
 <h2>Section 2</h2>
@@ -33,16 +33,16 @@ exports[`link testing > component snapshot is consistent 1`] = `
 </template>
 
 <script setup>
+  
   defineExpose({ frontmatter: {\\"title\\":\\"Links Testing\\"} })
   
  const title = \\"Links Testing\\"
  const excerpt = undefined
 </script>
-    
+
 <script>
   /** frontmatter meta-data for MD page **/
   export const frontmatter = {\\"title\\":\\"Links Testing\\"}
 </script>
-    
 "
 `;

@@ -29,26 +29,26 @@ const frontmatterPreprocess: ResolvedOptions['frontmatterPreprocess'] = (fm) => 
 let md = ''
 
 describe('frontmatter pre-processor', () => {
-  beforeAll(async() => {
+  beforeAll(async () => {
     md = await readFile('test/fixtures/simple.md', 'utf-8')
   })
 
-  it('frontmatter is unchanged', async() => {
+  it('frontmatter is unchanged', async () => {
     const { frontmatter } = await composeSfcBlocks('', md, { frontmatterPreprocess, headEnabled: true })
     expect(frontmatter).toMatchSnapshot()
   })
 
-  it('head is unchanged', async() => {
+  it('head is unchanged', async () => {
     const { head } = await composeSfcBlocks('', md, { frontmatterPreprocess, headEnabled: true })
     expect(head).toMatchSnapshot()
   })
 
-  it('meta props are unchanged', async() => {
+  it('meta props are unchanged', async () => {
     const { meta } = await composeSfcBlocks('', md, { frontmatterPreprocess, headEnabled: true })
     expect(meta).toMatchSnapshot()
   })
 
-  it('inline markdown is used over default properties', async() => {
+  it('inline markdown is used over default properties', async () => {
     const { frontmatter } = await composeSfcBlocks('', md, { frontmatterPreprocess, headEnabled: true })
 
     // Positive tests
@@ -74,7 +74,7 @@ describe('frontmatter pre-processor', () => {
     ).toBeFalsy()
   })
 
-  it('meta and head props are populated based on default rules', async() => {
+  it('meta and head props are populated based on default rules', async () => {
     const { head, meta } = await composeSfcBlocks('', md, { frontmatterPreprocess, headEnabled: true })
     // Meta props
     const title = meta.find(i => i.property === 'og:title')

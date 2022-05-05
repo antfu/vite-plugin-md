@@ -1,69 +1,51 @@
-import { readFile } from 'fs/promises'
 import { beforeAll, describe, expect, it } from 'vitest'
-import { composeSfcBlocks } from '../src/pipeline'
+import { getAttribute, select } from 'happy-wrapper'
+import type { Pipeline } from '../src/types'
+import { composeFixture } from './utils'
 
-let page = ''
+let sfc: Pipeline<'closeout'>
 
 describe('transform snapshots', () => {
-  beforeAll(async() => {
-    page = await readFile('test/fixtures/transform.md', 'utf-8')
+  beforeAll(async () => {
+    sfc = await composeFixture('transform.md')
   })
 
-  it('frontmatter remains the same', async() => {
-    const sfc = await composeSfcBlocks('transform.md', page)
+  it('frontmatter remains the same', async () => {
     expect(sfc.frontmatter).toMatchSnapshot()
   })
-  it('meta props remains the same', async() => {
-    const sfc = await composeSfcBlocks('transform.md', page)
+  it('meta props remains the same', async () => {
     expect(sfc.meta).toMatchSnapshot()
   })
-  it('head props remains the same', async() => {
-    const sfc = await composeSfcBlocks('transform.md', page)
+  it('head props remains the same', async () => {
     expect(sfc.head).toMatchSnapshot()
   })
-  it('html remains the same', async() => {
-    const sfc = await composeSfcBlocks('transform.md', page)
+  it('html remains the same', async () => {
     expect(sfc.html).toMatchSnapshot()
   })
-  it('customBlocks remain the same', async() => {
-    const sfc = await composeSfcBlocks('transform.md', page)
+  it('customBlocks remain the same', async () => {
     expect(sfc.customBlocks).toMatchSnapshot()
   })
-  it('script blocks remain the same', async() => {
-    const sfc = await composeSfcBlocks('transform.md', page)
+  it('script blocks remain the same', async () => {
     expect(sfc.scriptBlock).toMatchSnapshot()
   })
 })
 
-/**
- * the key here is that "v-pre" is present otherwise
- * when VueJS tries to convert to the {{ variable }}
- * into a value
- */
-const ESCAPED_CODE_TAG = (lang: 'html' | 'ts') => `<code class="language-${lang}" v-pre>`
-const UN_ESCAPED_CODE_TAG = (lang: 'html' | 'ts') => `<code class="language-${lang}">`
-
 describe('transform', () => {
-  beforeAll(async() => {
-    page = await readFile('test/fixtures/transform.md', 'utf-8')
+  it('escapeCodeTagInterpolation behavior exhibited when option set to true (default)', async () => {
+    const sfc = await composeFixture('transform.md', { escapeCodeTagInterpolation: true })
+    const pre = select(sfc.html).findAll('pre')
+    const getVPre = getAttribute('v-pre')
+
+    expect(getVPre(pre[0])).toBeTruthy()
+    expect(getVPre(pre[1])).toBeFalsy()
   })
 
-  it('escapeCodeTagInterpolation behavior exhibited when option set to true (default)', async() => {
-    const sfc = await composeSfcBlocks('transform.md', page)
+  it('escapeCodeTagInterpolation behavior removed when set to false', async () => {
+    const sfc = await composeFixture('transform.md', { escapeCodeTagInterpolation: false })
+    const pre = select(sfc.html).findAll('pre')
+    const getVPre = getAttribute('v-pre')
 
-    expect(sfc.html.includes(ESCAPED_CODE_TAG('html'))).toBeTruthy()
-    expect(
-      sfc.html.includes(UN_ESCAPED_CODE_TAG('ts')),
-      `when "escapeCodeTagInterpolation" is turned on at the option level, but the "!" is used as a prefix to the language it should reverse the behavior but did not [ isEscaped: ${sfc.html.includes(ESCAPED_CODE_TAG('ts'))} ]\n${sfc.html}`,
-    ).toBeTruthy()
-  })
-
-  it('escapeCodeTagInterpolation behavior removed when set to false', async() => {
-    const sfc = await composeSfcBlocks('transform.md', page, { escapeCodeTagInterpolation: false })
-    expect(sfc.html.includes(UN_ESCAPED_CODE_TAG('html'))).toBeTruthy()
-    expect(
-      sfc.html.includes(ESCAPED_CODE_TAG('ts')),
-      `when "escapeCodeTagInterpolation" is turned OFF at the option level, using the "!" as a prefix should reverse the behavior but did not [ isUnescaped: ${sfc.html.includes(UN_ESCAPED_CODE_TAG('ts'))} ]\n${sfc.html}`,
-    ).toBeTruthy()
+    expect(getVPre(pre[0])).toBeFalsy()
+    expect(getVPre(pre[1])).toBeTruthy()
   })
 })

@@ -2,7 +2,25 @@
   "prettier.enable": false,
   "prettier": false,
   "editor.codeActionsOnSave": {
+
     "source.fixAll": true
   },
-  "eslint.validate": ["typescript"]
+  "eslint.validate": [
+    "typescript"
+  ],
+  "cSpell.words": [
+    "antfu",
+    "frontmatter",
+    "itemprop",
+    "klass",
+    "klasses",
+    "nord",
+    "prefetch",
+    "Shiki",
+    "userland",
+    "Vite",
+    "vitepress",
+    "vitest",
+    "vuepress"
+  ]
 }

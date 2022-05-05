@@ -7,7 +7,7 @@ import { isValidLanguage, prismTranslateAliases, usesPrismHighlighting } from '.
  */
 export const resolveLanguage = (o: CodeOptions) => (fence: CodeBlockMeta<'code'>): CodeBlockMeta<'code'> => {
   if (o.engine === 'prism')
-    fence = { ...fence, lang: prismTranslateAliases(fence.lang) }
+    fence = { ...fence, requestedLang: fence.lang, lang: prismTranslateAliases(fence.lang) }
 
   if (fence.lang) {
     if (!isValidLanguage(o.engine, fence)) {

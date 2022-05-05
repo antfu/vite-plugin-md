@@ -5,5 +5,8 @@ import { transformer } from '../utils'
  */
 export const parseHtml = transformer('parseHtml', 'parser', 'parsed', (payload) => {
   const html = payload.parser.render(payload.md, {})
-  return { ...payload, html, fencedLanguages: new Set<string>() }
+  return {
+    ...payload,
+    html,
+  }
 })

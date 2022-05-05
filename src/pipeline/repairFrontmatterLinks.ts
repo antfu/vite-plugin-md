@@ -1,6 +1,6 @@
 import type { IElement } from 'happy-dom'
+import { clone, select } from 'happy-wrapper'
 import { transformer } from '../utils'
-import { clone, select } from '../builders/code/utils/happyDom'
 
 const wrappedFrontmatter = /%7B%7B(.*)%7D%7D/
 // const staticallyReplace = (bare: string, fm: Frontmatter) => fm[bare] ? String(fm[bare]) : 'missing-frontmatter-prop'

@@ -38,22 +38,7 @@ export const getBuilderTask = <S extends IPipelineStage>(
       return TE.right(payload)
     }
 
-    // convert handlers to tasks
-    // const tasks = builders.reduce(
-    //   (acc, b) => {
-    //     const task = TE.tryCatch(
-    //       () => b.handler(payload, options),
-    //       e =>
-    //         `During the "${stage}" stage, the builder API "${b.name}" was unable to transform the payload. It received the following error message: ${e instanceof Error ? e.message : String(e)}`
-    //       ,
-    //     )
-    //     return [...acc, task]
-    //   },
-    //   [] as PipeTask<S>[],
-    // )
-    // }
-
-    const asyncApi = async(payload: Pipeline<S>) => {
+    const asyncApi = async (payload: Pipeline<S>) => {
       for (const b of builders) {
         try {
           payload = await b.handler(payload, b.options)
@@ -75,7 +60,7 @@ export const getBuilderTask = <S extends IPipelineStage>(
  * A higher order function which starts by taking the `options` for this plugin
  *
  * - returns a function requesting a _stage_,
- * - another function of type `AsyncTransformer` which recieves
+ * - another function of type `AsyncTransformer` which receives
  *    - a synchronous `Pipeline<S>`
  *    - an asynchronous `TaskEither<unknown, Pipeline<S>`
  * - in _both_ cases the return type will be a `TaskEither<string, S>`

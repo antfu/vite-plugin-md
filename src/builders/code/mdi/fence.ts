@@ -4,6 +4,7 @@ import type { Pipeline, PipelineStage } from '../../../types'
 import {
   convertBlocksToDomNodes,
   defaultBlocks,
+  expandCodeBlockVariables,
   extractMarkdownItTokens,
   highlightLines,
   renderHtml,
@@ -16,6 +17,7 @@ import {
 import type {
   CodeOptions,
 } from '../types'
+import { trace } from '../utils'
 
 import { establishHighlighter } from './establishHighlighter'
 
@@ -23,7 +25,7 @@ import { establishHighlighter } from './establishHighlighter'
  * A higher-order function which receives payload and options for context up front
  * and then can be added as Markdown plugin using the standard `.use()` method.
  */
-export const fence = async(payload: Pipeline<PipelineStage.parser>, options: CodeOptions) => {
+export const fence = async (payload: Pipeline<PipelineStage.parser>, options: CodeOptions) => {
   const highlighter = await establishHighlighter(options)
 
   // return a Markdown-IT plugin
@@ -38,14 +40,15 @@ export const fence = async(payload: Pipeline<PipelineStage.parser>, options: Cod
         resolveLanguage(options),
 
         userRules('before', payload, options),
+        expandCodeBlockVariables(payload),
         useHighlighter(highlighter, options),
 
         convertBlocksToDomNodes(payload, options),
-
-        updateCodeBlockWrapper(options),
+        
+        updateCodeBlockWrapper(payload, options),
         updateLineNumbers(options),
         highlightLines(options),
-        updatePreWrapper,
+        updatePreWrapper(payload),
         userRules('after', payload, options),
 
         renderHtml(payload, options),

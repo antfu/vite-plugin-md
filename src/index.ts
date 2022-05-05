@@ -5,6 +5,7 @@ import { createSfcComponent } from './createSfcComponent'
 import { resolveOptions } from './options'
 import type { Options } from './types'
 export { link, meta, code } from './builders'
+export { default as uno } from './builders/code/styles/uno'
 
 function VitePluginMarkdown(userOptions: Options = {}): Plugin {
   const options = resolveOptions(userOptions)
@@ -44,7 +45,7 @@ function VitePluginMarkdown(userOptions: Options = {}): Plugin {
         return
 
       const defaultRead = ctx.read
-      ctx.read = async function() {
+      ctx.read = async function () {
         return markdownToVue(config)(ctx.file, await defaultRead())
       }
     },

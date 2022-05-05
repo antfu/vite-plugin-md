@@ -26,6 +26,7 @@ exports[`meta() snapshots > frontmatter is consistent 1`] = `
 exports[`meta() snapshots > script blocks are consistent 1`] = `
 "
 <script setup>
+  
   defineExpose({ frontmatter: {\\"title\\":\\"Metadata Rules\\",\\"byline\\":\\"who loves ya baby?\\",\\"layout\\":\\"yowza\\",\\"image\\":\\"facebook.png\\"} })
   
  const title = \\"Metadata Rules\\"
@@ -34,10 +35,9 @@ exports[`meta() snapshots > script blocks are consistent 1`] = `
  const image = \\"facebook.png\\"
  const excerpt = undefined
 </script>
-    
+
 <script>
   /** frontmatter meta-data for MD page **/
   export const frontmatter = {\\"title\\":\\"Metadata Rules\\",\\"byline\\":\\"who loves ya baby?\\",\\"layout\\":\\"yowza\\",\\"image\\":\\"facebook.png\\"}
-</script>
-    "
+</script>"
 `;

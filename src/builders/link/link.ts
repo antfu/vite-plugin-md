@@ -135,7 +135,7 @@ export const link = createBuilder('link', 'parser')
   // the approach for this builder is to inject a rule into the MarkdownIt
   // which will call our `transform` function on each instance of a link element
   // discovered and allow mutation.
-  .handler(async(p, o) => {
+  .handler(async (p, o) => {
     const { fileName, viteConfig: { base } } = p
     // merge default settings with user settings
     const options: LinkifyConfig = {

@@ -12,7 +12,7 @@ export const defaultBlocks = (_o: CodeOptions) => (fence: CodeBlockMeta<'code'>)
     ? `<div class="footer">${fence.props.footer}</div`
     : undefined
 
-  const codeBlockWrapper = `<div class="code-wrapper">${heading}<div class="code-block"></div>${footer}</div>`
+  const codeBlockWrapper = `<div class="code-wrapper">${heading || ''}<div class="code-block"></div>${footer || ''}</div>`
   const pre = '<pre>\n</pre>\n'
   const lineNumbersWrapper = '<div class="line-numbers-wrapper"></div>\n'
 

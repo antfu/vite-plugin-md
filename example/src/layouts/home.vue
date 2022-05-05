@@ -3,7 +3,7 @@ const name = 'home'
 </script>
 
 <template>
-  <div class="heading w-full">
+  <div class="page-heading w-full">
     <div class="border-b-gray-800 dark:border-b-gray-200 border-b-1 flex flex-row text-2xl px-4 py-1.5 items-center">
       <span class="package flex flex-grow font-mono ">
         <a

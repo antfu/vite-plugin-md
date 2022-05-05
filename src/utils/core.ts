@@ -38,5 +38,5 @@ export function isVue2(options: ResolvedOptions) {
 }
 
 export function wrap(tag: string, content: string) {
-  return `\n<${tag}>\n  ${content}\n</${tag.split(/ /)[0]}>`
+  return `\n<${tag}>\n  ${content}\n</${tag?.split(/ /)[0]}>`
 }

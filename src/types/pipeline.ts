@@ -1,8 +1,8 @@
 import type MarkdownIt from 'markdown-it'
+import type { DocumentFragment } from 'happy-dom'
 import type * as TE from 'fp-ts/TaskEither'
 import type { UserConfig } from 'vite'
 import type { Either } from 'fp-ts/lib/Either'
-import type { Task } from 'fp-ts/lib/Task'
 import type { EnumValues, Frontmatter, MetaProperty, ResolvedOptions } from './core'
 
 export enum PipelineStage {
@@ -32,6 +32,13 @@ export enum PipelineStage {
    * have been able to apply their customizations to it.
    */
   parsed = 'parsed',
+
+  /**
+   * The HTML has been converted to a HappyDom tree to allow
+   * interested parties to manipulate contents using DOM based
+   * queries.
+   */
+  dom = 'dom',
 
   /**
    * SFC blocks (template, script, and an array of customBlocks) are ready for
@@ -93,10 +100,92 @@ export interface BuilderRegistration<O extends BuilderOptions, S extends IPipeli
   initializer?: BuilderHandler<O, PipelineStage.initialize>
 }
 
-/** container of events organized by PipelineStage */
-export type BuilderStruct<T extends string> = Record<PipelineStage | T, any>
+export type Parser<S extends IPipelineStage> = S extends 'parser' | 'parsed' | 'dom' | 'sfcBlocksExtracted' | 'closeout'
+  ? {
+      /** the **MarkdownIT** parser instance */
+      parser: MarkdownIt
 
-export interface PipelineProperties {
+    }
+  : {}
+
+export type MetaExtracted<S extends IPipelineStage> = S extends 'initialize'
+  ? {}
+  : {
+      /** the frontmatter metadata */
+      frontmatter: Frontmatter
+
+      /**
+       * The markdown content (after extracting frontmatter)
+       */
+      md: string
+
+      /**
+       * Meta properties that will be put into the HEAD section
+       */
+      meta: MetaProperty[]
+
+      /**
+       * Meta properties which are to be added to the VueJS router's "meta" attribute
+       * for this page's route
+       */
+      routeMeta: Record<string, any>
+
+      /**
+       * Non-meta tags that will be put into the HEAD section of the page
+       */
+      head: Record<string, any>
+
+      excerpt?: string
+    }
+
+export type HtmlContent<S extends IPipelineStage> = S extends 'parsed' | 'sfcBlocksExtracted' | 'closeout'
+  ? {
+      /**
+       * the HTML produced from MD content (and using parser rules passed in)
+       */
+      html: string
+    }
+  : S extends 'dom'
+    ? {
+        /**
+         * the HTML wrapped into a HappyDom fragment
+         */
+        html: DocumentFragment
+
+        /**
+         * If any code blocks were found on the page then their languages will be represented
+         * here as a `Set<string>`
+         */
+        fencedLanguages: Set<string>
+      }
+    : {}
+
+export type Blocks<S extends IPipelineStage> = S extends 'sfcBlocksExtracted' | 'closeout'
+  ? {
+      /**
+       * all hoisted scripts
+       */
+      hoistedScripts: string[]
+
+      /** the SFC's template block (aka, html content) */
+      templateBlock: string
+
+      /** the `<script [setup] ...>` block */
+      scriptBlock: string
+
+      /** any other top-level SFC blocks besides "template" and "script" */
+      customBlocks: string[]
+    }
+  : {}
+
+export type Completed<S extends IPipelineStage> = S extends 'closeout'
+  ? {
+      /** the finalized component in string form */
+      component: string
+    }
+  : {}
+
+export type Pipeline<S extends IPipelineStage> = {
   fileName: string
   /** the raw content in the file being processed */
   content: string
@@ -105,117 +194,7 @@ export interface PipelineProperties {
   /** the Vite config */
   viteConfig: UserConfig
 
-  /** the frontmatter metadata */
-  frontmatter: Frontmatter
-  /**
-   * Meta properties that will be put into the HEAD section
-   */
-  meta: MetaProperty[]
-  /**
-   * Meta properties which are to be added to the VueJS router's "meta" attribute
-   * for this page's route
-   */
-  routeMeta: Record<string, any>
-  /**
-   * Non-meta tags that will be put into the HEAD section of the page
-   */
-  head: Record<string, any>
-  excerpt?: string
-  /**
-   * The markdown content (after extracting frontmatter)
-   */
-  md: string
-
-  /** the **MarkdownIT** parser instance */
-  parser: MarkdownIt
-
-  /**
-   * the HTML produced from MD content (and using parser rules passed in)
-   */
-  html: string
-
-  /**
-   * If any code blocks were found on the page then their languages will be represented
-   * here.
-   */
-  fencedLanguages: Set<string>
-
-  /**
-   * all hoisted scripts
-   */
-  hoistedScripts: string[]
-
-  /** the SFC's template block (aka, html content) */
-  templateBlock: string
-  /** the `<script [setup] ...>` block */
-  scriptBlock: string
-  /** any other top-level SFC blocks besides "template" and "script" */
-  customBlocks: string[]
-
-  /** the finalized component in string form */
-  component: string
-
-}
-
-export type InitializedOmissions = 'md'
-| 'fencedLanguages'
-| 'frontmatter'
-| 'head'
-| 'meta'
-| 'routeMeta'
-| 'excerpt'
-| 'html'
-| 'hoistedScripts'
-| 'templateBlock'
-| 'parser'
-| 'scriptBlock'
-| 'customBlocks'
-| 'component'
-
-/** after extracting metadata */
-export type MetaOmissions =
-  | 'fencedLanguages'
-  | 'parser'
-  | 'html'
-  | 'hoistedScripts'
-  | 'templateBlock'
-  | 'scriptBlock'
-  | 'customBlocks'
-  | 'component'
-
-/** after providing the markdown-it parser */
-export type ParserOmissions =
-  | 'fencedLanguages'
-  | 'html'
-  | 'hoistedScripts'
-  | 'templateBlock'
-  | 'scriptBlock'
-  | 'customBlocks'
-  | 'component'
-
-/** after parsing to raw HTML using markdown-it */
-export type ParsedOmissions =
-  | 'hoistedScripts'
-  | 'templateBlock'
-  | 'scriptBlock'
-  | 'customBlocks'
-  | 'component'
-
-export type SfcBlockOmissions = 'component'
-
-/**
- * The _state/payload_ that is available at a given stage in the pipeline process.
- *
- * - `<S>` provides the stage we're in
- */
-export type Pipeline<S extends IPipelineStage> = S extends 'initialize'
-  ? Omit<PipelineProperties, InitializedOmissions>
-  : S extends 'metaExtracted' ? Omit<PipelineProperties, MetaOmissions>
-    : S extends 'parser' ? Omit<PipelineProperties, ParserOmissions>
-      : S extends 'parsed' ? Omit<PipelineProperties, ParsedOmissions>
-        : S extends 'sfcBlocksExtracted' ? Omit<PipelineProperties, SfcBlockOmissions>
-          : S extends 'closeout' ? PipelineProperties
-            : never
+} & Parser<S> & MetaExtracted<S> & HtmlContent<S> & Blocks<S> & Completed<S>
 
 /**
  * The Builder's event listener/handler
@@ -275,7 +254,7 @@ export type PipelinePayload<S extends IPipelineStage> = PipeTask<S> | PipeEither
 /**
  * A _synchronous_ transformer function which:
  *
- * - recieves a payload of `PipeEither<F>`, and
+ * - receives a payload of `PipeEither<F>`, and
  * - converts it to a type of `PipeEither<T>`
  */
 export type SyncPipelineTransformer<
@@ -286,7 +265,7 @@ export type SyncPipelineTransformer<
 /**
 * An _asynchronous_ transformer function which:
 *
-* - recieves a payload of `PipeTask<F>` (async) or `PipeEither<F>` (sync)
+* - receives a payload of `PipeTask<F>` (async) or `PipeEither<F>` (sync)
 * - converts it to a type of `PipeTask<T>`
 */
 export type AsyncPipelineTransformer<

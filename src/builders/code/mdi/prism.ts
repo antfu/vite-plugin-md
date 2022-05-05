@@ -20,13 +20,13 @@ export function getPrismHighlighter(options: PrismOptions) {
       loadLanguages([lang])
     }
     const grammar: Grammar | undefined = Prism.languages[lang]
-    const highlight = Prism.highlight as (line: string, grammer: Grammar, lang: string) => string
+    const highlight = Prism.highlight as (line: string, grammar: Grammar, lang: string) => string
 
     return code
       .trimEnd()
       .split(/\r?\n/g)
       .map(line => grammar
-        ? highlight(line, grammar, lang)
+        ? highlight(line, grammar, lang as string)
         : escapeHtml(line) as string,
       )
       .map(line => wrap(line, klass))
@@ -52,7 +52,7 @@ export function loadPrismPlugin(name: string): void {
  * Select the language to use for highlighting, based on the provided options and the specified language.
  *
  * @param options
- *        The options that were used to initialise the plugin.
+ *        The options that were used to initialize the plugin.
  * @param lang
  *        Code of the language to highlight the text in.
  * @return  The name of the language to use and the Prism language object for that language.

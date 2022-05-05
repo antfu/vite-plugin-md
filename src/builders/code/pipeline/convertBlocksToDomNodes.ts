@@ -1,6 +1,6 @@
+import { createFragment, safeString, select } from 'happy-wrapper'
 import type { Pipeline, PipelineStage } from '../../../types'
 import type { BlockCallback, CodeBlockMeta, CodeOptions } from '../types'
-import { createFragment, safeString, select } from '../utils'
 
 function mergeClasses(
   payload: Pipeline<PipelineStage.parser>,
@@ -21,9 +21,14 @@ function mergeClasses(
   return Array.from(new Set([...baseClasses, ...userDefined])).join(' ')
 }
 
+/**
+ * converts string representations to DOM nodes
+ */
 export const convertBlocksToDomNodes = (p: Pipeline<PipelineStage.parser>, o: CodeOptions) => (fence: CodeBlockMeta<'code'>): CodeBlockMeta<'dom'> => {
   const code = createFragment(fence.code)
-  const codeLinesCount = select(code).findAll('.line').length
+  const codeLinesCount = select(code).findAll('.code-line').length
+
+  const aboveTheFoldCode = fence.aboveTheFoldCode ? createFragment(fence.aboveTheFoldCode) : undefined
 
   const pre = createFragment(fence.pre)
   const codeBlockWrapper = createFragment(fence.codeBlockWrapper)
@@ -45,6 +50,7 @@ export const convertBlocksToDomNodes = (p: Pipeline<PipelineStage.parser>, o: Co
     ...fence,
     code,
     codeLinesCount,
+    aboveTheFoldCode,
     pre,
     codeBlockWrapper,
     lineNumbersWrapper,

@@ -1,99 +1,102 @@
 import { pipe } from 'fp-ts/lib/function'
-import type { DocumentFragment } from 'happy-dom'
-import type { CodeBlockMeta, CodeOptions } from '../types'
+import type { DocumentFragment, IElement } from 'happy-dom'
 import {
   addClass,
-  createFragment,
+  createElement,
   into,
   select,
-  toHtml,
-} from '../utils'
+  wrap,
+} from 'happy-wrapper'
+import type { CodeBlockMeta, CodeOptions } from '../types'
 
-const applyLineClasses = (
-  fence: CodeBlockMeta<'dom'>,
-  genericLineClass: string,
-  aboveTheFold = 0,
-) => (section: DocumentFragment) => {
-  const dom = select(section)
-  const generics = dom.findAll(`.${genericLineClass.replace(/^\./, '')}`)
-  const evenOdd = (lineNumber: number) => lineNumber % 2 === 0 ? 'even' : 'odd'
-  const firstLast = (lineNumber: number) => lineNumber === 0
-    ? 'first-row'
-    : lineNumber === fence.codeLinesCount
-      ? 'last-row'
-      : undefined
+const evenOdd = (lineNumber: number) => (el: IElement) => lineNumber % 2 === 0
+  ? addClass('even')(el)
+  : addClass('odd')(el)
 
-  generics.forEach((el, idx) => {
-    const lineNumber = idx + 1 - aboveTheFold
-    const classes = [
-      // specific line class
-      `${lineNumber > 0 ? 'line' : 'negative-line'}-${lineNumber}`,
-      evenOdd(lineNumber),
-      firstLast(lineNumber),
-    ].filter(i => i) as string[]
+const firstLast = (lineNumber: number, lineCount: number) => (el: IElement) => lineNumber === 1
+  ? addClass('first-row')(el)
+  : lineNumber === lineCount
+    ? addClass('last-row')(el)
+    : el
 
-    el.replaceWith(
-      pipe(
-        el,
-        addClass(classes),
-      ),
-    )
-  })
+const lineNumber = (i: number, aboveTheFold: number) => i + 1 - aboveTheFold
 
-  return section
+const specificLine = (i: number, aboveTheFold: number) => {
+  return lineNumber(i, aboveTheFold) > 0 
+    ? `line-${lineNumber(i, aboveTheFold)}` 
+    : `negative-line-${Math.abs(lineNumber(i, aboveTheFold))}`
 }
+
+/**
+ * Adds line number DOM elements for each code line; along with "above the fold"
+ * lines if there are any
+ */
+const addLinesToContainer = (fence: CodeBlockMeta<'dom'>, o: CodeOptions, aboveTheFold = 0) => {
+  return (wrapper: DocumentFragment) => {
+    const children: IElement[] = []
+    for (let lineNumber = 1 - aboveTheFold; fence.codeLinesCount >= lineNumber; lineNumber++) {
+      const tagName = 'span'
+      const child = createElement(`<${tagName} class="line-number">${lineNumber}</${tagName}>`)
+      children.push(child)
+    }
+
+    return wrap(children)(wrapper)
+  }
+}
+
+const addLineClasses = (aboveTheFold: number) =>  (el: IElement, idx: number = 0, total: number = 0) => pipe(
+  el,
+  evenOdd(lineNumber(idx, aboveTheFold)),
+  firstLast(lineNumber(idx, aboveTheFold), total),
+  addClass(specificLine(idx, aboveTheFold)),
+)
 
 /**
  * - Builds up the full DOM tree for line numbers and puts it back into the
  * `fence.lineNumbersWrapper` property.
- * - Adds classes for all _lines_ nodes (e.g., even/odd, first/last, etc.)
+ * - Adds classes for all _lines_ nodes (e.g., even/odd, first/last, etc.), this includes
+ * normal code lines and "above the fold"
  */
 export const updateLineNumbers = (o: CodeOptions) =>
   (fence: CodeBlockMeta<'dom'>): CodeBlockMeta<'dom'> => {
-    const addLines = (aboveTheFold = 0) => {
-      const siblings: DocumentFragment[] = []
-      for (let lineNumber = 1 - aboveTheFold; fence.codeLinesCount >= lineNumber; lineNumber++) {
-        const tagName = o.layoutStructure === 'flex-lines' ? 'div' : 'span'
-        siblings.push(
-          createFragment(`<${tagName} class="line-number">${lineNumber}</${tagName}>`),
-        )
-      }
-      return siblings
-    }
-
-    let aboveTheFold = 0
+    let linesAboveTheFold = 0
+    let emptyLines = 0
     const aboveTheFoldCode = fence.aboveTheFoldCode
       ? pipe(
-        fence.aboveTheFoldCode,
-        select,
-        s => s.updateAll('.line-above')((el, idx, total) => {
-          aboveTheFold = total
-          return pipe(
-            el,
-            addClass(['line']),
-          )
-        }).toContainer(),
+          fence.aboveTheFoldCode,
+          select,
+          s => s.updateAll('.code-line')(el => {
+          const isEmptyLine = el.textContent.length === 0
+          const isEmptyComment = el.textContent.trim() === '//'
+          return isEmptyComment || isEmptyLine ? false : el
+        }),
+        s => s.toContainer()
       )
       : undefined
 
-    const code = pipe(
-      // merge in aboveTheFold (if needed)
+    /** the code with meta-classes added and including the "aboveTheFold" code */
+    const code: DocumentFragment = pipe(
       aboveTheFoldCode
-        ? createFragment([toHtml(aboveTheFoldCode), toHtml(fence.code)].join(''))
+        ? into()(aboveTheFoldCode, fence.code)
         : fence.code,
-      // add meta classes across all lines of code
-      applyLineClasses(fence, 'line', aboveTheFold),
+      select,
+      s => s.updateAll('.code-line')(addLineClasses(linesAboveTheFold)),
+      s => s.toContainer()
+    )
+
+    const lineNumbersWrapper = pipe(
+      fence.lineNumbersWrapper,
+      addLinesToContainer(fence, o, linesAboveTheFold),
+      select,
+      s => s.updateAll('.code-line')(addLineClasses(linesAboveTheFold)),
+      s => s.toContainer()
     )
 
     return {
       ...fence,
-      trace: `Processed ${fence.codeLinesCount} lines and put into fence.lineNumbersWrapper [the level was at ${fence.level}]. Also merged aboveTheFold code [${aboveTheFold} lines] with code (if needed) and added meta classes for for each line.`,
-      aboveTheFoldCode,
+      trace: `Processed ${fence.codeLinesCount} lines and put into fence.lineNumbersWrapper [the level was at ${fence.level}]. Also merged aboveTheFold code [${linesAboveTheFold} lines] with code (if needed) and added meta classes for for each line.`,
+      aboveTheFoldCode, // frozen in pipeline now that incorporated into `code`
       code,
-      lineNumbersWrapper: pipe(
-        addLines(aboveTheFold),
-        into(fence.lineNumbersWrapper),
-        applyLineClasses(fence, 'line-number', aboveTheFold),
-      ),
+      lineNumbersWrapper,
     }
   }

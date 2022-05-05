@@ -2,7 +2,7 @@ import type { CodeBlockMeta, CodeOptions, LineCallback, PrismOptions, ShikiOptio
 import { Highlighter } from '../types'
 import { validPrismLanguage } from './prism-languages'
 
-export function isValidLanguage(h: Highlighter, meta: CodeBlockMeta<'dom'>): boolean {
+export function isValidLanguage(h: Highlighter, meta: CodeBlockMeta<'code'>): boolean {
   if (h === Highlighter.prism) {
     return validPrismLanguage(meta.lang)
   }

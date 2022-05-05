@@ -11,7 +11,7 @@ export type HeadProperties = 'title'
 | 'htmlAttrs'
 | 'bodyAttrs'
 
-export type DefaultValueCallback = (fm: Frontmatter) => any
+export type DefaultValueCallback = (fm: Frontmatter, filename: string) => any
 
 function addMetaTag(k: string, v: any): MetaProperty {
   return ({
@@ -25,22 +25,56 @@ function addMetaTag(k: string, v: any): MetaProperty {
 
 export interface MetaConfig {
   /**
-   * Properties which found in frontmatter will be transformed to "meta" properties in HEAD
+   * Properties in frontmatter dictionary which will be treated as "meta" properties
+   * when discovered in documents
+   *
+   * @default ['title', 'description', 'image', 'url', 'image_width', 'image_height']
    */
   metaProps: string[]
-
+  /**
+   * Properties in frontmatter dictionary which will be treated as "route meta" properties
+   * when discovered in documents
+   *
+   * @default ['layout']
+   */
   routeProps: string[]
 
+  /**
+   * Properties in frontmatter dictionary which will be treated as HEAD properties
+   * when discovered in documents
+   *
+   * @default ['title']
+   */
   headProps: HeadProperties[]
 
-  /** default values for a property if none was stated */
-  defaults: Record<string, any | DefaultValueCallback>
+  /**
+   * Default values for a frontmatter property if none was stated in the doc. Property defaults
+   * can be static values or be provided at build time by a passed in callback function.
+   * In cases where the callback is desireable, it will conform t the `DefaultValueCallback`
+   * type:
+   * ```ts
+   * const cb: DefaultValueCallback = (
+   *   frontmatter: Frontmatter,
+   *   fileName: string
+   * ) => Record<string, any>
+   * ```
+   *
+   * @default {}
+   */
+  defaults: Record<string, string | number | any[] | DefaultValueCallback>
+
+  /**
+   * provides a callback hook that is called directly after the default values for frontmatter
+   * properties are merged with the page specific properties and allows this callback to take
+   * an authoritative view on what the final property values should be
+   */
+  override?: (frontmatter: Frontmatter, fileName: string) => Frontmatter
 }
 
 export const meta = createBuilder('meta', 'metaExtracted')
   .options<Partial<MetaConfig>>()
   .initializer()
-  .handler(async(p, o) => {
+  .handler(async (p, o) => {
     let { frontmatter, meta, head, routeMeta } = p
     const c: MetaConfig = {
       metaProps: ['image', 'title', 'description', 'url', 'image_width', 'image_height'],
@@ -55,13 +89,20 @@ export const meta = createBuilder('meta', 'metaExtracted')
     // convert all defaults to concrete values
     for (const k of Object.keys(c.defaults)) {
       if (typeof c.defaults[k] === 'function')
-        c.defaults[k] = (c.defaults[k] as unknown as DefaultValueCallback)(frontmatter)
+        c.defaults[k] = (c.defaults[k] as unknown as DefaultValueCallback)(frontmatter, p.fileName)
     }
 
-    frontmatter = [...Object.keys(frontmatter), ...Object.keys(c.defaults)].reduce(
+    frontmatter = [
+      ...Object.keys(c.defaults),
+      ...Object.keys(frontmatter),
+    ].reduce(
+      // iterate over all keys defined in page's Frontmatter dictionary
+      // or defined with a "default value"
       (acc, p) => ({ ...acc, [p]: frontmatter[p] || c.defaults[p] }),
       {},
     )
+    if (c.override)
+      frontmatter = c.override(frontmatter, p.fileName)
 
     head = {
       ...head,

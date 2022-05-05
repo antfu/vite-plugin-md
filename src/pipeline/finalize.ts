@@ -1,3 +1,4 @@
+import type { Pipeline } from '../types'
 import { transformer, wrap } from '../utils'
 
 /**
@@ -14,5 +15,5 @@ export const finalize = transformer('finalize', 'sfcBlocksExtracted', 'closeout'
     component: after
       ? after(component, payload.fileName)
       : component,
-  }
+  } as Pipeline<'closeout'>
 })

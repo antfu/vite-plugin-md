@@ -45,7 +45,7 @@ const plugin = (o: MdLinkOptions): PluginSimple => (
   }
   else {
     const base = normalizePath(join(o.base || '/', dirname(o.file)))
-    md.renderer.rules.link_open = function(tokens, idx, options, env, self) {
+    md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
       const link = tokens[idx]
       const original = toDictionary(link, base)
       const transformed = o.transform(original)
@@ -74,7 +74,7 @@ const plugin = (o: MdLinkOptions): PluginSimple => (
       return self.renderToken(tokens, idx, options)
     }
 
-    md.renderer.rules.link_close = function(tokens, idx, options, _env, self) {
+    md.renderer.rules.link_close = function (tokens, idx, options, _env, self) {
       const close = tokens[idx]
       const priors = tokens.slice(0, idx).reverse()
       let open: Token | undefined

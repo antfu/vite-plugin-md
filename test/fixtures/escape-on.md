@@ -1,12 +1,10 @@
 ---
-title: Escape Tag Interpolation
 description: in this case we markdown intended for the setting to be turned on
 ---
 
 # Escape Code Interpolation
 
 This is a config based feature that effects code blocks. If the `options.escapeCodeInterpolation` feature is turned on -- and it is by default -- then it will add the property "v-pre" to the `<pre>` tag so that any double curly brackets inside the code block _are not_ mistakenly interpreted as being variables by Vue when it is processing the page.
-
 
 ## Do Not Interpolate
 
@@ -27,5 +25,3 @@ There might, however, be a cases where you want the opposite behavior but the gl
     {{ description }}
 </div>
 ```
-
-

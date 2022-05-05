@@ -1,6 +1,7 @@
 export * from './convertBlocksToDomNodes'
 export * from './defaultBlocks'
 export * from './extractMarkdownItTokens'
+export * from './expandCodeBlockVariables'
 export * from './highlightLines'
 export * from './resolveLanguage'
 export * from './renderHtml'

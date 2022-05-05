@@ -27,9 +27,7 @@ exports[`transform snapshots > head props remains the same 1`] = `
 exports[`transform snapshots > html remains the same 1`] = `
 "<div class=\\"markdown-body\\"><h1>Hello</h1>
 <style>h1 { color: red }</style>
-<script lang=\\"ts\\" setup=\\"\\">
-import Foo from './Foo.vue'
-</script>
+
 <ul>
 <li>A</li>
 <li>B</li>
@@ -37,8 +35,8 @@ import Foo from './Foo.vue'
 </ul>
 <h2>Escaping Code Tag Interpolation</h2>
 <div>{{hello}}</div>
-<p>When the markdown below is parsed – assuming the default behavior of “escapeCodeTagInterpolation” is set – it should be translated to include a “pre” attribute on the <code v-pre>code</code> tag so that VueJS does not interpolate this as a variable:</p>
-<pre><code class=\\"language-html\\" v-pre>&lt;div&gt;{{hello}}&lt;/div&gt;
+<p>When the markdown below is parsed – assuming the default behavior of “escapeCodeTagInterpolation” is set – it should be translated to include a “pre” attribute on the <code class=\\"\\">code</code> tag so that VueJS does not interpolate this as a variable:</p>
+<pre v-pre=\\"true\\"><code class=\\"language-html\\">&lt;div&gt;{{hello}}&lt;/div&gt;
 </code></pre>
 <p>By contrast, the below code fence will take on the opposite behavior:</p>
 <pre><code class=\\"language-ts\\">const theValue = {{ hello }};
@@ -51,6 +49,7 @@ exports[`transform snapshots > meta props remains the same 1`] = `[]`;
 exports[`transform snapshots > script blocks remain the same 1`] = `
 "
 <script setup>
+  import Foo from './Foo.vue'
   defineExpose({ frontmatter: {\\"title\\":\\"transform tests\\",\\"description\\":\\"hello world\\",\\"hello\\":\\"how friendly\\"} })
   
  const title = \\"transform tests\\"
@@ -58,10 +57,9 @@ exports[`transform snapshots > script blocks remain the same 1`] = `
  const hello = \\"how friendly\\"
  const excerpt = undefined
 </script>
-    
+
 <script>
   /** frontmatter meta-data for MD page **/
   export const frontmatter = {\\"title\\":\\"transform tests\\",\\"description\\":\\"hello world\\",\\"hello\\":\\"how friendly\\"}
-</script>
-    "
+</script>"
 `;

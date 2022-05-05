@@ -1,27 +1,29 @@
+import { join } from 'path'
 import type { MountingOptions } from '@vue/test-utils'
-import { mount } from '@vue/test-utils'
 import { HappyMishap } from '../../src/builders/code/utils'
 import type { Options } from '../../src/types'
 import { composeFixture } from './composeFixture'
 
-export const mountFixture = async(fixture: string, pluginOptions: Options = {}) => {
-  const file = fixture.endsWith('.md')
-    ? `./test/fixtures/${fixture}`
-    : `./test/fixtures/${fixture}.md`
+export const mountFixture = async (fixture: string, pluginOptions: Options = {}) => {
+  const sfc = await composeFixture(fixture, pluginOptions)
+  const file = fixture = join(process.cwd(), 'test/fixtures', fixture.endsWith('.md')
+    ? fixture
+    : `${fixture}.md`)
 
-  const component = await import(file)
+  const Component = await import(file)
 
-  const sfc = await composeFixture(component, pluginOptions)
-  return <T extends MountingOptions<any>>(mountOptions: T = {} as T) => {
+  return <T extends MountingOptions<any>>(_mountOptions: T = {} as T) => {
     try {
-      return mount({
-        name: fixture.replace('.md', ''),
-        props: mountOptions.props || {},
-        template: sfc.component,
-      }, mountOptions)
+      // const wrapper = mount(Component.default, mountOptions)
+      // console.log(`wrapper mounted: ${typeof wrapper}`)
+
+      return {
+        frontmatter: Component().frontmatter,
+        component: Component().default,
+      }
     }
     catch (error) {
-      throw new HappyMishap(`Problem mounting "${file}" into DOM. The markdown of the file was:\n${sfc.md}`, { error, name: 'mountFixture' })
+      throw new HappyMishap(`Problem mounting "${fixture}" into DOM [${file}]. The markdown of the file was:\n${sfc.md}`, { error, name: 'mountFixture' })
     }
   }
 }

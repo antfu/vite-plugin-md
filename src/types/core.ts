@@ -81,6 +81,8 @@ export interface Frontmatter {
   name?: string
   excerpt?: string
   image?: string
+  layout?: string
+  requiresAuth?: boolean
   meta?: MetaProperty[]
   [key: string]: unknown
 }
@@ -352,6 +354,8 @@ export interface Options {
 
 export interface ResolvedOptions extends Required<Options> {
   wrapperClasses: string
+  /** a utility which tests whether a given builder is being used */
+  usingBuilder: (name: string) => boolean
 }
 
 export interface ViteConfigPassthrough {

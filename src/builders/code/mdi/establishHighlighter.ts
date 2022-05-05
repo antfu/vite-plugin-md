@@ -12,7 +12,7 @@ import { usesPrismHighlighting } from '../utils/highlighting'
 import { getPrismHighlighter } from './prism'
 import { getShikiHighlighter } from './shiki'
 
-const shiki = async(options: ShikiOptions): Promise<HighlighterFunction<Lang>> => {
+const shiki = async (options: ShikiOptions): Promise<HighlighterFunction<Lang>> => {
   const api = await getShikiHighlighter(options)
 
   return (code: string, lang: Lang, klass: LineClassFn): string => {
@@ -31,7 +31,7 @@ const prism = (options: PrismOptions): HighlighterFunction<PrismLanguage> => {
  * Provides either **Prism** or **Shiki** as the _highlight_ function used for code
  * blocks.
  */
-export const establishHighlighter = async(options: CodeOptions) =>
+export const establishHighlighter = async (options: CodeOptions) =>
   usesPrismHighlighting(options)
     ? prism(options)
     : shiki(options)

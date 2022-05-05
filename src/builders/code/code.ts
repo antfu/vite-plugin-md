@@ -27,7 +27,7 @@ const SHIKI_DEFAULTS = {
 export const code = createBuilder('code', PipelineStage.parser)
   .options<Partial<CodeOptions>>()
   .initializer()
-  .handler(async(p, o) => {
+  .handler(async (p, o) => {
     // ensure proper defaults for options
     const options = {
       highlightLines: true,
