@@ -51,6 +51,9 @@ exports[`transform snapshots > meta props remains the same 1`] = `[]`;
 exports[`transform snapshots > script blocks remain the same 1`] = `
 "
 <script setup>
+  
+import Foo from './Foo.vue'
+
   defineExpose({ frontmatter: {\\"title\\":\\"transform tests\\",\\"description\\":\\"hello world\\",\\"hello\\":\\"how friendly\\"} })
   
  const title = \\"transform tests\\"
