@@ -11,44 +11,48 @@
     <h1>Code Builder Test</h1>
     <p>this test is intended to validate testing of code blocks</p>
     <div class="code-wrapper">
+      <div class="heading-row with-heading show-lang">
+        <div class="heading">This is a code block</div><span class="lang-display"></span>
+      </div>
       <div class="code-block language-typescript line-numbers-mode" data-lang="ts" data-modifiers="">
         <table class="language-typescript" data-lang="ts" v-pre="true">
           <tr class="code-row odd first-row line-1">
-            <td class="line-number odd first-row line-1">1</td>
-            <td class="code-line odd first-row line-1"><span class="token keyword">type</span> <span
-                class="token class-name">Valid</span> <span class="token operator">=</span> <span
-                class="token string">'foo'</span> <span class="token operator">|</span> <span
-                class="token string">'bar'</span> <span class="token operator">|</span> <span
-                class="token string">'baz'</span></td>
+            <td class="line-number">1</td>
+            <td class="code-line"><span class="token keyword">type</span> <span class="token class-name">Valid</span>
+              <span class="token operator">=</span> <span class="token string">'foo'</span> <span
+                class="token operator">|</span> <span class="token string">'bar'</span> <span
+                class="token operator">|</span> <span class="token string">'baz'</span>
+            </td>
           </tr>
           <tr class="code-row even line-2">
-            <td class="line-number even line-2">2</td>
-            <td class="code-line even line-2"><span class="token keyword">const</span> testVariable<span
+            <td class="line-number">2</td>
+            <td class="code-line"><span class="token keyword">const</span> testVariable<span
                 class="token operator">:</span> Valid <span class="token operator">=</span> <span
                 class="token string">'foo'</span></td>
           </tr>
           <tr class="code-row odd line-3">
-            <td class="line-number odd line-3">3</td>
-            <td class="code-line odd line-3"><span class="token keyword">function</span> <span
+            <td class="line-number">3</td>
+            <td class="code-line"><span class="token keyword">function</span> <span
                 class="token function">myFunc</span><span class="token punctuation">(</span>name<span
                 class="token operator">:</span> <span class="token builtin">string</span><span
                 class="token punctuation">)</span> <span class="token punctuation">{</span></td>
           </tr>
           <tr class="code-row even line-4">
-            <td class="line-number even line-4">4</td>
-            <td class="code-line even line-4"> <span class="token keyword">return</span> <span
-                class="token template-string"><span class="token template-punctuation string">`</span><span
-                  class="token string">hello </span><span class="token interpolation"><span
+            <td class="line-number">4</td>
+            <td class="code-line"> <span class="token keyword">return</span> <span class="token template-string"><span
+                  class="token template-punctuation string">`</span><span class="token string">hello </span><span
+                  class="token interpolation"><span
                     class="token interpolation-punctuation punctuation">${</span>name<span
                     class="token interpolation-punctuation punctuation">}</span></span><span
                   class="token template-punctuation string">`</span></span></td>
           </tr>
           <tr class="code-row odd last-row line-5">
-            <td class="line-number odd last-row line-5">5</td>
-            <td class="code-line odd last-row line-5"><span class="token punctuation">}</span></td>
+            <td class="line-number">5</td>
+            <td class="code-line"><span class="token punctuation">}</span></td>
           </tr>
         </table>
       </div>
+      <div class="footer">lovely right?</div>
     </div>
     <p>The test is now complete; everyone should return to their desks.</p>
   </div>

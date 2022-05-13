@@ -1,12 +1,48 @@
-import type { CodeBlockMeta, CodeOptions } from '../types'
+import { identity, pipe } from 'fp-ts/lib/function'
+import { addClass, append } from 'happy-wrapper'
+import type { Pipeline, PipelineStage } from '../../../types'
+import type { BlockCallback, CodeBlockMeta, CodeOptions } from '../code-types'
 
 /**
  * provides initial defaults for the `pre`, `codeBlockWrapper`, and `lineNumbersWrapper`
  */
-export const defaultBlocks = (_o: CodeOptions) => (fence: CodeBlockMeta<'code'>): CodeBlockMeta<'code'> => {
-  const heading = fence.props.heading
-    ? `<div class="heading">${fence.props.heading}</div>`
-    : undefined
+export const defaultBlocks = (payload: Pipeline<PipelineStage.parser>, o: CodeOptions) => (fence: CodeBlockMeta<'code'>): CodeBlockMeta<'code'> => {
+  /**
+   * Resolves properties which can have either a discrete value or a callback
+   */
+  const resolver = <I>(identity: I) => <T>(prop: T | BlockCallback<T> | undefined) => typeof prop === 'function'
+    ? (prop as BlockCallback<T>)(fence, payload.fileName, payload.frontmatter)
+    : typeof prop === 'undefined'
+      ? identity
+      : prop
+
+  const metaClasses: string[] = []
+  if (fence.props.heading)
+    metaClasses.push('with-heading')
+  if (resolver(false)(o?.clipboard))
+    metaClasses.push('with-clipboard')
+  if (resolver(false)(o?.showLanguage))
+    metaClasses.push('show-lang')
+
+  /**
+   * The heading row will always be defined but what it contains is determined by
+   * configuration
+   */
+  const heading = pipe(
+    '<div class="heading-row">',
+    addClass(metaClasses),
+    fence.props.heading
+      ? append(
+        `<div class="${resolver([])(o?.headingClasses).join(' ')}">${fence.props.heading}</div>`,
+      )
+      : identity,
+    o?.clipboard
+      ? append('<i-clipboard class="icon clipboard" @click="_copyClipboard" />')
+      : identity,
+    o?.showLanguage
+      ? append('<span class="lang-display"></span>')
+      : identity,
+  )
 
   const footer = fence.props.footer
     ? `<div class="footer">${fence.props.footer}</div`

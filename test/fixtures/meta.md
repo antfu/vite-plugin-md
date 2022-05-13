@@ -1,5 +1,6 @@
 ---
 title: Metadata Rules
+name: My Name
 byline: who loves ya baby?
 layout: yowza
 image: facebook.png

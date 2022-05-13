@@ -1,7 +1,9 @@
 import { pipe } from 'fp-ts/lib/function'
 import { describe, expect, it } from 'vitest'
+import type { IElement } from '../src'
 import {
   addClass,
+  addVueEvent,
   after,
   before,
   changeTagName,
@@ -9,19 +11,19 @@ import {
   createDocument,
   createElement,
   createFragment,
+  createInlineStyle,
   createTextNode,
-  describeNode as desc,
   filterClasses,
   getChildren,
   getClassList,
   getNodeType,
+  hasParentElement,
   inspect,
   into,
   isElementLike,
   isHappyWrapperError,
   nodeBoundedByElements,
   nodeChildrenAllElements,
-  prepend,
   removeClass,
   replaceElement,
   safeString,
@@ -137,6 +139,44 @@ describe('HappyDom\'s can be idempotent', () => {
     expect(textNode.hasChildNodes()).toBeFalsy()
   })
 
+  it('inline style API', () => {
+    const style = createInlineStyle()
+      .addCssVariable('my-width', '45px')
+      .addCssVariable('my-height', '65px')
+      .addClassDefinition('.code-wrapper', c => c
+        .addProps({
+          display: 'flex',
+          flexDirection: 'row',
+        }),
+      )
+
+    const html = toHtml(style.finish())
+
+    expect(html).toContain('--my-width: 45px;')
+    expect(html).toContain('--my-height: 65px;')
+    expect(html, html).toContain('display: flex;')
+    expect(html, html).toContain('type="text/css"')
+
+    const vHtml = toHtml(style.convertToVueStyleBlock('css', true).finish())
+    expect(vHtml, vHtml).not.toContain('type="text/css"')
+    expect(vHtml, vHtml).toContain('lang="css"')
+  })
+
+  it('inline style with nested selectors', () => {
+    const style = createInlineStyle()
+      .addClassDefinition('.code-wrapper', c => c
+        .addProps({ height: '99px' })
+        .addChild('.code-block', { display: 'flex' })
+        .addChild('.foobar', { width: '25px' }),
+      )
+      .finish()
+
+    const html = toHtml(style)
+    expect(html).toContain('.code-wrapper {')
+    expect(html).toContain('.code-wrapper .code-block {')
+    expect(html).toContain('.code-wrapper .foobar {')
+  })
+
   it('changeTag() utility works as expected with all container types', () => {
     const html = '<span class="foobar">hello world</span>'
     const toDiv = changeTagName('div')
@@ -170,6 +210,23 @@ describe('HappyDom\'s can be idempotent', () => {
     const child = select(node).findFirst('.child', 'did not find child selector!')
     toDiv(child)
     expect(toHtml(node)).toBe('<div class="parent"><div class="child">hello world</div></div>')
+  })
+
+  it('changeTag() works with select().update()', () => {
+    const html = '<div><span class="inside">inside</span></div>'
+    const toTable = changeTagName('table')
+    const converted = select(html).update()(toTable).toContainer()
+    expect(converted).toBe('<table><span class="inside">inside</span></table>')
+
+    const toTR = changeTagName('tr')
+    const converted2 = pipe(
+      html,
+      select,
+      s => s.update()(toTable),
+      s => s.updateAll('span')(toTR),
+      s => s.toContainer(),
+    )
+    expect(converted2).toBe('<table><tr class="inside">inside</tr></table>')
   })
 
   it('replaceElement() replaces an element while preserving parental relationship', () => {
@@ -215,8 +272,9 @@ describe('HappyDom\'s can be idempotent', () => {
       <span class='line line-3'>3</span>
     </div>
     `
+    const toDiv = changeTagName('div')
     const updated = select(html)
-      .updateAll('.line')(changeTagName('div'))
+      .updateAll('.line')(toDiv)
       .toContainer()
     const found = select(updated).findAll('.line')
 
@@ -287,7 +345,8 @@ describe('HappyDom\'s can be idempotent', () => {
     const three = '<span class="item three">three</span>'
     const wrappedOneTwo = into(wrap)(one, two)
     // basic test with HTML
-    const t1 = before(two)(one)
+    const beforeTwo = before(two)
+    const t1 = beforeTwo(one)
     expect(t1).toBe(`${two}${one}`)
     // a fragment should work the same
     const One = createFragment(one)
@@ -328,6 +387,30 @@ describe('HappyDom\'s can be idempotent', () => {
     expect(items[0].textContent).toContain('one')
     expect(items[1].textContent).toContain('three')
     expect(items[2].textContent).toContain('two')
+  })
+
+  it('before() works in concert with select().updateAll()', () => {
+    const html = '<div><span>one</span><span>two</span></div>'
+    const injectBefore = before('<p>before</p>')
+    const transformed = pipe(
+      html,
+      select,
+      s => s.updateAll('span')(injectBefore),
+      s => s.toContainer(),
+    )
+
+    expect(transformed).toBe('<div><p>before</p><span>one</span><p>before</p><span>two</span></div>')
+
+    const injectWithIndex = (el: IElement, idx: number) => before(`<p>before ${idx}</p>`)(el)
+
+    const transformed2 = pipe(
+      html,
+      select,
+      s => s.updateAll('span')(injectWithIndex),
+      s => s.toContainer(),
+    )
+
+    expect(transformed2).toBe('<div><p>before 0</p><span>one</span><p>before 1</p><span>two</span></div>')
   })
 
   it('after() works as expected', () => {
@@ -386,7 +469,7 @@ describe('HappyDom\'s can be idempotent', () => {
     // when we call into() we are changing the hierarchy so that the parent of the incoming
     // element must now point to the _new_ parent node and this parent node in turn will
     // point to the incoming node
-    const html = '<div class="container"><span class="one item">one</span><span class="two item">two</span></div>'
+    const html = createElement('<div class="container"><span class="one item">one</span><span class="two item">two</span></div>')
     const wrapEach = '<span class="wrap-each"></span>'
     const expectedOutcome = '<div class="container"><span class="wrap-each"><span class="one item">one</span></span><span class="wrap-each"><span class="two item">two</span></span></div>'
     const sel = select(html)
@@ -394,7 +477,9 @@ describe('HappyDom\'s can be idempotent', () => {
     const result = sel
       .updateAll('.item')(wrapper)
       .toContainer()
-    expect(result).toBe(expectedOutcome)
+    expect(toHtml(result)).toBe(expectedOutcome)
+    expect(toHtml(html)).toBe(expectedOutcome)
+    select(html).findAll('.item').forEach(i => expect(hasParentElement(i)).toBeTruthy())
   })
 
   it('wrap() works as expected', () => {
@@ -426,11 +511,6 @@ describe('HappyDom\'s can be idempotent', () => {
   })
 
   it('wrap() using with updateAll() utility is able to mutate tree correctly', () => {
-    // NOTE: the issue we're testing for is that the selector passed to updateAll()
-    // is an IElement which _should_ have a parent element that contains it. When
-    // when we call into() we are changing the hierarchy so that the parent of the incoming
-    // element must now point to the _new_ parent node and this parent node in turn will
-    // point to the incoming node
     const html = '<div class="container"><span class="one item">one</span><span class="two item">two</span></div>'
     const wrapEach = '<span class="wrap-each"></span>'
     const expectedOutcome = '<div class="container"><span class="one item">one<span class="wrap-each"></span></span><span class="two item">two<span class="wrap-each"></span></span></div>'
@@ -543,5 +623,17 @@ describe('HappyDom\'s can be idempotent', () => {
     expect(safeString(t2)).toBe('hi there')
     expect(safeString(t3)).toBe(t3)
     expect(safeString(t4)).toBe('hi there')
+  })
+
+  it('addVueEvent() adds an appropriate v-bind attribute', () => {
+    const html = '<my-component>hello world</my-component>'
+    const eventful = addVueEvent('onClick', 'doit()')(html)
+    expect(eventful, eventful).toContain('v-bind="{')
+    expect(eventful, eventful).toContain('doit()')
+
+    const el = createElement(html)
+    const eventful2 = addVueEvent('onClick', 'doit()')(el)
+    expect(toHtml(eventful2), toHtml(eventful2)).toContain('v-bind="{')
+    expect(toHtml(eventful2), toHtml(eventful2)).toContain('doit()')
   })
 })

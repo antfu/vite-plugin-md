@@ -10,7 +10,7 @@ const name = 'home'
           href="https://github.com/antfu/vite-plugin-md"
           class="cursor-pointer no-underline hover:(bg-gray-50 rounded) px-2 py-0.75"
         >
-          vite-plugin-md
+          vite-plugin-md (HOME)
         </a>
       </span>
       <span class="npm-info ">

@@ -79,6 +79,33 @@ export const replaceElement = (newElement: IElement | HTML) => (oldElement: IEle
 }
 
 /**
+ * Appends one or more nodes to a parent container
+ */
+export const append = <N extends ContainerOrHtml[]>(...nodes: N | N[]) => {
+  const n = nodes.flat()
+  return <P extends UpdateSignature | ContainerOrHtml>(parent: P): P extends Array<any> ? IElement : P => {
+    const result = solveForNodeType('text', 'node').mirror().solver({
+      html: h => pipe(h, createElement, append(...nodes), toHtml),
+      element: (e) => {
+        n.forEach(i => e.append(i))
+        return e
+      },
+      fragment: (f) => {
+        n.forEach(i => f.append(i))
+        return f
+      },
+      document: (d) => {
+        n.forEach(i => d.body.append(i))
+        return d
+      },
+
+    })(isUpdateSignature(parent) ? parent[0] : parent)
+
+    return result as P extends Array<any> ? IElement : P
+  }
+}
+
+/**
  * A _partially applied_ instance of the `into()` utility; currently waiting
  * for child/children nodes.
  *
@@ -89,10 +116,13 @@ export const replaceElement = (newElement: IElement | HTML) => (oldElement: IEle
  * mutation when using the update/updateAll() utilities.
  */
 export type IntoChildren<P extends DocRoot | IElement | HTML | undefined> =
-  <C extends Container | HTML | UpdateSignature | ContainerOrHtml[]>(
-    /** Content which will be wrapped inside the parent */
-    ...content: C[] | C[][]
-  ) => undefined extends P ? DocumentFragment : P
+  <A extends UpdateSignature | ContainerOrHtml[] | ContainerOrHtml[][]>(
+    ...args: A
+  ) => A extends UpdateSignature
+    ? IElement | false
+    : undefined extends P
+      ? DocumentFragment
+      : P
 
 /**
  * A higher order function which starts by receiving a _wrapper_ component
@@ -108,20 +138,21 @@ export const into = <P extends DocRoot | IElement | HTML | undefined>(
   /** The parent container which will wrap the child content */
   parent?: P,
 ): IntoChildren<P> =>
-    <C extends Container | HTML | UpdateSignature | ContainerOrHtml[]>(
-      ...content: C[] | C[][]
-    ): undefined extends P ? DocumentFragment : P => {
+    <C extends UpdateSignature | ContainerOrHtml[] | ContainerOrHtml[][]>(
+      ...content: C
+    ): C extends UpdateSignature ? IElement | false : undefined extends P ? DocumentFragment : P => {
     /**
-     * Keeps track of whether the incoming parent was wrapped in a temp
-     * fragment. This is done for HTML passed in as it's the safest way
-     * to process it this way before reverting it back to HTML.
+     * Keeps track of whether the incoming parent was wrapped in a temporary
+     * document fragment.
      */
       const wrapped = !!(typeof parent === 'string')
+
       /**
-       * Make sure parent element is a suitable container
-       * type.
+       * Upgrade HTML or undefined values for parent to ensure
+       * that no matter what's passed in, the parent is some sort
+       * valid container
        */
-      let p: DocRoot | IElement = wrapped
+      let normalizedParent: DocRoot | IElement = wrapped
         ? createFragment(parent)
         : isElement(parent)
           ? parent
@@ -129,16 +160,14 @@ export const into = <P extends DocRoot | IElement | HTML | undefined>(
               ? createFragment()
               : parent
 
-      const isWithinUpdateMutation = isUpdateSignature(content)
-
       // flatten children passed in to support both arrays and destructed arrays
       const flat = isUpdateSignature(content)
         ? [content[0]] // first element is what's being used; discard index and count
         : content.flatMap(c => c as Container | string)
 
-      if (isTextNodeLike(p)) {
+      if (isTextNodeLike(normalizedParent)) {
         throw new HappyMishap(
-          `The wrapper node -- when calling into() -- is wrapping a text node; this is not allowed. Parent HTML: "${toHtml(p)}"`, {
+          `The wrapper node -- when calling into() -- is wrapping a text node; this is not allowed. Parent HTML: "${toHtml(normalizedParent)}"`, {
             name: 'into()',
             inspect: [
               ['parent node', parent],
@@ -147,33 +176,33 @@ export const into = <P extends DocRoot | IElement | HTML | undefined>(
         )
       }
 
-      const html = flat.map(c => toHtml(c)).join('')
-      const transient = createFragment(html)
-      const parentHasChildElements = p.childElementCount > 0
+      const contentHtml = flat.map(c => toHtml(c)).join('')
+      const transient = createFragment(contentHtml)
+      const parentHasChildElements = normalizedParent.childElementCount > 0
 
       if (parentHasChildElements)
-        getChildren(transient).forEach(c => p.firstChild.appendChild(clone(c)))
+        getChildren(transient).forEach(c => normalizedParent.firstChild.appendChild(clone(c)))
       else
-        getChildren(transient).forEach(c => p.append(c))
+        getChildren(transient).forEach(c => normalizedParent.append(c))
 
       // if this call was made as part of an update operation we'll return
       // the parent as an IElement (even if it was wrapped in a fragment)
       // and make sure that the element passed in is replaced with the parent
-      if (isWithinUpdateMutation) {
+      if (isUpdateSignature(content)) {
         if (isElement(content[0])) {
-          p = isElementLike(p) ? p.firstElementChild : createElement(p)
+          normalizedParent = isElementLike(normalizedParent) ? normalizedParent.firstElementChild : createElement(normalizedParent)
 
-          content[0].replaceWith(p)
+          content[0].replaceWith(normalizedParent)
         }
       }
 
-      return wrapped && !isWithinUpdateMutation
-        ? toHtml(p) as undefined extends P ? DocumentFragment : P
-        : p as undefined extends P ? DocumentFragment : P
+      return (wrapped && !isUpdateSignature(content)
+        ? toHtml(normalizedParent)
+        : normalizedParent) as C extends UpdateSignature ? IElement | false : undefined extends P ? DocumentFragment : P
     }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export type ChangeTagNameTo<T extends string> = <E extends IElement | HTML | Document | DocumentFragment>(el: E) => E
+export type ChangeTagNameTo<T extends string> = <E extends [IElement | HTML | Document | DocumentFragment] | UpdateSignature>(...el: E) => E extends UpdateSignature ? IElement : E
 
 /**
  * Changes the tag name for the top level container element passed in
@@ -185,7 +214,10 @@ export type ChangeTagNameTo<T extends string> = <E extends IElement | HTML | Doc
  */
 export const changeTagName = <T extends string>(
   tagName: T,
-): ChangeTagNameTo<T> => {
+): ChangeTagNameTo<T> => <A extends [IElement | HTML | Document | DocumentFragment] | UpdateSignature>(
+    ...args: A
+  ): A extends UpdateSignature ? IElement : A => {
+  const node = args[0]
   /** uses regex to modify tag name to new value */
   const replacer = (el: IElement, tagName: string) => {
     const open = new RegExp(`^<${el.tagName.toLowerCase()}`)
@@ -240,7 +272,7 @@ export const changeTagName = <T extends string>(
 
         return createDocument(body, head)
       },
-    })
+    })(node) as A extends UpdateSignature ? IElement : A
 }
 
 /**
@@ -261,6 +293,11 @@ export const prepend = (prepend: IElement | IText | HTML) => (el: IElement): IEl
   return el
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export type Before<_T extends ContainerOrHtml> = <A extends [IElement | HTML | Document | DocumentFragment] | UpdateSignature>(
+    ...afterNode: A
+  ) => A extends UpdateSignature ? IElement : A extends string ? string : A
+
 /**
  * Inserts a set of Node or string objects in the children list of this Element's
  * parent, just before this Element. String objects are inserted as equivalent Text nodes.
@@ -271,27 +308,45 @@ export const prepend = (prepend: IElement | IText | HTML) => (el: IElement): IEl
  * const message: IElement = startWith(body)
  * ```
  */
-export const before = (
-  beforeNode: DocumentFragment | IElement | IText | HTML,
-) => <A extends IElement | DocumentFragment | HTML>(
-  afterNode: A,
-): A => {
-  const beforeNormalized = typeof beforeNode === 'string'
-    ? createFragment(beforeNode).firstElementChild
-    : beforeNode
+export const before = <B extends ContainerOrHtml>(
+  beforeNode: B,
+): Before<B> => <A extends [IElement | HTML | Document | DocumentFragment] | UpdateSignature>(
+    ...afterNode: A
+  ): A extends UpdateSignature ? IElement : A extends string ? string : A => {
+  const outputIsHtml = (typeof afterNode[0] === 'string')
+  const beforeNormalized: IElement | IText = typeof beforeNode === 'string'
+    ? (createFragment(beforeNode).firstElementChild || createFragment(beforeNode).firstChild) as IElement | IText
+    : createNode(beforeNode)
+
+  const afterNormalized: ContainerOrHtml = typeof afterNode[0] === 'string'
+    ? createFragment(afterNode[0])
+    : isUpdateSignature(afterNode[0])
+      ? afterNode[0][0]
+      : afterNode[0]
 
   const invalidType = (n: string | Container) => {
     throw new HappyMishap(
-    `The before function was passed an invalid container type: ${getNodeType(n)}`,
-    { name: `before(${getNodeType(beforeNode)})(invalid)` },
+    `The before() utility was passed an invalid container type for the "after" node: ${getNodeType(n)}`,
+    { name: `before(${getNodeType(beforeNormalized)})(${getNodeType(n)})`, inspect: n },
     )
   }
 
-  return solveForNodeType()
+  const noParent = (n: string | Container) =>
+    new HappyMishap(
+      'the before() utility for depends on having a parent element in the "afterNode" as the parent\'s value must be mutated. If you do genuinely want this behavior then use a DocumentFragment (or just HTML strings)',
+      { name: `before(${getNodeType(beforeNode)})(${getNodeType(n)})` },
+    )
+
+  const node = solveForNodeType()
     .mirror()
     .solver({
       html: h => pipe(h, createFragment, before(beforeNode), toHtml),
-      text: t => invalidType(t),
+      text: (t) => {
+        if (!t.parentElement)
+          throw noParent(t)
+        t.before(beforeNormalized)
+        return t
+      },
       node: n => invalidType(n),
       document: (d) => {
         d.body.prepend(beforeNormalized)
@@ -308,14 +363,13 @@ export const before = (
 
           return el
         }
-        else {
-          throw new HappyMishap(
-            'the before() utility for depends on having a parent element in the "afterNode" as the parent\'s value must be mutated. If you do genuinely want this behavior then use a DocumentFragment (or just HTML strings)',
-            { name: `before(${getNodeType(beforeNode)})(IElement)` },
-          )
-        }
+        else { throw noParent(el) }
       },
-    })(afterNode)
+    })(afterNormalized)
+
+  return (outputIsHtml && !isUpdateSignature(afterNode)
+    ? toHtml(node)
+    : node) as A extends UpdateSignature ? IElement: A extends string ? string :A
 }
 
 export const after = (
@@ -366,7 +420,7 @@ export const after = (
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export type ReadyForWrapper<_C extends ContainerOrHtml | ContainerOrHtml[]> =
+export type ReadyForWrapper<C extends UpdateSignature | ContainerOrHtml[]> =
   <P extends DocRoot | IElement | HTML | undefined>(
     parent: P,
   ) => undefined extends P ? DocumentFragment : P
@@ -384,8 +438,8 @@ export type ReadyForWrapper<_C extends ContainerOrHtml | ContainerOrHtml[]> =
  * const sandwich = wrap(peanut, butter, jelly)(bread)
  * ```
  */
-export const wrap = <C extends ContainerOrHtml | ContainerOrHtml[]>(
-  ...children: C[]
+export const wrap = <C extends UpdateSignature | ContainerOrHtml[]>(
+  ...children: C
 ): ReadyForWrapper<C> => <P extends DocRoot | IElement | HTML | undefined>(
     parent?: P,
   ) => {

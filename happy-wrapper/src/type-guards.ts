@@ -1,6 +1,6 @@
 import type { Document, DocumentFragment, IElement, IText } from 'happy-dom'
 import { createFragment } from './create'
-import type { Container, DocRoot, InspectionTuple, UpdateCallback_Native, UpdateSignature } from './happy-types'
+import type { Container, DocRoot, InspectionTuple, UpdateSignature } from './happy-types'
 import type { HappyMishap } from './errors'
 
 export function isHappyWrapperError(err: unknown): err is HappyMishap {

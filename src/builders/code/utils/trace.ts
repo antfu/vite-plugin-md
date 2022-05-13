@@ -1,5 +1,5 @@
 import { toHtml } from 'happy-wrapper'
-import type { CodeBlockMeta, CodeParsingStage } from '../types'
+import type { CodeBlockMeta, CodeParsingStage } from '../code-types'
 
 export const trace = (msg = '') => <T extends CodeParsingStage>(fence: CodeBlockMeta<T>): CodeBlockMeta<T> => {
   // eslint-disable-next-line no-console

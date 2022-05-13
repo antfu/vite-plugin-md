@@ -7,7 +7,7 @@ import {
   select,
   wrap,
 } from 'happy-wrapper'
-import type { CodeBlockMeta, CodeOptions } from '../types'
+import type { CodeBlockMeta, CodeOptions } from '../code-types'
 
 const evenOdd = (lineNumber: number) => (el: IElement) => lineNumber % 2 === 0
   ? addClass('even')(el)
@@ -22,8 +22,8 @@ const firstLast = (lineNumber: number, lineCount: number) => (el: IElement) => l
 const lineNumber = (i: number, aboveTheFold: number) => i + 1 - aboveTheFold
 
 const specificLine = (i: number, aboveTheFold: number) => {
-  return lineNumber(i, aboveTheFold) > 0 
-    ? `line-${lineNumber(i, aboveTheFold)}` 
+  return lineNumber(i, aboveTheFold) > 0
+    ? `line-${lineNumber(i, aboveTheFold)}`
     : `negative-line-${Math.abs(lineNumber(i, aboveTheFold))}`
 }
 
@@ -44,7 +44,7 @@ const addLinesToContainer = (fence: CodeBlockMeta<'dom'>, o: CodeOptions, aboveT
   }
 }
 
-const addLineClasses = (aboveTheFold: number) =>  (el: IElement, idx: number = 0, total: number = 0) => pipe(
+const addLineClasses = (aboveTheFold: number) => (el: IElement, idx = 0, total = 0) => pipe(
   el,
   evenOdd(lineNumber(idx, aboveTheFold)),
   firstLast(lineNumber(idx, aboveTheFold), total),
@@ -59,18 +59,17 @@ const addLineClasses = (aboveTheFold: number) =>  (el: IElement, idx: number = 0
  */
 export const updateLineNumbers = (o: CodeOptions) =>
   (fence: CodeBlockMeta<'dom'>): CodeBlockMeta<'dom'> => {
-    let linesAboveTheFold = 0
-    let emptyLines = 0
+    const linesAboveTheFold = 0
     const aboveTheFoldCode = fence.aboveTheFoldCode
       ? pipe(
-          fence.aboveTheFoldCode,
-          select,
-          s => s.updateAll('.code-line')(el => {
+        fence.aboveTheFoldCode,
+        select,
+        s => s.updateAll('.code-line')((el) => {
           const isEmptyLine = el.textContent.length === 0
           const isEmptyComment = el.textContent.trim() === '//'
           return isEmptyComment || isEmptyLine ? false : el
         }),
-        s => s.toContainer()
+        s => s.toContainer(),
       )
       : undefined
 
@@ -81,7 +80,7 @@ export const updateLineNumbers = (o: CodeOptions) =>
         : fence.code,
       select,
       s => s.updateAll('.code-line')(addLineClasses(linesAboveTheFold)),
-      s => s.toContainer()
+      s => s.toContainer(),
     )
 
     const lineNumbersWrapper = pipe(
@@ -89,7 +88,7 @@ export const updateLineNumbers = (o: CodeOptions) =>
       addLinesToContainer(fence, o, linesAboveTheFold),
       select,
       s => s.updateAll('.code-line')(addLineClasses(linesAboveTheFold)),
-      s => s.toContainer()
+      s => s.toContainer(),
     )
 
     return {

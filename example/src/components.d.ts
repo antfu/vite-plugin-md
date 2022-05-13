@@ -5,7 +5,9 @@ import '@vue/runtime-core'
 
 declare module '@vue/runtime-core' {
   export interface GlobalComponents {
+    Clippy: typeof import('./components/Clippy.vue')['default']
     Counter: typeof import('./components/Counter.vue')['default']
+    DarkMode: typeof import('./components/DarkMode.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

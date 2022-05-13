@@ -34,9 +34,12 @@ export function resolveOptions(userOptions: Omit<Options, 'usingBuilder'> = {}):
           return !options.builders.every(b => b().name !== name)
         },
         frontmatterPreprocess: (frontmatter: Frontmatter, options: ResolvedOptions) => {
-        // default process; will be removed if using links() builder
-          const head = preprocessHead(frontmatter, options)
-          return { head, frontmatter }
+          if (!options.usingBuilder('link')) {
+            // the link handler will manage this independently and as part of the
+            // builder pipeline
+            const head = preprocessHead(frontmatter, options)
+            return { head, frontmatter }
+          }
         },
       }
 

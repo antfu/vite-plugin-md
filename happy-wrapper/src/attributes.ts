@@ -1,9 +1,9 @@
-import { string } from 'fp-ts'
 import { pipe } from 'fp-ts/lib/function'
 import type { IElement, INode } from 'happy-dom'
-import { createFragment } from './create'
+import type { Events } from 'vue'
+import type { Container, ContainerOrHtml, DocRoot, GetAttribute, HTML } from './happy-types'
+import { createElement, createFragment, createNode } from './create'
 import { HappyMishap } from './errors'
-import type { Container, DocRoot, GetAttribute, HTML } from './happy-types'
 import { isDocument, isElement, isFragment } from './type-guards'
 import { getNodeType, solveForNodeType, toHtml } from './utils'
 
@@ -117,6 +117,19 @@ export const addClass = <A extends string[] | string[][]>(
   return setClass(resultantClasses.join(' ').trim())(doc) as D
 }
 
+export const addVueEvent = (event: keyof Events, value: string) => {
+  return <T extends IElement | HTML>(el: T): T => {
+    const isHtml = typeof el === 'string'
+    const bound = getAttribute('v-bind')(isHtml ? createElement(el) : el)
+    const bind = bound
+      ? bound.replace('}', `, ${event}: '${value}' }`)
+      : `{ ${event}: "${value}" }`
+    const e2 = setAttribute('v-bind')(bind)(el)
+
+    return (isHtml ? toHtml(e2) : el) as T
+  }
+}
+
 export type Filter = (string | RegExp)
 export type FilterCallback = (removed: string[]) => void
 export type FiltersWithCallback = [FilterCallback, ...Filter[]]
@@ -171,3 +184,27 @@ export const filterClasses = <A extends Filter[] | [FilterCallback, ...Filter[]]
 
   return doc
 }
+
+/**
+ * Checks whether a given node has a parent reference
+ */
+export const hasParentElement = (node: ContainerOrHtml) => {
+  const n = typeof node === 'string' ? createNode(node) : node
+  return solveForNodeType().outputType<boolean>().solver({
+    html: () => false,
+    text: t => !!t.parentElement,
+    element: e => !!e.parentElement,
+    fragment: f => !!f.parentElement,
+    document: () => true,
+    node: n => !!n.parentElement,
+  })(n)
+}
+
+/**
+ * Get's the parent element of a given node or returns `null` if not
+ * present.
+ */
+export const getParent = (node: ContainerOrHtml) => {
+  return hasParentElement(node) ? (node as Container).parentElement : null
+}
+

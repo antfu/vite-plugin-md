@@ -1,15 +1,7 @@
-import type { DocumentFragment } from 'happy-dom'
-import type Prism from 'prismjs'
-import type { ILanguageRegistration, IThemeRegistration, Lang, Highlighter as ShikiHighlighter } from 'shiki'
-import type { Pipeline, PipelineStage } from '../../../types'
-import type { PrismLanguage } from '../utils'
-
-export enum Highlighter {
-  /** [Shiki Highlighter](https://shiki.matsu.io/) */
-  shiki = 'shiki',
-  /** [PrismJS Highlighter](https://prismjs.com/)  */
-  prism = 'prism',
-}
+import type { Fragment } from 'happy-wrapper'
+import type { Grammar } from 'prismjs'
+import type { IPipelineStage, Pipeline, PipelineStage } from '../../types'
+import type { CodeColorTheme } from './styles/color/color-types'
 
 export type HTML = string
 
@@ -30,9 +22,26 @@ export type LineCallback = (
  * A callback for a block node which provides build-time capability to
  * modify a property with a callback
  */
-export type BlockCallback<T> = (fence: CodeBlockMeta<'code'>, filename: string, frontmatter: Pipeline<PipelineStage.parser>['frontmatter']) => T
+export type BlockCallback<T> = <S extends CodeParsingStage>(fence: CodeBlockMeta<S>, filename: string, frontmatter: Pipeline<PipelineStage.parser>['frontmatter']) => T
 
-export interface CommonOptions {
+export interface CodeOptions {
+  /**
+   * The language to use for code blocks that specify a language that Prism does not know.
+   *
+   * @default 'plain'
+   */
+  defaultLanguageForUnknown?: string
+  /**
+   * The language to use for code blocks that do not specify a language.
+   *
+   * @default 'plain'
+   */
+  defaultLanguageForUnspecified: string
+  /**
+   * Shorthand to set both {@code defaultLanguageForUnknown} and {@code defaultLanguageForUnspecified} to the same value. Will be copied
+   * to each option if it is set to {@code undefined}.
+   */
+  defaultLanguage?: string
   /**
    * Hook into the fence mutation process _before_ the builder
    * gets involved.
@@ -48,92 +57,119 @@ export interface CommonOptions {
    * By default each _line_ in the code will be given a class of "line" but you can override this
    * default behavior in one of the following ways:
    *
-   * 1. if for some reason you want to _change_ the classname you may pass in a static string value
+   * 1. if for some reason you want to _change_ the class name you may pass in a static string value
    * which will be used instead of "line".
    * 2. if you pass in a `LineCallback` function you will receive the code on that line along with the language and you can opt to _add_ additional classes (the "line" class will persist regardless of what you return)
    * 3. if you want _no classes_ then you can pass in a `false` value to indicate this
    */
   lineClass?: string | false | LineCallback
 
-  layoutStructure: 'flex-lines' | 'tabular' | 'vuepress' | 'none'
+  /**
+   * The vuepress/vitepress implementation of code blocks appears to use an interesting
+   * DOM structure to bring in line numbers that didn't feel naturally intuitive (but may
+   * have been done for very good reason). If you wish to use this structure you can configure
+   * to use the `flex-lines` style.
+   *
+   * By default we use the 'tabular' layout which feels more intuitive and has full testing
+   * behind it (in this repo).
+   *
+   * @default 'tabular'
+   */
+  layoutStructure: 'flex-lines' | 'tabular'
 
   /**
-   * Any default classes to add to the header region (when region is found to exist)
+   * Any default classes to add to the header region (when region is found to exist);
+   * if you override this be aware that some styling may expect the default "heading" class
+   * to exist.
+   *
+   * @default 'heading'
    */
   headingClasses?: string[] | BlockCallback<string[]>
+
   /**
-   * Any default classes to add to the footer region (when region is found to exist)
+   * Any default classes to add to the footer region (when region is found to exist);
+   * if you override this be aware that some styling may expect the default "footer" class
+   * to exist.
+   *
+   * @default 'footer'
    */
   footerClasses?: string[] | BlockCallback<string[]>
 
   /**
-   * Determines the default behavior for showing/hiding the line numbers in code blocks
+   * Allows to turn on/off the feature of highlighting lines in code; this is just a "default"
+   * as individual code blocks can explicitly ask for line numbers with the `#` modifier
+   *
+   * @default false
    */
   lineNumbers: boolean
 
   /**
    * Flag indicating whether to display the language name in the upper right
    * of the code block.
-   */
-  showLanguage: boolean
-
-  /**
    *
+   * @default true
    */
-  highlightLines: boolean
-}
+  showLanguage: boolean | BlockCallback<boolean>
 
-export interface PrismOptions extends CommonOptions {
   /**
-   * The highlighter engine -- **Prism** or **Shiki** -- that will provide styling
+   * Allows to turn on/off the feature of _highlighting_ lines in code; lines will never
+   * be highlighted unless the page has instructions to highlight particular lines but
+   * this allows all highlights to be explicitly turned off
+   *
+   * @default true
    */
-  engine: Highlighter.prism
-  /** Prism plugins */
-  plugins: string[]
-  /**
-   * Callback for Prism initialisation. Useful for initialising plugins.
-   * @param prism The Prism instance that will be used by the plugin.
-   */
-  init: (prism: typeof Prism) => void
-  /**
-   * The language to use for code blocks that specify a language that Prism does not know.
-   */
-  defaultLanguageForUnknown?: string
-  /**
-   * The language to use for code blocks that do not specify a language.
-   */
-  defaultLanguageForUnspecified: string
-  /**
-   * Shorthand to set both {@code defaultLanguageForUnknown} and {@code defaultLanguageForUnspecified} to the same value. Will be copied
-   * to each option if it is set to {@code undefined}.
-   */
-  defaultLanguage?: string
-}
+  highlightLines: boolean | BlockCallback<boolean>
 
-/**
- * Allows a user to register both a light and dark theme for
- * code blocks.
- */
-export interface IDarkModeThemeRegistration {
-  dark: IThemeRegistration
-  light: IThemeRegistration
-}
-
-export interface ShikiOptions extends CommonOptions {
   /**
-   * The highlighter engine -- **Prism** or **Shiki** -- that will provide styling
+   * Adds a clipboard icon to the header row and injects the functionality to
+   * copy code block contents to the clipboard.
+   *
+   * @default false
    */
-  engine: Highlighter.shiki
-  theme?: IThemeRegistration | IDarkModeThemeRegistration
-  langs?: ILanguageRegistration[]
-  highlighter?: ShikiHighlighter
-}
+  clipboard: boolean | BlockCallback<boolean>
 
-export type CodeOptions = ShikiOptions | PrismOptions
+  /**
+   * The `copyToClipboard()` and `clipboardAvailable()` functions are automatically
+   * added to pages which have a code block on the page which requests this functionality
+   * but you can also just ask for it to be included in call pages so you can use these
+   * functions for your own evil plans.
+   */
+  provideClipboardFunctionality: boolean | BlockCallback<boolean>
+
+  theme?: 'base' | 'lighting' | 'material' | 'dracula' | CodeColorTheme<any>
+
+  /**
+   * By default light mode has code blocks with light backgrounds, and dark mode with
+   * dark backgrounds. If you want to _invert_ that you can by setting this property to
+   * true.
+   *
+   * @default false
+   */
+  invertColorMode?: boolean
+
+  /**
+   * Should you want to add your own language grammar you can:
+   * [Extending Prism Language Definitions](https://prismjs.com/extending.html#language-definitions)
+   */
+  languageGrammars?: Record<string, Grammar>
+
+  /**
+   * Code blocks will default to the following inline style:
+   * ```css
+   * .code-block {
+   *    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+   * }
+   * ```
+   *
+   * but you can override this inline style if you wish. Obviously you can also just
+   * target the `.code-block` class to whatever you like
+   */
+  codeFont?: string
+}
 
 /**
  * Modifiers are single character tokens which are allowed
- * to preceed the "language" in a fence statement to provide
+ * to precede the "language" in a fence statement to provide
  * some binary instruction to how to handle the code block.
  */
 export enum Modifier {
@@ -144,7 +180,7 @@ export enum Modifier {
    */
   '#' = '#',
   /**
-   * using an asteriks modifier will force the line numbers
+   * using an asterisk modifier will force the line numbers
    * of a code block to NOT be used regardless of configuration
    */
   '*' = '*',
@@ -228,12 +264,12 @@ export interface CodeBlockMeta<S extends CodeParsingStage> {
    */
   html: S extends 'complete' ? string : never
 
-  pre: S extends 'code' ? string : DocumentFragment
-  lineNumbersWrapper: S extends 'code' ? string : DocumentFragment
-  codeBlockWrapper: S extends 'code' ? string : DocumentFragment
+  pre: S extends 'code' ? string : Fragment
+  lineNumbersWrapper: S extends 'code' ? string : Fragment
+  codeBlockWrapper: S extends 'code' ? string : Fragment
 
   /**
-   * All highlightlighting information will be captured as
+   * All highlighting information will be captured as
    * an array of `HighlightToken` tokens.
    */
   highlightTokens: HighlightToken[]
@@ -260,22 +296,22 @@ export interface CodeBlockMeta<S extends CodeParsingStage> {
    * Typically not used but when a code block references an external file
    * AND the local code block _also_ has code, then it will be placed here
    */
-  aboveTheFoldCode?: S extends 'code' ? string : DocumentFragment
+  aboveTheFoldCode?: S extends 'code' ? string : Fragment
 
   /**
    * The code block; represented as either a string or a DOM tree
    * based on lifecycle
    */
-  code: S extends 'code' ? string : DocumentFragment
+  code: S extends 'code' ? string : Fragment
 
   /**
    * An optional heading to put above the code block
    */
-  heading?: S extends 'code' ? string : DocumentFragment
+  heading?: S extends 'code' ? string : Fragment
   /**
    * An optional footer to put under the code block
    */
-  footer?: S extends 'code' ? string : DocumentFragment
+  footer?: S extends 'code' ? string : Fragment
 
   /**
    * The number of lines in the code block
@@ -292,7 +328,7 @@ export interface CodeBlockMeta<S extends CodeParsingStage> {
    */
   level: number
   /**
-   * The identified language in the code block
+   * The language used by the highlighter
    */
   lang: string
 
@@ -305,14 +341,14 @@ export interface CodeBlockMeta<S extends CodeParsingStage> {
    */
   trace?: string
   /**
-   * The properties found on the top line (to right of language and backticks), these
+   * The properties found on the top line (to right of language and back ticks), these
    * key/value pairs will be assigned to the
    */
   props: CodeBlockProperties
   modifiers: Modifier[]
   /**
    * not sure how useful this is yet ... currently always evaluates to three
-   * backticks
+   * back ticks
    */
   markup: string
 }
@@ -320,15 +356,13 @@ export interface CodeBlockMeta<S extends CodeParsingStage> {
 export type LineClassFn = (line: string) => string
 
 /**
- * A function which receives a code block's text, the language to
- * convert it to and returns the HTML which provides tokenized style
- * for the language.
+ * A _highlighter_ API which is implementation neutral.
  */
-export type HighlighterFunction<T extends PrismLanguage | Lang> = (
+export type Highlighter = (
   /** the code prior to being transformed */
   code: string,
   /** the language of the code */
-  lang: T,
+  lang: string,
   /** a callback fn which returns the line's class string */
   lineClass: LineClassFn
-) => string
+) => [code: string, langUsed: string]

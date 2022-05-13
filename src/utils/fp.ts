@@ -12,7 +12,7 @@ import type { IPipelineStage, PipeEither, PipeTask, Pipeline, PipelineStage } fr
  *
  * To be lifted up to becoming a Task:
  * ```ts
- * dclare function task = (P: PipeTask<F>) => PipeTask<T>
+ * declare function task = (P: PipeTask<F>) => PipeTask<T>
  * ```
  */
 export const transformer = <F extends IPipelineStage, T extends IPipelineStage>(
@@ -24,8 +24,13 @@ export const transformer = <F extends IPipelineStage, T extends IPipelineStage>(
     payload,
     TE.map(
       p => TE.tryCatch(
-        () => Promise.resolve(fn(p)),
-        e => `There was a problem using "${name}" to transform the pipeline: ${e instanceof Error ? e.message : String(e)}`,
+        () => {
+          const result = Promise.resolve(fn(p))
+          return result
+        },
+        (e) => {
+          return `Problem encountered during the "${name}" stage of the vite-plugin-md transform pipeline:\n\n  ${e instanceof Error ? `${e.message}\n\n${e.stack}` : String(e)}`
+        },
       ),
     ),
     TE.flatten,

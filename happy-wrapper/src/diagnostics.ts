@@ -2,131 +2,140 @@ import { flow, pipe } from 'fp-ts/lib/function'
 import type { Document, DocumentFragment, IElement, INode } from 'happy-dom'
 import { getClassList } from './attributes'
 import { createFragment } from './create'
-import type { Container, HTML, NodeSolverReady, Tree, TreeSummary } from './happy-types'
+import type { Container, ContainerOrHtml, HTML, NodeSolverReady, Tree, TreeSummary, UpdateSignature } from './happy-types'
 import { getChildren, into } from './nodes'
-import { isContainer, isElement, isElementLike, isTextNode, isTextNodeLike } from './type-guards'
+import { isContainer, isElement, isElementLike, isTextNode, isTextNodeLike, isUpdateSignature } from './type-guards'
 import { getNodeType, solveForNodeType, toHtml } from './utils'
 
-export const describeNode = (node: Container | HTML): string => {  
+export const describeNode = (node: Container | HTML | null | UpdateSignature | any[]): string => {
+  if (!node)
+    return node === null ? '[null]' : 'undefined'
+  else if (isUpdateSignature(node))
+    return `UpdateSignature(${describeNode(node[0])})`
+  else if (Array.isArray(node))
+    return node.map(i => describeNode(i)).join('\n')
+
   return solveForNodeType()
-  .outputType<string>()
-  .solver({
-    html: h => pipe(h, createFragment, describeNode),
-    node: n => `node${descClass(n)}`,
-    text: t => `text[${t.textContent.slice(0, 5).replace('\n', '')}...]`,
-    element: e => `element[${e.tagName.toLowerCase()}]${descClass(e)}`,
-    fragment: f => `fragment${descFrag(f)}`,
-    document: d => `doc[head: ${!!d.head}, body: ${!!d.body}]: ${describeNode(createFragment(d.body))}`,
-  })(node)
+    .outputType<string>()
+    .solver({
+      html: h => pipe(h, createFragment, describeNode),
+      node: n => `node${descClass(n)}`,
+      text: t => `text[${t.textContent.slice(0, 5).replace('\n', '')}...]`,
+      element: e => `element[${e.tagName.toLowerCase()}]${descClass(e)}`,
+      fragment: f => `fragment${descFrag(f)}`,
+      document: d => `doc[head: ${!!d.head}, body: ${!!d.body}]: ${describeNode(createFragment(d.body))}`,
+    })(node)
 }
 
 export const inspect = <T extends boolean>(item?: unknown, toJSON: T = false as T): false extends T ? Record<string, any> : string => {
-  const solver = solveForNodeType()
-    .outputType<Record<string, any>>()
-    .solver({
-      html: h => pipe(h, createFragment, f => inspect(f)),
-      fragment: x => ({
-        kind: 'DocumentFragment',
-        children: `${x.children.length} / ${x.childNodes.length}`,
-        ...(x.childNodes.length > 1
-          ? {
-              leadsWith: isElement(x.firstChild)
-                ? 'element'
-                : isTextNode(x.firstChild)
-                  ? 'text'
-                  : 'other',
-              endsWith: isElement(x.lastChild)
-                ? 'element'
-                : isTextNode(x.lastChild)
-                  ? 'text'
-                  : 'other',
+  const solver = Array.isArray(item)
+    ? () => item.map(i => describeNode(i))
+    : solveForNodeType()
+      .outputType<Record<string, any>>()
+      .solver({
+        html: h => pipe(h, createFragment, f => inspect(f)),
+        fragment: x => ({
+          kind: 'DocumentFragment',
+          children: `${x.children.length} / ${x.childNodes.length}`,
+          ...(x.childNodes.length > 1
+            ? {
+                leadsWith: isElement(x.firstChild)
+                  ? 'element'
+                  : isTextNode(x.firstChild)
+                    ? 'text'
+                    : 'other',
+                endsWith: isElement(x.lastChild)
+                  ? 'element'
+                  : isTextNode(x.lastChild)
+                    ? 'text'
+                    : 'other',
+              }
+            : {
+                childNode: inspect(x.firstChild),
+              }),
+          content: x.textContent,
+          childDetails: x.childNodes.map((i) => {
+            try {
+              return {
+                html: toHtml(i),
+                nodeType: getNodeType(i),
+                hasParentElement: !!i.parentElement,
+                hasParentNode: i.parentNode ? `${getNodeType(i.parentNode)} [type:${i.parentNode.nodeType}]` : false,
+                childNodes: i.childNodes.length,
+              }
             }
-          : {
-              childNode: inspect(x.firstChild),
-            }),
-        content: x.textContent,
-        childDetails: x.childNodes.map((i) => {
-          try {
-            return {
-              html: toHtml(i),
-              nodeType: getNodeType(i),
-              hasParentElement: !!i.parentElement,
-              hasParentNode: i.parentNode ? `${getNodeType(i.parentNode)} [type:${i.parentNode.nodeType}]` : false,
-              childNodes: i.childNodes.length,
+            catch {
+              return 'N/A'
             }
-          }
-          catch {
-            return 'N/A'
-          }
+          }),
+          html: toHtml(x),
         }),
-        html: toHtml(x),
-      }),
-      document: x => ({
-        kind: 'Document',
-        headerChildren: x.head.childNodes?.length,
-        bodyChildren: x.body.childNodes?.length,
-        body: toHtml(x.body),
-        children: `${x.body.children?.length} / ${x.body.childNodes?.length}`,
-        childTextContent: x.body.childNodes.map(i => i.textContent),
-        childDetails: x.childNodes.map((i) => {
-          try {
-            return {
-              html: toHtml(i),
-              nodeType: getNodeType(i),
-              hasParentElement: !!i.parentElement,
-              hasParentNode: i.parentNode ? `${getNodeType(i.parentNode)} [type:${i.parentNode.nodeType}]` : false,
-              childNodes: i.childNodes.length,
+        document: x => ({
+          kind: 'Document',
+          headerChildren: x.head.childNodes?.length,
+          bodyChildren: x.body.childNodes?.length,
+          body: toHtml(x.body),
+          children: `${x.body.children?.length} / ${x.body.childNodes?.length}`,
+          childTextContent: x.body.childNodes.map(i => i.textContent),
+          childDetails: x.childNodes.map((i) => {
+            try {
+              return {
+                html: toHtml(i),
+                nodeType: getNodeType(i),
+                hasParentElement: !!i.parentElement,
+                hasParentNode: i.parentNode ? `${getNodeType(i.parentNode)} [type:${i.parentNode.nodeType}]` : false,
+                childNodes: i.childNodes.length,
+              }
             }
-          }
-          catch {
-            return 'N/A'
-          }
+            catch {
+              return 'N/A'
+            }
+          }),
         }),
-      }),
-      text: x => ({
-        kind: 'IText node',
-        textContent: x.textContent,
-        children: x.childNodes?.length,
-        childContent: x.childNodes?.map(i => i.textContent),
-      }),
-      element: x => ({
-        kind: 'IElement node',
-        tagName: x.tagName,
-        classes: getClassList(x),
-        /**
+        text: x => ({
+          kind: 'IText node',
+          textContent: x.textContent,
+          children: x.childNodes?.length,
+          childContent: x.childNodes?.map(i => i.textContent),
+        }),
+        element: x => ({
+          kind: 'IElement node',
+          tagName: x.tagName,
+          classes: getClassList(x),
+          /**
          * in functions like wrap and pretty print, a "parent element" is provided
          * as a synthetic parent but if this flag indicates whether the flag has
          * a connected parent in a DOM tree.
          */
-        hasNaturalParent: !!x.parentElement,
-        ...(x.parentElement ? { parent: describeNode(x.parentElement) } : {}),
-        textContent: x.textContent,
-        children: `${x.children.length} / ${x.childNodes.length}`,
-        childContent: x.childNodes?.map(i => i.textContent),
-        childDetails: x.childNodes.map((i) => {
-          try {
-            return {
-              html: toHtml(i),
-              nodeType: getNodeType(i),
-              hasParentElement: !!i.parentElement,
-              hasParentNode: i.parentNode ? `${getNodeType(i.parentNode)} [type:${i.parentNode.nodeType}]` : false,
-              childNodes: i.childNodes.length,
+          hasNaturalParent: !!x.parentElement,
+          ...(x.parentElement ? { parent: describeNode(x.parentElement) } : {}),
+          textContent: x.textContent,
+          children: `${x.children.length} / ${x.childNodes.length}`,
+          childContent: x.childNodes?.map(i => i.textContent),
+          childDetails: x.childNodes.map((i) => {
+            try {
+              return {
+                html: toHtml(i),
+                nodeType: getNodeType(i),
+                hasParentElement: !!i.parentElement,
+                hasParentNode: i.parentNode ? `${getNodeType(i.parentNode)} [type:${i.parentNode.nodeType}]` : false,
+                childNodes: i.childNodes.length,
+              }
             }
-          }
-          catch {
-            return 'N/A'
-          }
+            catch {
+              return 'N/A'
+            }
+          }),
+          html: toHtml(x),
         }),
-        html: toHtml(x),
-      }),
-      node: n => ({
-        kind: 'INode (generic)',
-        looksLike: isElement(n) ? 'element' : isTextNode(n) ? 'text' : 'unknown',
-        children: `${n.childNodes?.length}`,
-        childContent: n.childNodes?.map(i => i.textContent),
-        html: n.toString(),
-      }),
-    })
+        node: n => ({
+          kind: 'INode (generic)',
+          looksLike: isElement(n) ? 'element' : isTextNode(n) ? 'text' : 'unknown',
+          children: `${n.childNodes?.length}`,
+          childContent: n.childNodes?.map(i => i.textContent),
+          html: n.toString(),
+        }),
+      })
   const result = isContainer(item) || typeof item === 'string'
     ? solver(item)
     : {
@@ -255,9 +264,8 @@ export const tree = (node: Container | HTML): Tree => {
  * Allows various content-types to be wrapped into a single
  * DocumentFragment which contains each element as a sibling
  */
-export const siblings = <
-  C extends Container | HTML | Array<Container | HTML>,
-  >(...content: C[]) => {
+export const siblings = <C extends UpdateSignature | ContainerOrHtml[]>
+  (...content: C) => {
   return into()(...content)
 }
 

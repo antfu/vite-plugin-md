@@ -12,6 +12,8 @@ const headProperties = [
 ]
 
 export function preprocessHead<T extends Frontmatter>(frontmatter: T, options: ResolvedOptions) {
+  // handling of header is done only when user has
+  // signed up to use @vueuse/head
   if (!options.headEnabled)
     return frontmatter
 

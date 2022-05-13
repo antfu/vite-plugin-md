@@ -1,4 +1,4 @@
-import type { IElement } from 'happy-dom'
+import type { IElement } from 'happy-wrapper'
 import { clone, select } from 'happy-wrapper'
 import { transformer } from '../utils'
 

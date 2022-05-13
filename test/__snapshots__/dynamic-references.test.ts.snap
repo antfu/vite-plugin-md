@@ -7,5 +7,54 @@ exports[`loading images and links from frontmatter props > snapshot test 1`] = `
 <p><img src=\\"{{remoteCat}}\\" alt=\\"remote cat\\"/></p>
 <p>for more on cats, check out this link: <a href=\\"{{catLink}}\\">link</a></p>
 <p>{{catLink}}</p>
-</div>"
+</div><style type=\\"text/css\\">
+:root {
+    --md-text-color: #111827;
+    --md-code-background: rgba(27,31,35,.05);
+    --code-font: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \\"Liberation Mono\\", \\"Courier New\\", monospace;
+  }
+html.dark {
+    --md-text-color: #e5e7eb;
+    --md-code-background: rgba(229, 231, 235, 0.65);
+  }
+
+
+  .markdown-body {
+    color: var(--md-text-color);
+  }
+
+
+  .markdown-body code {
+    font-size: 85%;
+    padding: 0.2em 0.3em;
+    margin-left: 0.1rem;
+    margin-right: 0.1rem;
+    background-color: var(--md-code-background);
+    border-radius: 3px;
+    font-family: var(--code-font);
+    color: #333;
+    white-space: pre;
+  }
+
+
+  .markdown-body blockquote {
+    margin-top: 0;
+    margin-bottom: 0.25rem;
+    padding: 0 1em;
+    color: #6a73737d;
+    border-left: 0.25rem solid #dfe2e5;
+  }
+
+
+  .markdown-body a {
+    cursor: pointer;
+  }
+
+
+  .markdown-body a:hover {
+    background-color: rgba(0,0,0,.5);
+    font-weight: 700;
+    border-radius: 0.2rem 0.4rem;
+  }
+</style>"
 `;

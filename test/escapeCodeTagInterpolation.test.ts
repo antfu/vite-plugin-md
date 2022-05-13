@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { getAttribute, select, toHtml } from 'happy-wrapper'
+import { getAttribute, select } from 'happy-wrapper'
 import { code } from '../src'
-import { composeFixture, importFixture } from './utils'
+import { composeFixture } from './utils'
 
 describe('escapeCodeTagInterpolation()', () => {
   it('default is to turn on tag interpolation', async () => {

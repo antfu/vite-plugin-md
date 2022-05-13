@@ -1,5 +1,6 @@
 import { identity } from 'fp-ts/lib/function'
 import { Text, Window } from 'happy-dom'
+import { dasherize } from 'native-dash'
 import type { Document, DocumentFragment, IElement, IText } from 'happy-dom'
 import { HappyMishap } from './errors'
 import type { Container, HTML } from './happy-types'
@@ -90,12 +91,11 @@ export const createElement = (el: Container | HTML, parent?: IElement): IElement
       throw new HappyMishap('An IElement can not be created from a IText node because element\'s require a wrapping tag name!', { name: 'createElement(text)', inspect: t })
     },
     fragment: (f) => {
-      if(isElement(f.firstElementChild)) {
-          return f.firstElementChild as IElement
-        }
-        else {
-          throw new HappyMishap(`Unable to create a IElement node from: \n\n${toHtml(f)}`, {name: 'createElement()'})
-        }
+      if (isElement(f.firstElementChild))
+        return f.firstElementChild as IElement
+
+      else
+        throw new HappyMishap(`Unable to create a IElement node from: \n\n${toHtml(f)}`, { name: 'createElement()' })
     },
     document: (d) => {
       if (isElementLike(d)) {
@@ -108,3 +108,104 @@ export const createElement = (el: Container | HTML, parent?: IElement): IElement
       else { throw new HappyMishap('Can not create an Element from passed in Document', { name: 'createElement(document)', inspect: d }) }
     },
   })(el)
+
+export interface CssVariable {
+  prop: string
+  value: string | number | boolean
+}
+
+export type ClassDefn = Record<string, string | boolean | number>
+export type MultiClassDefn = [selector: string, keyValues: ClassDefn][]
+
+export interface ClassApi {
+  /** add a child selector */
+  addChild: (selector: string, defn: ClassDefn) => ClassApi
+  /** add CSS prop/values */
+  addProps: (defn: ClassDefn) => ClassApi
+}
+
+export interface InlineStyle {
+  /** add a single CSS variable (at a time); the CSS scope will ':root' unless specified */
+  addCssVariable: (prop: string, value: string | number | boolean, scope?: string) => InlineStyle
+  addClassDefinition: (selection: string, cb: ((api: ClassApi) => void)) => InlineStyle
+  addCssVariables: (dictionary: Record<string, string>, scope?: string) => InlineStyle
+  convertToVueStyleBlock: (lang: 'css' | 'scss', scoped: boolean) => InlineStyle
+
+  finish: () => IElement
+}
+
+const renderClasses = (klasses: MultiClassDefn) => {
+  return klasses.map(
+    ([selector, defn]) => `\n\n  ${selector} {\n${Object.keys(defn).map(
+      p => `    ${dasherize(p)}: ${defn[p]};`,
+    ).join('\n')}\n  }`).join('\n')
+}
+
+/**
+ * Creates a new `<style>...</style>` node and provides a simple API surface to allow
+ * populating the contents with inline CSS content
+ */
+export const createInlineStyle = <T extends string = 'text/css'>(type: T = 'text/css' as T) => {
+  const cssVariables: Record<string, CssVariable[]> = {}
+  const cssClasses: MultiClassDefn = []
+  let isVueBlock = false
+  let isScoped = true
+  let vueLang: 'css' | 'scss' = 'css'
+
+  const api: InlineStyle = {
+    addCssVariable(prop: string, value: string | number | boolean, scope = ':root') {
+      if (!(scope in cssVariables))
+        cssVariables[scope] = []
+      cssVariables[scope].push({ prop: prop.replace(/^--/, ''), value })
+
+      return api
+    },
+    addClassDefinition(selector, cb) {
+      const classApi: ClassApi = {
+        addChild: (child, defn) => {
+          const childSelector = `${selector} ${child}`
+          cssClasses.push([childSelector, defn])
+          return classApi
+        },
+        addProps: (defn) => {
+          cssClasses.push([selector, defn])
+          return classApi
+        },
+      }
+      cb(classApi)
+      return api
+    },
+    addCssVariables(dictionary: Record<string, string | number | boolean>, scope = ':root') {
+      Object.keys(dictionary).forEach(p => api.addCssVariable(p, dictionary[p], scope))
+
+      return api
+    },
+    convertToVueStyleBlock(lang, scoped = true) {
+      vueLang = lang
+      isVueBlock = true
+      isScoped = scoped
+
+      return api
+    },
+
+    finish() {
+      const setVariable = (scope: string, defn: Record<string, any>) => `${scope} {\n${Object.keys(defn).map(prop => `    --${defn[prop].prop}: ${defn[prop].value}${String(defn.prop).endsWith(';') ? '' : ';'}`).join('\n')}\n  }`
+
+      let text = ''
+      // variables
+      Object.keys(cssVariables).forEach(
+        (v) => {
+          text = `${text}${setVariable(v, cssVariables[v])}\n`
+        },
+      )
+      // classes
+      text = `${text}${renderClasses(cssClasses)}`
+
+      return isVueBlock
+        ? createElement(`<style lang="${vueLang}"${isScoped ? ' scoped' : ''}>\n${text}\n</style>`)
+        : createElement(`<style type="${type}">\n${text}\n</style>`)
+    },
+  }
+
+  return api
+}

@@ -5,15 +5,9 @@ import { createRouter, createWebHistory } from 'vue-router'
 import generatedRoutes from 'virtual:generated-pages'
 import { setupLayouts } from 'virtual:generated-layouts'
 import App from './App.vue'
-// import '@unocss/reset/tailwind.css'
+import './styles/main.css'
 import 'uno.css'
 
-import 'prismjs'
-import 'prismjs/components/prism-bash'
-import 'prismjs/components/prism-typescript'
-import 'prismjs/components/prism-javascript'
-import 'prismjs/components/prism-markup'
-import 'prismjs/components/prism-markup-templating'
 App.name = 'Example App'
 
 const routes = setupLayouts(generatedRoutes)

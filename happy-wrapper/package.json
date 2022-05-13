@@ -23,6 +23,7 @@
   },
   "devDependencies": {
     "@vitest/ui": "^0.12.4",
+    "native-dash": "^1.22.1",
     "vitest": "^0.12.4"
   }
 }

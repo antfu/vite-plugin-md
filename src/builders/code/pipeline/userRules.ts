@@ -1,5 +1,5 @@
 import type { Pipeline, PipelineStage } from '../../../types'
-import type { CodeBlockMeta, CodeOptions } from '../types'
+import type { CodeBlockMeta, CodeOptions } from '../code-types'
 
 /**
  * Provides a before/after hook that consumers can use to tie into the

@@ -5,7 +5,7 @@ import { createSfcComponent } from './createSfcComponent'
 import { resolveOptions } from './options'
 import type { Options } from './types'
 export { link, meta, code } from './builders'
-export { default as uno } from './builders/code/styles/uno'
+export { mergeColorThemes } from './builders/code/styles/color/mergeColorThemes'
 
 function VitePluginMarkdown(userOptions: Options = {}): Plugin {
   const options = resolveOptions(userOptions)

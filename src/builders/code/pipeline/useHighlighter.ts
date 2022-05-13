@@ -1,6 +1,9 @@
-import { pipe } from 'fp-ts/lib/function'
-import type { CodeBlockMeta, CodeOptions, HighlighterFunction, LineClassFn } from '../types'
-import { isLineCallback } from '../utils'
+import type { Pipeline, PipelineStage } from '../../../types'
+import type { CodeBlockMeta, CodeOptions, Highlighter, LineCallback, LineClassFn } from '../code-types'
+
+export function isLineCallback(cb?: false | string | LineCallback): cb is LineCallback {
+  return !!(cb && typeof cb === 'function')
+}
 
 /**
  * Adds the class for a given line in the code block including
@@ -20,24 +23,32 @@ const klass = (generalClass: string, o: CodeOptions, fence: CodeBlockMeta<'code'
 }
 
 /**
- * Iterate, line-by-line, through the code block and use **Prism** or
- * **Shiki** to mutate the code block into stylized HTML.
+ * Get a _highlighter_ from the underlying library (PrismJS currently)
+ * and parse each line of code into tokenized span's.
  *
- * Note: each line is distinguished by a newline character in the source
- * Markdown, this newline is maintained but each line of code is wrapped with
- * `<span class=''></span>` and default classes are applied to this line.
+ * Note: this library will try to load requested language but if not
+ * will use aliases and fallbacks. The _actual_ language used will be
+ * stored as `lang` on payload.
  */
 export const useHighlighter = (
-  h: HighlighterFunction<any>,
+  p: Pipeline<PipelineStage.parser>,
+  h: Highlighter,
   o: CodeOptions,
 ) => (fence: CodeBlockMeta<'code'>): CodeBlockMeta<'code'> => {
+  const requestedLang = fence.lang
+  const [code, lang] = h(fence.code, requestedLang, klass('code-line', o, fence))
+  const [aboveTheFoldCode] = fence.aboveTheFoldCode
+    ? h(fence.aboveTheFoldCode, requestedLang, klass('line-above', o, fence))
+    : [undefined]
+
+  p.codeBlockLanguages.langsRequested.push(requestedLang)
+  p.codeBlockLanguages.langsUsed.push(lang)
+
   return {
     ...fence,
-    code: h(fence.code, fence.lang, klass('code-line', o, fence)),
-    aboveTheFoldCode: fence.aboveTheFoldCode
-      ? pipe(
-        h(fence.aboveTheFoldCode, fence.lang, klass('line-above', o, fence)),
-      )
-      : undefined,
+    lang,
+    requestedLang,
+    code,
+    aboveTheFoldCode,
   }
 }

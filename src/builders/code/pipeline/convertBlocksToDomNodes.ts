@@ -1,6 +1,6 @@
 import { createFragment, safeString, select } from 'happy-wrapper'
 import type { Pipeline, PipelineStage } from '../../../types'
-import type { BlockCallback, CodeBlockMeta, CodeOptions } from '../types'
+import type { BlockCallback, CodeBlockMeta, CodeOptions } from '../code-types'
 
 function mergeClasses(
   payload: Pipeline<PipelineStage.parser>,

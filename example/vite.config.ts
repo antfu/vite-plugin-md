@@ -3,9 +3,8 @@ import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import Inspect from 'vite-plugin-inspect'
 import Layouts from 'vite-plugin-vue-layouts'
-import Markdown, { code, link, meta, uno } from 'vite-plugin-md'
+import Markdown, { code, link, meta } from 'vite-plugin-md'
 import Pages from 'vite-plugin-pages'
-import prism from 'markdown-it-prism'
 import Unocss from 'unocss/vite'
 import Vue from '@vitejs/plugin-vue'
 import { defineConfig } from 'vite'
@@ -42,11 +41,23 @@ const config = defineConfig({
       include: [/\.vue$/, /\.vue\?vue/, /\.md$/],
       dts: 'src/components.d.ts',
     }),
-    Unocss(uno()),
+    Unocss(),
 
     Markdown({
       headEnabled: true,
-      builders: [meta(), link(), code()],
+      builders: [
+        meta({
+          routeProps: ['layout', 'requireAuth'],
+          defaults: {
+            requireAuth: () => false,
+          },
+        }),
+        link(),
+        code({
+          theme: 'dracula',
+          layoutStructure: 'tabular',
+        }),
+      ],
     }),
 
     Inspect(),

@@ -1,5 +1,4 @@
 import { relative } from 'path'
-import type { CallSite } from 'callsites'
 import callsites from 'callsites'
 import { inspect } from './diagnostics'
 import { isHappyWrapperError, isInspectionTuple } from './type-guards'

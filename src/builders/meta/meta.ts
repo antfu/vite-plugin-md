@@ -1,4 +1,4 @@
-import type { Frontmatter, MetaProperty } from '../../types'
+import type { Frontmatter, MetaProperty, Pipeline, PipelineStage, RouteConfig } from '../../types'
 import { createBuilder } from '../createBuilder'
 
 export type MetaFlag = [prop: string, defVal: boolean]
@@ -23,6 +23,11 @@ function addMetaTag(k: string, v: any): MetaProperty {
   })
 }
 
+/**
+ * A callback for meta-builder callbacks
+ */
+export type MetaCallback<T> = (filename: string, frontmatter: Pipeline<PipelineStage.parser>['frontmatter']) => T
+
 export interface MetaConfig {
   /**
    * Properties in frontmatter dictionary which will be treated as "meta" properties
@@ -38,6 +43,21 @@ export interface MetaConfig {
    * @default ['layout']
    */
   routeProps: string[]
+
+  /**
+   * Allows the user to configure a bespoke scheme for setting a page's route path.
+   * By default the path is simply a direct artifact of the filename and directory.
+   */
+  routePath?: MetaCallback<string>
+
+  /**
+   * You can pass in a callback to resolve route names; you'll be passed
+   * the filename and frontmatter data for each page to determine what
+   * the name should be. By default the name is not defined.
+   *
+   * @default undefined
+   */
+  routeName?: MetaCallback<string>
 
   /**
    * Properties in frontmatter dictionary which will be treated as HEAD properties
@@ -75,10 +95,10 @@ export const meta = createBuilder('meta', 'metaExtracted')
   .options<Partial<MetaConfig>>()
   .initializer()
   .handler(async (p, o) => {
-    let { frontmatter, meta, head, routeMeta } = p
+    let { frontmatter, meta, head } = p
     const c: MetaConfig = {
       metaProps: ['image', 'title', 'description', 'url', 'image_width', 'image_height'],
-      routeProps: ['layout'],
+      routeProps: ['layout', 'requiresAuth'],
 
       headProps: ['title'],
       defaults: {},
@@ -122,19 +142,27 @@ export const meta = createBuilder('meta', 'metaExtracted')
       ),
     ]
 
-    routeMeta = {
-      ...routeMeta,
-      ...c.routeProps.reduce(
-        (acc, p) => ({ ...acc, [p]: frontmatter[p as string] }),
-        {},
+    const routeMetaProps: Record<string, any> = c.routeProps.reduce(
+      (acc, p) => (
+        p in frontmatter
+          ? { ...acc, [p]: frontmatter[p as string] }
+          : acc
       ),
+      {},
+    )
+
+    const routeMeta: RouteConfig = {
+      ...p.routeMeta,
+      ...(c.routeName ? { name: c.routeName(p.fileName, p.frontmatter) } : {}),
+      ...(c.routePath ? { path: c.routePath(p.fileName, p.frontmatter) } : {}),
+      ...(Object.keys(routeMetaProps).length > 0 ? { meta: routeMetaProps } : {}),
     }
 
     return {
       ...p,
       head,
       meta,
-      routeMeta,
+      routeMeta: Object.keys(routeMeta).length > 0 ? routeMeta : undefined,
       frontmatter,
     }
   })

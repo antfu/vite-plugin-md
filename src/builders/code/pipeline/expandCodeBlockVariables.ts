@@ -1,6 +1,6 @@
 import type { Pipeline, PipelineStage } from '../../../types'
-import type { CodeBlockMeta } from '../types'
-import { Modifier } from '../types'
+import type { CodeBlockMeta } from '../code-types'
+import { Modifier } from '../code-types'
 
 /**
  * In cases where escapeCodeTagInterpolation is `false` or the code block

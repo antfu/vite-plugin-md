@@ -8,7 +8,7 @@ import { transformer, wrap } from '../utils'
 export const finalize = transformer('finalize', 'sfcBlocksExtracted', 'closeout', (payload) => {
   const { options: { transforms: { after } } } = payload
 
-  const component = `${wrap('template', payload.templateBlock)}\n${payload.scriptBlock}\n${payload.customBlocks.join('\n')}`
+  const component = `${payload.customBlocks.join('\n')}${wrap('template', payload.templateBlock)}\n${payload.scriptBlock}\n`
 
   return {
     ...payload,

@@ -1,8 +1,9 @@
 import type MarkdownIt from 'markdown-it'
-import type { DocumentFragment } from 'happy-dom'
+import type { MaybeRef } from '@vueuse/core'
 import type * as TE from 'fp-ts/TaskEither'
 import type { UserConfig } from 'vite'
 import type { Either } from 'fp-ts/lib/Either'
+import type { Fragment, IElement } from 'happy-wrapper'
 import type { EnumValues, Frontmatter, MetaProperty, ResolvedOptions } from './core'
 
 export enum PipelineStage {
@@ -108,6 +109,113 @@ export type Parser<S extends IPipelineStage> = S extends 'parser' | 'parsed' | '
     }
   : {}
 
+/**
+ * The **Route** custom-block can be configured with these properties.
+ *
+ * Note: this is best done with the _meta_ builder
+ */
+export interface RouteConfig {
+  name?: string
+  path?: string
+  meta?: Record<string, any>
+}
+
+export interface LinkProperty {
+  rel?: string
+  href?: string
+  integrity?: string
+  crossorigin?: string
+  [key: string]: unknown
+}
+
+export interface StyleProperty {
+  type?: string
+  [key: string]: unknown
+}
+
+/**
+ * The <base> element specifies the base URL and/or target for all
+ * relative URLs in a page.
+ */
+export interface BaseProperty {
+  href?: string
+  target?: string
+}
+
+export interface ScriptProperty {
+  /**
+   * For classic scripts, if the async attribute is present, then the classic
+   * script will be fetched in parallel to parsing and evaluated as soon as it is
+   * available.
+   *
+   * For module scripts, if the async attribute is present then the scripts and
+   * all their dependencies will be executed in the defer queue, therefore they will
+   * get fetched in parallel to parsing and evaluated as soon as they are available.
+   */
+  async?: boolean
+  crossorigin?: string
+  /** only to be used alongside the `src` attribute */
+  defer?: boolean
+  /** Provides a hint of the relative priority to use when fetching an external script.  */
+  fetchPriority?: 'high' | 'low' | 'auto'
+
+  integrity?: string
+  /**
+   * This Boolean attribute is set to indicate that the script should not be executed
+   * in browsers that support ES2015 modules — in effect, this can be used to serve
+   * fallback scripts to older browsers that do not support modular JavaScript code.
+   */
+  nomodule?: boolean
+  nonce?: string
+  referencePolicy?: 'no-referrer' | 'no-referrer-when-downgrade' | 'origin' | 'origin-when-cross-origin' | 'same-origin' | 'strict-origin' | 'strict-origin-when-cross-origin' | 'unsafe-url'
+  src?: string
+  type?: string
+  [key: string]: unknown
+}
+
+/**
+ * The properties destined for the HEAD block in the HTML
+ */
+export interface HeadProps {
+  title?: MaybeRef<string>
+  meta?: MaybeRef<MetaProperty[]>
+  link?: MaybeRef<LinkProperty[]>
+  base?: MaybeRef<BaseProperty[]>
+  style?: MaybeRef<StyleProperty[]>
+  script?: MaybeRef<ScriptProperty[]>
+  htmlAttrs?: MaybeRef<Record<string, unknown>[]>
+  bodyAttrs?: MaybeRef<Record<string, unknown>[]>
+  [key: string]: unknown
+}
+
+export interface PipelineUtilityFunctions {
+  /**
+   * Adds a `<link>` to the page's header section
+   */
+  addLink: (link: LinkProperty) => void
+  /**
+   * Adds a `<script>` reference to the page's header section
+   */
+  addScriptReference: (script: ScriptProperty) => void
+
+  /**
+   * Allows the addition of code which will be brought into the
+   * `<script setup>` block if using VueJS 3.x and into a normal
+   * `<script>` block in VueJS2
+   */
+  addCodeBlock: (name: string, script: string, forVue2?: string[] | undefined) => void
+
+  /**
+   * Adds a `<style>` reference to the page's header section
+   */
+  addStyleReference: (style: StyleProperty) => void
+  /**
+   * Adds a VueJS `<script>` block to the HTML (which VueJS will eventually place in HEAD). A style block should be named so that downstream consumers
+   * can -- potentially -- override or further modify the style.
+   */
+  addStyleBlock: (name: string, style: IElement | string) => void
+}
+
 export type MetaExtracted<S extends IPipelineStage> = S extends 'initialize'
   ? {}
   : {
@@ -121,22 +229,14 @@ export type MetaExtracted<S extends IPipelineStage> = S extends 'initialize'
 
       /**
        * Meta properties that will be put into the HEAD section
+       *
        */
+      // TODO: this should be removed as it's duplicative with what's in `head`
       meta: MetaProperty[]
 
-      /**
-       * Meta properties which are to be added to the VueJS router's "meta" attribute
-       * for this page's route
-       */
-      routeMeta: Record<string, any>
-
-      /**
-       * Non-meta tags that will be put into the HEAD section of the page
-       */
-      head: Record<string, any>
-
       excerpt?: string
-    }
+
+    } & PipelineUtilityFunctions
 
 export type HtmlContent<S extends IPipelineStage> = S extends 'parsed' | 'sfcBlocksExtracted' | 'closeout'
   ? {
@@ -150,7 +250,7 @@ export type HtmlContent<S extends IPipelineStage> = S extends 'parsed' | 'sfcBlo
         /**
          * the HTML wrapped into a HappyDom fragment
          */
-        html: DocumentFragment
+        html: Fragment
 
         /**
          * If any code blocks were found on the page then their languages will be represented
@@ -194,6 +294,43 @@ export type Pipeline<S extends IPipelineStage> = {
   /** the Vite config */
   viteConfig: UserConfig
 
+  /**
+   * All properties which are destined for the HEAD section of the HTML
+   */
+  head: HeadProps
+  /**
+   * Meta properties associated with a page's route; typically used
+   * and managed with the "meta" builder.
+   */
+  routeMeta?: RouteConfig
+
+  /**
+   * Indicates which _languages_ were found on the page; this property typically
+   * shouldn't be set but rather is managed by the `code()` builder and provided
+   * for contextual decisions.
+   */
+  codeBlockLanguages: {
+    /** the language setting the page author used */
+    langsRequested: string[]
+    /** the language used to parse with the highlighter */
+    langsUsed: string[]
+  }
+
+  /**
+   * A store for _named_ VueJS `<style>` blocks which will be injected
+   * into the SFC component at the appropriate time.
+   */
+  vueStyleBlocks: Record<string, IElement>
+
+  /**
+   * Provides a _named_ set of code blocks which will be injected into
+   * the VueJS's SFC's `<script setup>` section for Vue 3 and in a
+   * `<script>` block. All blocks will be setup for Typescript.
+   *
+   * Note: contributors may optionally include additional trailing lines
+   * for Vue2; this will allows you to export variables you've defined.
+   */
+  vueCodeBlocks: Record<string, string | [base: string, vue2Exports: string[]]>
 } & Parser<S> & MetaExtracted<S> & HtmlContent<S> & Blocks<S> & Completed<S>
 
 /**
