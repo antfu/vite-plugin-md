@@ -226,7 +226,7 @@ For more options available, please refer to [`@vueuse/head`'s docs](https://gith
       If you wanted to use both of these builders in their default configuration, you would simply add the following to your options config for this plugin:
 
       ```ts
-      import Markdown, { link, meta } from 'markdown-it-md'
+      import Markdown, { link, meta } from 'vite-plugin-md'
       export default {
         plugins: [
           Markdown({
