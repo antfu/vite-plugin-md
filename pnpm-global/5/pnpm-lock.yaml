@@ -1,0 +1,7 @@
+lockfileVersion: 5.3
+
+specifiers:
+  cypress-types: ^0.1.0
+
+devDependencies:
+  cypress-types: link:../../../../../../Users/kenny/pnpm-global/5/node_modules/cypress-types

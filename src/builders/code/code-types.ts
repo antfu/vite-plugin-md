@@ -1,6 +1,6 @@
 import type { Fragment } from 'happy-wrapper'
 import type { Grammar } from 'prismjs'
-import type { IPipelineStage, Pipeline, PipelineStage } from '../../types'
+import type { Pipeline, PipelineStage } from '../../types'
 import type { CodeColorTheme } from './styles/color/color-types'
 
 export type HTML = string
@@ -136,7 +136,7 @@ export interface CodeOptions {
    */
   provideClipboardFunctionality: boolean | BlockCallback<boolean>
 
-  theme?: 'base' | 'lighting' | 'material' | 'dracula' | CodeColorTheme<any>
+  theme?: 'base' | 'solarizedLight' | 'material' | 'dracula' | 'tomorrow' | 'duotone' | CodeColorTheme<any>
 
   /**
    * By default light mode has code blocks with light backgrounds, and dark mode with

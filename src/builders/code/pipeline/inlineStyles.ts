@@ -12,7 +12,8 @@ export const inlineStyles = (p: Pipeline<PipelineStage.parser>, o: CodeOptions) 
       const style = createInlineStyle()
         .convertToVueStyleBlock('css', false)
         .addCssVariable('code-col-width', 'auto', '.code-wrapper')
-        .addCssVariable('code-border-color', 'gray', '.code-wrapper')
+        .addCssVariable('code-border-color', 'rgba(238, 239, 240, 0.75)', '.code-wrapper')
+        .addCssVariable('code-border-color', 'rgba(238, 239, 240, 0.35)', 'html.dark .code-wrapper')
         .addCssVariable('code-text-copy', '#166534')
         .addCssVariable('code-text-copy', '#bbf7d0', 'html.dark')
         .addClassDefinition('.code-wrapper', c => c
@@ -25,22 +26,26 @@ export const inlineStyles = (p: Pipeline<PipelineStage.parser>, o: CodeOptions) 
           })
           .addChild('.heading-row', {
             position: 'relative',
+          })
+          .addChild('.heading-row no-heading', {
             height: 0,
             padding: 0,
             margin: 0,
           })
           .addChild('.heading-row with-heading', {
             padding: '0.5rem',
+            margin: 'auto',
             height: 'auto',
           })
           .addChild('.heading', {
             color: 'var(--prism-foreground)',
             fontSize: '1.2rem',
             fontWeight: 600,
-            padding: '0.25rem 0.5rem 0.25rem 0.5rem',
+            padding: '0.25rem 1rem 0.25rem 1rem',
           })
           .addChild('.heading-row .lang-display', {
             position: 'absolute',
+            color: 'var(--prism-foreground)',
             right: '0.5rem',
             top: '0.325rem',
             fontSize: '0.75rem',
@@ -72,6 +77,7 @@ export const inlineStyles = (p: Pipeline<PipelineStage.parser>, o: CodeOptions) 
           })
           .addChild('table', {
             width: '100%',
+            tableLayout: 'auto',
             padding: '0.375rem',
             margin: 'auto',
             color: 'var(--prism-foreground)',
@@ -88,7 +94,7 @@ export const inlineStyles = (p: Pipeline<PipelineStage.parser>, o: CodeOptions) 
             paddingLeft: '0.25rem',
             textAlign: 'right',
             borderRight: '1px solid',
-            borderColor: 'var(--code-border-color)',
+            borderColor: 'var(--lineNumberGutter)',
           })
           .addChild('.no-line-numbers table td.line-number', {
             width: 0,
@@ -98,7 +104,7 @@ export const inlineStyles = (p: Pipeline<PipelineStage.parser>, o: CodeOptions) 
             display: 'none',
           })
           .addChild('table td.code-line', {
-            width: '100%',
+            width: '100vw',
             whiteSpace: 'pre',
             border: '0px',
             lineHeight: '1.4',
@@ -115,14 +121,14 @@ export const inlineStyles = (p: Pipeline<PipelineStage.parser>, o: CodeOptions) 
             lineHeight: '0.875',
           })
           .addChild('table tr.highlight', {
-            backgroundColor: 'var(--prism-lineHighlightBackground)',
+            backgroundColor: 'var(--prism-highlight)',
             borderRadius: '0.875rem',
           })
           .addChild('table tr.odd.highlight', {
-            backgroundColor: 'var(--prism-lineHighlightBackground)',
+            backgroundColor: 'var(--prism-highlight)',
           })
           .addChild('table tr.even.highlight', {
-            backgroundColor: 'var(--prism-lineHighlightBackground)',
+            backgroundColor: 'var(--prism-highlight)',
           })
           .addChild('table tr.odd', {
             backgroundColor: 'var(--prism-background)',
@@ -138,6 +144,7 @@ export const inlineStyles = (p: Pipeline<PipelineStage.parser>, o: CodeOptions) 
             paddingBottom: '0.5rem',
             fontSize: '0.75rem',
             fontWeight: 300,
+            color: 'var(--prism-foreground)',
           }),
 
         )

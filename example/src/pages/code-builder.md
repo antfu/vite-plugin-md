@@ -3,7 +3,7 @@
 The code builder is designed to making representing code easy. It starts out by providing functionality you'd expect. Using _blocks_ of code encapsulated by the triple-backtick marker provides the critical first step:
 
 ```rust
-let foo = 'bar'.to_string();
+let foo = "bar".to_string();
 ```
 
 ## Feature Overview
@@ -14,9 +14,9 @@ Beyond that we can do the following:
 
     ```#rust
     // is foo really bar?
-    let foo = 'bar'.to_string();
+    let foo = "bar".to_string();
     // or is bar really foo?
-    let bar = 'foo'.to_string();
+    let bar = "foo".to_string();
     ```
 
     While configuration let's us state a _default_ for whether we want line number or not, you can explicitly "opt-in" to line numbers but putting a `#` in front of the language. You can also state you want the _inverse_ of the global configuration by using the `!` modifier prior to the language.
@@ -24,9 +24,9 @@ Beyond that we can do the following:
 2. **Highlighting**
 
     ```rust highlight=2
-    let foo = 'bar'.to_string();
-    let notable = 'wow'.to_string();
-    let bar = 'foo'.to_string();
+    let foo = "bar".to_string();
+    let notable = "wow".to_string();
+    let bar = "foo".to_string();
     ```
 
     Certain lines (or ranges of lines) can be highlighted as being more important.
@@ -34,8 +34,8 @@ Beyond that we can do the following:
 3. **Heading / Footer**
 
     ```rust {"heading": "Rust by Example", "footer": "bullshit in, bullshit out"}
-    let foo = 'bar'.to_string();
-    let bar = 'foo'.to_string();
+    let foo = "bar".to_string();
+    let bar = "foo".to_string();
     ```
 
 4. **Light / Dark Mode**
@@ -47,8 +47,8 @@ Beyond that we can do the following:
     You can turn on a clipboard feature which will copy the code to the clipboard.
 
     ```rust {"clipboard": true }
-    let foo = 'bar'.to_string();
-    let bar = 'foo'.to_string();
+    let foo = "bar".to_string();
+    let bar = "foo".to_string();
     ```
 
     This can be turned on _locally_ by setting the `clipboard` property to **true** or globally by setting the similarly named property in configuration.

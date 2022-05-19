@@ -19,6 +19,8 @@ export const defaultBlocks = (payload: Pipeline<PipelineStage.parser>, o: CodeOp
   const metaClasses: string[] = []
   if (fence.props.heading)
     metaClasses.push('with-heading')
+  else
+    metaClasses.push('no-heading')
   if (resolver(false)(o?.clipboard))
     metaClasses.push('with-clipboard')
   if (resolver(false)(o?.showLanguage))

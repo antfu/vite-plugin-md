@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { getAttribute, getClassList, select, toHtml } from 'happy-wrapper'
+import { addFile, changeFile, compileFile, compileModules } from 'vue-sfc2esm'
 import { composeSfcBlocks } from '../src/pipeline'
 import { code } from '../src/index'
 import { getPrismGrammar } from '../src/builders/code/mdi/establishHighlighter'
@@ -350,6 +351,33 @@ describe('code() builder using Prism (incl generalized tests)', () => {
     const display = select(sfc.html).findFirst('.lang-display', 'didn\'t find .lang-display node!')
     expect(display.textContent).toBe('ts')
   })
+
+  it('inline styles for code blocks are defined only once even with multiple code blocks', async () => {
+    const sfc = await composeFixture('multi-code-block', { builders: [code()] })
+
+    expect(sfc.vueStyleBlocks?.codeStyle).toBeDefined()
+
+    const styles = sfc.customBlocks.filter(i => i.includes('prism'))
+    // resulting in only one VueJS block which contains prism colors
+    expect(styles.length).toBe(1)
+    // TODO: need to find way to compile SFC so this test can be more end-to-end
+  })
+
+  it('whitespace at start of line is represented in final markup', async () => {
+    const sfc = await composeFixture('ts-code-indented', { builders: [code()] })
+    const line2 = select(sfc.html).findFirst('.line-2', 'couldn\'t find line 2')
+    const line3 = select(sfc.html).findFirst('.line-3', 'couldn\'t find line 3')
+    expect(line2.textContent.startsWith('  ')).toBeTruthy()
+    expect(line3.textContent.startsWith('    ')).toBeTruthy()
+
+    const sfc2 = await composeFixture('ts-code-indented', { builders: [code({ layoutStructure: 'tabular' })] })
+    const line22 = select(sfc2.html).findFirst('.line-2', 'couldn\'t find line 2')
+    const line23 = select(sfc2.html).findFirst('.line-3', 'couldn\'t find line 3')
+    expect(line22.textContent.startsWith('  ')).toBeTruthy()
+    expect(line23.textContent.startsWith('    ')).toBeTruthy()
+  })
+
+  it.todo('the raw code is captured and available to clipboard operation')
 })
 
 describe('table format for code blocks', () => {

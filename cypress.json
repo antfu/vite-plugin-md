@@ -1,0 +1,11 @@
+{
+  "projectId": "9eqvmp",
+  "downloadsFolder": "test/integration/downloads",
+  "commandsFolder": "test/integration/support",
+  "videosFolder": "test/integration/videos",
+  "screenshotsFolder": "test/integration/screenshots",
+  "pluginsFile": "test/integration/plugins/index.ts",
+  "supportFile": "test/integration/support",
+  "componentFolder": "test/integration",
+  "testFiles": "**/*.test.ts"
+}

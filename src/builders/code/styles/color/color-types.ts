@@ -7,8 +7,11 @@ export interface CodeColorTheme<T extends Color | ColorByMode> {
   foreground: T
   background: T
 
+  lineNumber: T
+  lineNumberGutter: T
+  highlight: T
   /** the background color for text selection */
-  textSelectionBackground?: T
+  textSelection: T
 
   /**
    * used in some grammars like SCSS where you might have `@apply`
@@ -58,6 +61,9 @@ export interface CodeColorTheme<T extends Color | ColorByMode> {
   boolean?: T
   /** uses `builtin` if not specified */
   selector?: T
+
+  placeholder?: T
+
   /** uses `builtin` if not specified */
   important?: T
   /** uses `builtin` if not specified */
