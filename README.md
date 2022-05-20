@@ -18,15 +18,18 @@ npm i vite-plugin-md -D # yarn add vite-plugin-md -D
 ```
 
 ### TypeScript Shim
+
 _where needed:_
+
 ```ts
 declare module '*.vue' {
-  import type { ComponentOptions, } from 'vue'
+  import type { ComponentOptions } from 'vue'
   const Component: ComponentOptions
   export default Component
 }
 
 declare module '*.md' {
+  import type { ComponentOptions } from 'vue'
   const Component: ComponentOptions
   export default Component
 }
@@ -95,7 +98,7 @@ app.mount()
 
 ```html
 <script setup>
-import { Counter } from './Counter.vue
+import { Counter } from './Counter.vue'
 </script>
 
 <Counter :init='5'/>
@@ -105,7 +108,7 @@ Or you can use [`vite-plugin-components`](#work-with-vite-plugin-components) for
 
 ## Frontmatter
 
-Frontmatter will be parsed and inject into Vue's instance data `frontmatter` field. 
+Frontmatter will be parsed and inject into Vue's instance data `frontmatter` field.
 
 For example:
 
@@ -155,6 +158,7 @@ export default {
 ```
 
 `src/main.js`
+
 ```js
 import { createApp } from 'vue'
 import { createHead } from '@vueuse/head' // <--
@@ -215,7 +219,7 @@ For more options available, please refer to [`@vueuse/head`'s docs](https://gith
       }
       ```
 
-  3. [`Builder APIs`](./docs/BuilderApi.md)      
+3. [`Builder APIs`](./docs/BuilderApi.md)
 
       Builder API's are mini-configurators for a particular feature area. The idea behind them is to allow extending functionality quickly with _sensible defaults_ but also providing their own configurations to allow users to grow into and configure that feature area. The builder APIs available are:
 
@@ -225,7 +229,7 @@ For more options available, please refer to [`@vueuse/head`'s docs](https://gith
       If you wanted to use both of these builders in their default configuration, you would simply add the following to your options config for this plugin:
 
       ```ts
-      import Markdown, { link, meta } from 'markdown-it-md'
+      import Markdown, { link, meta } from 'vite-plugin-md'
       export default {
         plugins: [
           Markdown({
@@ -251,7 +255,6 @@ This plugin has good integrations with several other plugins, including:
 - [`vite-plugin-components`](https://github.com/antfu/vite-plugin-components)
 - [`vite-plugin-vue-layouts`](https://github.dev/JohnCampionJr/vite-plugin-vue-layouts)
 - for details, refer to the [Integration Page](./docs/Integrations.md)
-
 
 ## License
 

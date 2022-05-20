@@ -2,7 +2,7 @@
 title: Multi Code Block
 ---
 
-# Code Builder Test
+# {{ title }}
 
 This test is intended to validate testing of code blocks; the first test is a typescript block.
 

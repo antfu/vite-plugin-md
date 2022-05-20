@@ -1,5 +1,5 @@
 import { pipe } from 'fp-ts/lib/function'
-import type { DocumentFragment, UpdateCallback_Native } from 'happy-wrapper'
+import type { Fragment, UpdateCallback_Native } from 'happy-wrapper'
 import {
   addClass,
   before,
@@ -34,7 +34,7 @@ import type { CodeBlockMeta } from '../../code-types'
    * </div>
    * ```
    */
-export const tabularFormatting = (p: Pipeline<PipelineStage.parser>, fence: CodeBlockMeta<'dom'>): DocumentFragment => {
+export const tabularFormatting = (p: Pipeline<PipelineStage.parser>, fence: CodeBlockMeta<'dom'>): Fragment => {
   const toTable = changeTagName('table')
   const toTD = changeTagName('td')
   let misplaced: string[] = []
