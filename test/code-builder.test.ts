@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 import { getAttribute, getClassList, select, toHtml } from 'happy-wrapper'
-import { addFile, changeFile, compileFile, compileModules } from 'vue-sfc2esm'
 import { composeSfcBlocks } from '../src/pipeline'
 import { code } from '../src/index'
 import { getPrismGrammar } from '../src/builders/code/mdi/establishHighlighter'

@@ -111,7 +111,6 @@ export const extractBlocks = transformer('extractBlocks', 'dom', 'sfcBlocksExtra
       (acc, [key, value]) => `${acc}\n${isVue2(options) ? 'export' : ''} const ${key} = ${JSON.stringify(value)}`,
       '',
     ),
-
   }
 
   const regularScriptBlocks = hoistScripts.scripts.map(

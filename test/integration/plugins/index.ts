@@ -1,10 +1,8 @@
 import path from 'path'
 import { startDevServer } from '@cypress/vite-dev-server'
 
-export default function (on, config) {
-  console.log(config)
-
-  on('dev-server:start', (options) => {
+export default function (on: any, config: any) {
+  on('dev-server:start', (options: any) => {
     return startDevServer({
       options,
       viteConfig: {

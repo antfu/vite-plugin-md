@@ -6,8 +6,8 @@ exports[`meta() snapshots > HTML is consistent 1`] = `
 <p>{{ byline }}</p>
 </blockquote>
 <p>This is a markdown file intended for testing meta data.</p>
-<p><img src=\\"{{image}}\\" alt=\\"image\\"/>
-<img src=\\"{{ image }}\\"/></p>
+<p><img src=\\"{{image}}\\" alt=\\"image\\">
+<img src=\\"{{ image }}\\"></p>
 </div><style type=\\"text/css\\">
 :root {
     --md-text-color: #111827;

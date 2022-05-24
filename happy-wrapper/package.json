@@ -18,7 +18,7 @@
   "dependencies": {
     "callsites": "^3.1.0",
     "fp-ts": "^2.12.1",
-    "happy-dom": "^3.2.0",
+    "happy-dom": "^4.0.1",
     "tsup": "^5.12.7"
   },
   "devDependencies": {

@@ -57,7 +57,7 @@ html.dark {
   <div class=\\"markdown-body\\">
 <h1>{{title}}</h1>
 <p>The import above should be brought into the VueJS component which would then allow us to use this <em>fake</em> component in our page:</p>
-<foobar title=\\"i am not real\\">
+<foobar title=\\"i am not real\\"></foobar>
 <p>Furthermore we can add a script setup block like this:</p>
 
 <p>And now the function we’ve defined can be used: {{ sayHi(‘Foo’) }}</p>
@@ -65,7 +65,7 @@ html.dark {
 
 <p>The traditional <em>script blocks</em> can appear multiple times, and even use different languages without incident. These blocks will be maintained as separate blocks in the resulting SFC component.</p>
 
-</foobar></div>
+</div>
 </template>
 
 <script setup>
