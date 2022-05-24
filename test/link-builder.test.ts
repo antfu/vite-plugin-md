@@ -10,12 +10,24 @@ const document = window.document
 let md = ''
 
 describe('link testing', () => {
-  beforeAll(async() => {
+  beforeAll(async () => {
     md = await readFile('test/fixtures/links.md', 'utf-8')
   })
 
-  it('internal and external classes are brought in appropriately', () => {
-    const sfc = composeSfcBlocks('', md, { builders: [link()] })
+  it('component snapshot is consistent', async () => {
+    const sfc = await composeSfcBlocks('links.md', md, { builders: [link()] })
+    expect(sfc.component).toMatchSnapshot()
+  })
+
+  it('class links are found in HTML text', async () => {
+    const { html } = await composeSfcBlocks('links.md', md, { builders: [link()] })
+    expect(html.includes('internal-link')).toBeTruthy()
+    expect(html.includes('external-link')).toBeTruthy()
+  })
+
+  it('internal and external classes are found in DOM', async () => {
+    const sfc = await composeSfcBlocks('links.md', md, { builders: [link()] })
+
     document.body.innerHTML = sfc.html
     const internalLinks = document.querySelectorAll('.internal-link')
     const externalLinks = document.querySelectorAll('.external-link')
@@ -33,8 +45,8 @@ describe('link testing', () => {
     expect(externalLinks.map(i => i.textContent)).not.toContain('internal link')
   })
 
-  it('content-type classes are brought in appropriately', () => {
-    const sfc = composeSfcBlocks('', md, { builders: [link()] })
+  it('content-type classes are brought in appropriately', async () => {
+    const sfc = await composeSfcBlocks('', md, { builders: [link()] })
     document.body.innerHTML = sfc.html
     const imageLinks = document.querySelectorAll('.image-reference')
     const docLinks = document.querySelectorAll('.doc-reference')
@@ -45,13 +57,15 @@ describe('link testing', () => {
     expect(mailTo.map(i => i.textContent)).toContain('contact us')
   })
 
-  it('custom rules add classes as expected', () => {
-    const sfc = composeSfcBlocks('', md, {
+  it('custom rules add classes as expected', async () => {
+    const sfc = await composeSfcBlocks('', md, {
       builders: [link({
         ruleBasedClasses: [[/colors\.com/, 'colorful']],
       })],
     })
+
     document.body.innerHTML = sfc.html
+
     const colorful = document.querySelectorAll('.colorful')
 
     expect(colorful.length).toBe(3)
@@ -60,8 +74,8 @@ describe('link testing', () => {
     expect(colorful.map(i => i.textContent)).toContain('green')
   })
 
-  it('internal index route reference to a markdown file is cleaned up', () => {
-    const sfc = composeSfcBlocks('', md, { builders: [link({ useRouterLinks: false })] })
+  it('internal index route reference to a markdown file is cleaned up', async () => {
+    const sfc = await composeSfcBlocks('', md, { builders: [link({ useRouterLinks: false })] })
     document.body.innerHTML = sfc.html
     const internal = document.querySelectorAll('.internal-link')
     const indexRoute = internal.find(i => i.textContent === 'index route')
@@ -69,7 +83,7 @@ describe('link testing', () => {
     expect(indexRoute?.getAttribute('href')).toEqual('/foobar/')
 
     // double check that conversion to router link works in the same way
-    const sfc2 = composeSfcBlocks('', md, { builders: [link()] })
+    const sfc2 = await composeSfcBlocks('', md, { builders: [link()] })
     document.body.innerHTML = sfc2.html
     const internal2 = document.querySelectorAll('.internal-link')
     const indexRoute2 = internal2.find(i => i.textContent === 'index route')
@@ -78,8 +92,8 @@ describe('link testing', () => {
     expect(indexRoute2?.getAttribute('to')).toEqual('/foobar/')
   })
 
-  it('internal non-index route with MD in href is shortened to route path', () => {
-    const sfc = composeSfcBlocks('repo/src/pages/current.md', md, { builders: [link({ useRouterLinks: false })] })
+  it('internal non-index route with MD in href is shortened to route path', async () => {
+    const sfc = await composeSfcBlocks('repo/src/pages/current.md', md, { builders: [link({ useRouterLinks: false })] })
     document.body.innerHTML = sfc.html
     const internal = document.querySelectorAll('.internal-link')
     const nonIndexRoute = internal.find(i => i.textContent === 'non-index route')
@@ -87,8 +101,8 @@ describe('link testing', () => {
     expect(nonIndexRoute?.getAttribute('href')).toEqual('foo/bar')
   })
 
-  it('external routes with .md reference are left as is', () => {
-    const sfc = composeSfcBlocks('', md, { builders: [link()] })
+  it('external routes with .md reference are left as is', async () => {
+    const sfc = await composeSfcBlocks('', md, { builders: [link()] })
     document.body.innerHTML = sfc.html
     const external = document.querySelectorAll('.external-link')
     const indexRoute = external.find(i => i.textContent === 'external index routes')
@@ -100,8 +114,12 @@ describe('link testing', () => {
     expect(nonIndexRoute?.getAttribute('href')).toEqual('https://dev.null/foo/bar.md')
   })
 
-  it('"base" option set changes link resolution for relative links', () => {
-    const sfc = composeSfcBlocks('', md, { builders: [link({ relativeLinkClass: 'relative-link' })] }, { base: 'one' })
+  it('"base" option set changes link resolution for relative links', async () => {
+    const sfc = await composeSfcBlocks('', md, {
+      builders: [
+        link({ relativeLinkClass: 'relative-link' }),
+      ],
+    }, { base: 'one' })
     document.body.innerHTML = sfc.html
 
     const links = document.querySelectorAll('.relative-link')
@@ -115,8 +133,8 @@ describe('link testing', () => {
     }
   })
 
-  it('"base" option set changes link resolution for fully qualified local links', () => {
-    const sfc = composeSfcBlocks('', md, { builders: [link({ fullyQualifiedLinkClass: 'fq-link' })] }, { base: 'one' })
+  it('"base" option set changes link resolution for fully qualified local links', async () => {
+    const sfc = await composeSfcBlocks('', md, { builders: [link({ fullyQualifiedLinkClass: 'fq-link' })] }, { base: 'one' })
     document.body.innerHTML = sfc.html
 
     const links = document.querySelectorAll('.fq-link')
@@ -130,12 +148,8 @@ describe('link testing', () => {
     }
   })
 
-  it.todo('reactive "path" adjusts relative links', () => {
-    // const path = ref('foo/bar/baz')
-  })
-
-  it('internal routes are converted to `<router-link>` elements by default', () => {
-    const sfc = composeSfcBlocks('', md, { builders: [link()] })
+  it('internal routes are converted to `<router-link>` elements by default', async () => {
+    const sfc = await composeSfcBlocks('test/fixtures/links.md', md, { builders: [link()] })
     document.body.innerHTML = sfc.html
 
     const internal = document.querySelectorAll('.internal-link')
@@ -143,13 +157,61 @@ describe('link testing', () => {
 
     expect(internal.length).toEqual(router.length)
 
-    internal.forEach(t =>
+    router.forEach(t =>
       expect(t.tagName, 'the tagname should have been converted from <a> to <router-link>').toEqual('ROUTER-LINK'),
     )
-    internal.forEach(t =>
+    router.forEach(t =>
       expect(t.getAttribute('href'), 'the "href" should be empty in favor of a "to" prop').toBeNull(),
     )
-    internal.forEach(t =>
+    router.forEach(t =>
       expect(t.getAttribute('to'), 'the "to" property should be set for <router-link>').toBeTypeOf('string'))
+  })
+
+  it('the "_base" attribute is removed prior to rendering HTML of router links', async () => {
+    const sfc = await composeSfcBlocks(
+      'test/fixtures/links.md',
+      md,
+      {
+        builders: [link()],
+      },
+    )
+    document.body.innerHTML = sfc.html
+
+    const router = document.querySelectorAll('.router-link')
+
+    router.forEach(t =>
+      expect(t.getAttribute('_base'), 'the _base attribute is set during the build process to ensure a relative path but should be removed in final rendering').toBeNull(),
+    )
+  })
+
+  it('router links which are relative are resolved to a valid route', async () => {
+    const sfc = await composeSfcBlocks(
+      'test/fixtures/links.md',
+      md,
+      {
+        builders: [link()],
+      },
+    )
+    document.body.innerHTML = sfc.html
+
+    const router = document.querySelectorAll('.router-link')
+
+    router.forEach(t => expect(t.getAttribute('to').startsWith('test/fixtures')))
+  })
+
+  it('router links add in "base" when present', async () => {
+    const sfc = await composeSfcBlocks(
+      'test/fixtures/links.md',
+      md,
+      {
+        builders: [link()],
+      },
+      { base: 'foobar' },
+    )
+    document.body.innerHTML = sfc.html
+
+    const router = document.querySelectorAll('.router-link')
+
+    router.forEach(t => expect(t.getAttribute('to').startsWith('foobar/test/fixtures')))
   })
 })

@@ -2,7 +2,44 @@
   "prettier.enable": false,
   "prettier": false,
   "editor.codeActionsOnSave": {
+
     "source.fixAll": true
   },
-  "eslint.validate": ["typescript"]
+  "eslint.validate": [
+    "typescript"
+  ],
+  "cSpell.words": [
+    "antfu",
+    "atrule",
+    "bumpp",
+    "Chainable",
+    "Consolas",
+    "crossorigin",
+    "darcula",
+    "dasherize",
+    "duplicative",
+    "frontmatter",
+    "Grammer",
+    "graymatter",
+    "hexcode",
+    "iconify",
+    "itemprop",
+    "klass",
+    "klasses",
+    "linkify",
+    "Menlo",
+    "monospace",
+    "nord",
+    "Opengraph",
+    "pluginutils",
+    "prefetch",
+    "Shiki",
+    "unocss",
+    "unplugin",
+    "userland",
+    "Vite",
+    "vitepress",
+    "vitest",
+    "vuepress"
+  ]
 }

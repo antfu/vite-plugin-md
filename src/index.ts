@@ -1,9 +1,11 @@
 import type { Plugin } from 'vite'
 import { createFilter } from '@rollup/pluginutils'
+import type { TransformResult } from 'rollup'
 import { createSfcComponent } from './createSfcComponent'
 import { resolveOptions } from './options'
 import type { Options } from './types'
-export { link, meta } from './builders'
+export { link, meta, code } from './builders'
+export { mergeColorThemes } from './builders/code/styles/color/mergeColorThemes'
 
 function VitePluginMarkdown(userOptions: Options = {}): Plugin {
   const options = resolveOptions(userOptions)
@@ -19,14 +21,20 @@ function VitePluginMarkdown(userOptions: Options = {}): Plugin {
   return {
     name: 'vite-plugin-md',
     enforce: 'pre',
+
     configResolved(c) {
       config = { ...c }
     },
-    transform(raw, id) {
+    async transform(raw, id): Promise<TransformResult> {
       if (!filter(id))
         return
+
       try {
-        return markdownToVue(config)(id, raw)
+        const convert = markdownToVue(config)
+        const code = await convert(id, raw)
+        return {
+          code,
+        }
       }
       catch (e: any) {
         this.error(e)
@@ -37,11 +45,11 @@ function VitePluginMarkdown(userOptions: Options = {}): Plugin {
         return
 
       const defaultRead = ctx.read
-      ctx.read = async function() {
+      ctx.read = async function () {
         return markdownToVue(config)(ctx.file, await defaultRead())
       }
     },
-  }
+  } as Plugin
 }
 
 export default VitePluginMarkdown

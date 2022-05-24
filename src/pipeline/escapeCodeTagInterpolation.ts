@@ -1,6 +1,5 @@
-import type { Pipeline, PipelineStage } from '../types'
-
-const codeTagRe = /<code(?:.*?language-([!]{0,1})(\w+))?(.*?)>/g
+import { getClassList, select, setAttribute } from '@yankeeinlondon/happy-wrapper'
+import { transformer } from '../utils'
 
 /**
  * Modifies the HTML based on the configuration of `options.
@@ -11,35 +10,41 @@ const codeTagRe = /<code(?:.*?language-([!]{0,1})(\w+))?(.*?)>/g
  * the payload being passed through as this could be valuable for _search_
  * or other meta features.
  */
-export function escapeCodeTagInterpolation(payload: Pipeline<PipelineStage.parsed>): Pipeline<PipelineStage.parsed> {
-  const { options: { escapeCodeTagInterpolation }, html, fencedLanguages } = payload
-  const replacements = new Map()
+export const escapeCodeTagInterpolation = transformer(
+  'escapeCodeTagInterpolation',
+  'dom', 'dom',
+  (payload) => {
+    const { options: { escapeCodeTagInterpolation, usingBuilder }, html: dom } = payload
+    const addVPre = setAttribute('v-pre')('true')
 
-  const match = html.matchAll(codeTagRe)
+    const html = usingBuilder('code')
+      ? dom
+      : select(dom)
+      // add "v-pre" to pre tag where appropriate
+        .updateAll('pre')((pre) => {
+          const code = select(pre).findFirst('code', 'no <code> block found in <pre>!')
+          const lang = getClassList(code).find(c => c.startsWith('language-'))
+          if (lang) {
+            const hasNegation = lang.includes('!')
+            const shouldSetVPre = (escapeCodeTagInterpolation && !hasNegation)
+            || (!escapeCodeTagInterpolation && hasNegation)
 
-  // identify targets for interpolation in <code>, #14
-  for (const m of match) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [codeTag, negation, lang] = m
-    if (lang)
-      fencedLanguages.add(lang)
-    if (escapeCodeTagInterpolation) {
-      if (negation !== '!')
-        replacements.set(codeTag, codeTag.replace('>', ' v-pre>'))
-      else
-        replacements.set(codeTag, codeTag.replace(`!${lang}`, `${lang}`))
-    }
-    else {
-      if (negation === '!')
-        replacements.set(codeTag, codeTag.replace(`!${lang}`, `${lang}`).replace('>', ' v-pre>'))
-    }
-  }
+            if (shouldSetVPre)
+              return addVPre(pre)
+          }
+          return pre
+        })
+        // remove ! modifier from code tag
+        .updateAll('code')((code) => {
+          setAttribute('class')(
+            getClassList(code).map(klass =>
+              klass.startsWith('language-') ? klass.replace('!', '') : klass,
+            ).join(' '),
+          )(code)
 
-  // iterate over interpolation replacements
-  let updated: string = html
+          return code
+        })
+        .toContainer()
 
-  for (const [before, after] of replacements)
-    updated = updated.replace(new RegExp(before, 'g'), after)
-
-  return { ...payload, html: updated, fencedLanguages }
-}
+    return { ...payload, html }
+  })

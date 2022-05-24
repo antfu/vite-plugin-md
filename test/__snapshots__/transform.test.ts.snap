@@ -3,6 +3,58 @@
 exports[`transform snapshots > customBlocks remain the same 1`] = `
 [
   "<style>h1 { color: red }</style>",
+  "<style type=\\"text/css\\">
+:root {
+    --md-text-color: #111827;
+    --md-code-background: rgba(27,31,35,.05);
+    --code-font: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \\"Liberation Mono\\", \\"Courier New\\", monospace;
+  }
+html.dark {
+    --md-text-color: #e5e7eb;
+    --md-code-background: rgba(229, 231, 235, 0.65);
+  }
+
+
+  .markdown-body {
+    color: var(--md-text-color);
+  }
+
+
+  .markdown-body code {
+    font-size: 85%;
+    padding: 0.2em 0.3em;
+    margin-left: 0.1rem;
+    margin-right: 0.1rem;
+    background-color: var(--md-code-background);
+    border-radius: 3px;
+    font-family: var(--code-font);
+    color: #333;
+    white-space: pre;
+  }
+
+
+  .markdown-body blockquote {
+    margin-top: 0;
+    margin-bottom: 0.25rem;
+    padding: 0 1em;
+    color: #6a73737d;
+    border-left: 0.25rem solid #dfe2e5;
+  }
+
+
+  .markdown-body a {
+    cursor: pointer;
+  }
+
+
+  .markdown-body a:hover {
+    background-color: rgba(0,0,0,.5);
+    font-weight: 700;
+    border-radius: 0.2rem 0.4rem;
+  }
+</style>",
+  "<route lang=\\"json\\">{}</route>
+",
 ]
 `;
 
@@ -27,9 +79,7 @@ exports[`transform snapshots > head props remains the same 1`] = `
 exports[`transform snapshots > html remains the same 1`] = `
 "<div class=\\"markdown-body\\"><h1>Hello</h1>
 <style>h1 { color: red }</style>
-<script setup lang=\\"ts\\">
-import Foo from './Foo.vue'
-</script>
+
 <ul>
 <li>A</li>
 <li>B</li>
@@ -37,13 +87,62 @@ import Foo from './Foo.vue'
 </ul>
 <h2>Escaping Code Tag Interpolation</h2>
 <div>{{hello}}</div>
-<p>When the markdown below is parsed – assuming the default behavior of “escapeCodeTagInterpolation” is set – it should be translated to include a “pre” attribute on the <code v-pre>code</code> tag so that VueJS does not interpolate this as a variable:</p>
-<pre><code class=\\"language-html\\" v-pre>&lt;div&gt;{{hello}}&lt;/div&gt;
+<p>When the markdown below is parsed – assuming the default behavior of “escapeCodeTagInterpolation” is set – it should be translated to include a “pre” attribute on the <code class=\\"\\">code</code> tag so that VueJS does not interpolate this as a variable:</p>
+<pre v-pre=\\"true\\"><code class=\\"language-html\\">&lt;div&gt;{{hello}}&lt;/div&gt;
 </code></pre>
 <p>By contrast, the below code fence will take on the opposite behavior:</p>
 <pre><code class=\\"language-ts\\">const theValue = {{ hello }};
 </code></pre>
-</div>"
+</div><style type=\\"text/css\\">
+:root {
+    --md-text-color: #111827;
+    --md-code-background: rgba(27,31,35,.05);
+    --code-font: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \\"Liberation Mono\\", \\"Courier New\\", monospace;
+  }
+html.dark {
+    --md-text-color: #e5e7eb;
+    --md-code-background: rgba(229, 231, 235, 0.65);
+  }
+
+
+  .markdown-body {
+    color: var(--md-text-color);
+  }
+
+
+  .markdown-body code {
+    font-size: 85%;
+    padding: 0.2em 0.3em;
+    margin-left: 0.1rem;
+    margin-right: 0.1rem;
+    background-color: var(--md-code-background);
+    border-radius: 3px;
+    font-family: var(--code-font);
+    color: #333;
+    white-space: pre;
+  }
+
+
+  .markdown-body blockquote {
+    margin-top: 0;
+    margin-bottom: 0.25rem;
+    padding: 0 1em;
+    color: #6a73737d;
+    border-left: 0.25rem solid #dfe2e5;
+  }
+
+
+  .markdown-body a {
+    cursor: pointer;
+  }
+
+
+  .markdown-body a:hover {
+    background-color: rgba(0,0,0,.5);
+    font-weight: 700;
+    border-radius: 0.2rem 0.4rem;
+  }
+</style>"
 `;
 
 exports[`transform snapshots > meta props remains the same 1`] = `[]`;
@@ -51,9 +150,7 @@ exports[`transform snapshots > meta props remains the same 1`] = `[]`;
 exports[`transform snapshots > script blocks remain the same 1`] = `
 "
 <script setup>
-  
-import Foo from './Foo.vue'
-
+  import Foo from './Foo.vue'
   defineExpose({ frontmatter: {\\"title\\":\\"transform tests\\",\\"description\\":\\"hello world\\",\\"hello\\":\\"how friendly\\"} })
   
  const title = \\"transform tests\\"
@@ -61,9 +158,9 @@ import Foo from './Foo.vue'
  const hello = \\"how friendly\\"
  const excerpt = undefined
 </script>
-    
+
 <script>
+  /** frontmatter meta-data for MD page **/
   export const frontmatter = {\\"title\\":\\"transform tests\\",\\"description\\":\\"hello world\\",\\"hello\\":\\"how friendly\\"}
-</script>
-    "
+</script>"
 `;

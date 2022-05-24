@@ -2,15 +2,19 @@
   "compilerOptions": {
     "module": "ESNext",
     "target": "es2017",
-    "lib": ["ESNext", "DOM"],
+    "lib": [
+      "ESNext",
+      "DOM"
+    ],
     "esModuleInterop": true,
     "strict": true,
     "strictNullChecks": true,
     "moduleResolution": "Node",
     "resolveJsonModule": true,
     "skipLibCheck": true
+
   },
-  "include": ["src", "test"],
+  "include": ["src", "test", "vite.config.ts"],
   "exclude": [
     "**/dist",
     "**/node_modules"

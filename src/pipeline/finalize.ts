@@ -1,13 +1,19 @@
-import type { Pipeline, PipelineStage } from '../types'
-import { wrap } from '../utils'
+import type { Pipeline } from '../types'
+import { transformer, wrap } from '../utils'
 
 /**
- * Wraps the different SFC blocks into a single string as the `component` property
- * and thereby completes the _payload_ of this pipeline
+ * Wraps up all the content section into the final Vue SFC component syntax and then
+ * provides this to the `options.transforms.after` callback if provided.
  */
-export function finalize(payload: Pipeline<PipelineStage.sfcBlocksExtracted>): Pipeline<PipelineStage.closeout> {
+export const finalize = transformer('finalize', 'sfcBlocksExtracted', 'closeout', (payload) => {
+  const { options: { transforms: { after } } } = payload
+
+  const component = `${payload.customBlocks.join('\n')}${wrap('template', payload.templateBlock)}\n${payload.scriptBlock}\n`
+
   return {
     ...payload,
-    component: `${wrap('template', payload.templateBlock)}\n${payload.scriptBlock}\n${payload.customBlocks.join('\n')}`,
-  }
-}
+    component: after
+      ? after(component, payload.fileName)
+      : component,
+  } as Pipeline<'closeout'>
+})

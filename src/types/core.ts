@@ -14,6 +14,8 @@ export type ViteConfig = Parameters<Exclude<Plugin['configResolved'], undefined>
  */
 export interface RouteProperties {
   layout?: string
+  requiresAuth?: boolean
+  section?: string
   [key: string]: unknown
 }
 
@@ -81,6 +83,8 @@ export interface Frontmatter {
   name?: string
   excerpt?: string
   image?: string
+  layout?: string
+  requiresAuth?: boolean
   meta?: MetaProperty[]
   [key: string]: unknown
 }
@@ -168,6 +172,7 @@ export interface ProcessedFrontmatter {
   /**
    * non-meta props intended for the HEAD of the page
    */
+  // TODO: remove?
   head: Record<string, any>
   /**
    * Meta properties intended for the HEAD of the page
@@ -203,7 +208,7 @@ export interface Options {
   headEnabled?: boolean
 
   /**
-   * The head field in frontmatter used to be used for @vueuse/head
+   * The head field in frontmatter used to be used for `@vueuse/head`
    *
    * When an empty string is passed, it will use the root properties of the frontmatter
    *
@@ -352,6 +357,8 @@ export interface Options {
 
 export interface ResolvedOptions extends Required<Options> {
   wrapperClasses: string
+  /** a utility which tests whether a given builder is being used */
+  usingBuilder: (name: string) => boolean
 }
 
 export interface ViteConfigPassthrough {

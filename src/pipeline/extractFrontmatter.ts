@@ -1,17 +1,18 @@
 import matter from 'gray-matter'
-import type { ExcerptFunction, Pipeline, PipelineStage } from '../types'
-import type { GraymatterOptions } from '../types/core'
+import type { ExcerptFunction, GraymatterOptions, Pipeline, PipelineStage } from '../types'
+import { transformer } from '../utils'
+import { pipelineUtilityFunctions } from './pipelineUtilityFunctions'
 
 /**
  * Extracts meta data for the page:
  *
  * - it also applies some logic to resolve the Graymatter configuration while we still have
- * overlap between `options.extract` and the related options on Graymatter hash (depreacated)
+ * overlap between `options.extract` and the related options on Graymatter hash (deprecated)
  * - use the `gray-matter` npm package to separate frontmatter from Markdown content
  * - updates the "options" for Graymatter to reflect to downstream consumers what the
  * actual configuration used was.
  */
-export function extractFrontmatter(payload: Pipeline<PipelineStage.initialize>): Pipeline<PipelineStage.metaExtracted> {
+export const extractFrontmatter = transformer('extractFrontmatter', 'initialize', 'metaExtracted', (payload) => {
   const { options: { grayMatterOptions: { excerpt: ge }, excerpt: e } } = payload
   const eConfig = [e, ge]
   const excerpt = eConfig.find(i => i === false) !== undefined
@@ -35,7 +36,7 @@ export function extractFrontmatter(payload: Pipeline<PipelineStage.initialize>):
   }
   const r = matter(payload.content, o)
 
-  return {
+  const newPayload = {
     ...payload,
     options: {
       ...payload.options,
@@ -44,12 +45,17 @@ export function extractFrontmatter(payload: Pipeline<PipelineStage.initialize>):
       grayMatterOptions: o,
     },
     // prefer page property value over body at this stage so that
-    // builders might be able to distinquish between the two
+    // builders might be able to distinguish between the two
     frontmatter: { ...r.data, excerpt: r?.data?.excerpt?.trim() || r?.excerpt?.trim() || undefined },
     md: r.content,
     excerpt: r.excerpt || r.data?.excerpt || undefined,
     meta: [],
     head: [],
     routeMeta: {},
+  } as unknown as Pipeline<PipelineStage.metaExtracted>
+
+  return {
+    ...newPayload,
+    ...pipelineUtilityFunctions(newPayload),
   }
-}
+})

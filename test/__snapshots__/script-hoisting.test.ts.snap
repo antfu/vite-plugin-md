@@ -1,0 +1,115 @@
+// Vitest Snapshot v1
+
+exports[`hoisted script blocks > snapshot of component section remains the same 1`] = `
+"<style type=\\"text/css\\">
+:root {
+    --md-text-color: #111827;
+    --md-code-background: rgba(27,31,35,.05);
+    --code-font: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \\"Liberation Mono\\", \\"Courier New\\", monospace;
+  }
+html.dark {
+    --md-text-color: #e5e7eb;
+    --md-code-background: rgba(229, 231, 235, 0.65);
+  }
+
+
+  .markdown-body {
+    color: var(--md-text-color);
+  }
+
+
+  .markdown-body code {
+    font-size: 85%;
+    padding: 0.2em 0.3em;
+    margin-left: 0.1rem;
+    margin-right: 0.1rem;
+    background-color: var(--md-code-background);
+    border-radius: 3px;
+    font-family: var(--code-font);
+    color: #333;
+    white-space: pre;
+  }
+
+
+  .markdown-body blockquote {
+    margin-top: 0;
+    margin-bottom: 0.25rem;
+    padding: 0 1em;
+    color: #6a73737d;
+    border-left: 0.25rem solid #dfe2e5;
+  }
+
+
+  .markdown-body a {
+    cursor: pointer;
+  }
+
+
+  .markdown-body a:hover {
+    background-color: rgba(0,0,0,.5);
+    font-weight: 700;
+    border-radius: 0.2rem 0.4rem;
+  }
+</style>
+<route lang=\\"json\\">{}</route>
+
+<template>
+  <div class=\\"markdown-body\\">
+<h1>{{title}}</h1>
+<p>The import above should be brought into the VueJS component which would then allow us to use this <em>fake</em> component in our page:</p>
+<foobar title=\\"i am not real\\"></foobar>
+<p>Furthermore we can add a script setup block like this:</p>
+
+<p>And now the function we’ve defined can be used: {{ sayHi(‘Foo’) }}</p>
+<p>This doesn’t just apply to <code class=\\"\\">&lt;script setup&gt;</code> blocks but also more traditional <code class=\\"\\">&lt;script&gt;</code> blocks too:</p>
+
+<p>The traditional <em>script blocks</em> can appear multiple times, and even use different languages without incident. These blocks will be maintained as separate blocks in the resulting SFC component.</p>
+
+</div>
+</template>
+
+<script setup>
+  import { foobar } from 'some-other-place';
+  defineExpose({ frontmatter: {\\"title\\":\\"Hoisted Scripts\\",\\"description\\":\\"when an import or script block is embedded in HTML we need to preserve this\\"} })
+  
+ const title = \\"Hoisted Scripts\\"
+ const description = \\"when an import or script block is embedded in HTML we need to preserve this\\"
+ const excerpt = undefined
+  const sayHi = (name: string) => \`hi \${name}\`
+</script>
+
+<script>
+  /** frontmatter meta-data for MD page **/
+  export const frontmatter = {\\"title\\":\\"Hoisted Scripts\\",\\"description\\":\\"when an import or script block is embedded in HTML we need to preserve this\\"}
+</script>
+<script lang=\\"ts\\">
+// note that this variable is available within the script block but _not yet_ the template
+export const meToo = (thing: string) => \`I'm not materialistic but I want a \${thing} too!\`
+// with a traditional script block we need to return the variable to expose it to the template
+return { meToo }
+</script>
+<script lang=\\"js\\">
+export const ANSWER = 42
+</script>
+"
+`;
+
+exports[`hoisted script blocks > snapshot of hoisted scripts section remains the same 1`] = `
+[
+  "<script lang=\\"ts\\" setup=\\"\\">
+import { foobar } from 'some-other-place';
+</script>",
+  "<script lang=\\"ts\\" setup=\\"\\">
+const sayHi = (name: string) => \`hi \${name}\`
+</script>",
+  "<script lang=\\"ts\\">
+// note that this variable is available within the script block but _not yet_ the template
+export const meToo = (thing: string) => \`I'm not materialistic but I want a \${thing} too!\`
+// with a traditional script block we need to return the variable to expose it to the template
+return { meToo }
+</script>",
+  "<script lang=\\"js\\">
+export const ANSWER = 42
+</script>",
+]
+`;

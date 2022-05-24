@@ -11,12 +11,12 @@ const importFound = /import { useHead }/
 const useHeadFound = /useHead\(head\)/
 
 describe('using HEAD variables', () => {
-  beforeAll(async() => {
+  beforeAll(async () => {
     md = await readFile('test/fixtures/simple.md', 'utf-8')
   })
 
-  it('with default settings, head variable defined but no references to useHead', () => {
-    const { scriptBlock } = composeSfcBlocks('wrapper.md', md)
+  it('with default settings, head variable defined but no references to useHead', async () => {
+    const { scriptBlock } = await composeSfcBlocks('wrapper.md', md)
     expect(titleDefined.test(scriptBlock)).toBeTruthy()
     expect(descDefined.test(scriptBlock)).toBeTruthy()
     expect(metaDefined.test(scriptBlock)).toBeFalsy()
@@ -24,8 +24,8 @@ describe('using HEAD variables', () => {
     expect(useHeadFound.test(scriptBlock)).toBeFalsy()
   })
 
-  it('when headEnabled property is set to `false`, behavior is same as the default', () => {
-    const { scriptBlock } = composeSfcBlocks('wrapper.md', md, { headEnabled: false })
+  it('when headEnabled property is set to `false`, behavior is same as the default', async () => {
+    const { scriptBlock } = await composeSfcBlocks('wrapper.md', md, { headEnabled: false })
     expect(titleDefined.test(scriptBlock)).toBeTruthy()
     expect(descDefined.test(scriptBlock)).toBeTruthy()
     expect(metaDefined.test(scriptBlock)).toBeFalsy()
@@ -34,8 +34,8 @@ describe('using HEAD variables', () => {
     expect(scriptBlock).toMatchSnapshot()
   })
 
-  it('when the headEnabled property is set to `true`, all interaction with useHead is enabled', () => {
-    const { scriptBlock } = composeSfcBlocks('wrapper.md', md, { headEnabled: true })
+  it('when the headEnabled property is set to `true`, all interaction with useHead is enabled', async () => {
+    const { scriptBlock } = await composeSfcBlocks('wrapper.md', md, { headEnabled: true })
     expect(titleDefined.test(scriptBlock)).toBeTruthy()
     expect(descDefined.test(scriptBlock)).toBeTruthy()
     expect(metaDefined.test(scriptBlock)).toBeTruthy()
