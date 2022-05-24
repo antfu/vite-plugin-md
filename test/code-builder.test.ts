@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getAttribute, getClassList, select, toHtml } from 'happy-wrapper'
+import { getAttribute, getClassList, select, toHtml } from '@yankeeinlondon/happy-wrapper'
 import { composeSfcBlocks } from '../src/pipeline'
 import { code } from '../src/index'
 import { getPrismGrammar } from '../src/builders/code/mdi/establishHighlighter'

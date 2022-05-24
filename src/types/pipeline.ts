@@ -3,7 +3,7 @@ import type { MaybeRef } from '@vueuse/core'
 import type * as TE from 'fp-ts/TaskEither'
 import type { UserConfig } from 'vite'
 import type { Either } from 'fp-ts/lib/Either'
-import type { Fragment, IElement } from 'happy-wrapper'
+import type { Fragment, IElement } from '@yankeeinlondon/happy-wrapper'
 import type { EnumValues, Frontmatter, MetaProperty, ResolvedOptions } from './core'
 
 export enum PipelineStage {

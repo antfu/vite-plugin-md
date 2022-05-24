@@ -1,6 +1,6 @@
 import { pipe } from 'fp-ts/lib/function'
-import type { Fragment } from 'happy-wrapper'
-import { before, changeTagName, createFragment, select, wrap } from 'happy-wrapper'
+import type { Fragment } from '@yankeeinlondon/happy-wrapper'
+import { before, changeTagName, createFragment, select, wrap } from '@yankeeinlondon/happy-wrapper'
 import type { Pipeline, PipelineStage } from '../../../../types'
 import type { CodeBlockMeta, CodeOptions } from '../../code-types'
 import { Modifier } from '../../code-types'

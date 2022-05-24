@@ -2,14 +2,14 @@ import { pipe } from 'fp-ts/lib/function'
 import type {
   Fragment,
   IElement,
-} from 'happy-wrapper'
+} from '@yankeeinlondon/happy-wrapper'
 import {
   addClass,
   createElement,
   into,
   select,
   wrap,
-} from 'happy-wrapper'
+} from '@yankeeinlondon/happy-wrapper'
 import type { CodeBlockMeta, CodeOptions } from '../code-types'
 
 const evenOdd = (lineNumber: number) => (el: IElement) => lineNumber % 2 === 0

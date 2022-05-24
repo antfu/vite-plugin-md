@@ -1,4 +1,4 @@
-import { toHtml } from 'happy-wrapper'
+import { toHtml } from '@yankeeinlondon/happy-wrapper'
 import type { CodeBlockMeta, CodeParsingStage } from '../code-types'
 
 export const trace = (msg = '') => <T extends CodeParsingStage>(fence: CodeBlockMeta<T>): CodeBlockMeta<T> => {

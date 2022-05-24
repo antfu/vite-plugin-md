@@ -1,4 +1,4 @@
-import { getClassList, select, setAttribute } from 'happy-wrapper'
+import { getClassList, select, setAttribute } from '@yankeeinlondon/happy-wrapper'
 import { transformer } from '../utils'
 
 /**

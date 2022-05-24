@@ -1,4 +1,4 @@
-import type { Fragment } from 'happy-wrapper'
+import type { Fragment } from '@yankeeinlondon/happy-wrapper'
 import type { Grammar } from 'prismjs'
 import type { Pipeline, PipelineStage } from '../../types'
 import type { CodeColorTheme } from './styles/color/color-types'

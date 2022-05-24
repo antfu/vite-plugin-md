@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs'
 import { dirname, join } from 'path'
 import type Token from 'markdown-it/lib/token'
-import { toHtml } from 'happy-wrapper'
+import { toHtml } from '@yankeeinlondon/happy-wrapper'
 import type { Pipeline, PipelineStage } from '../../../types'
 import type { CodeBlockMeta, Modifier } from '../code-types'
 import { parseObjectSyntax } from './markdownItTokens.ts/parseObjectSyntax'

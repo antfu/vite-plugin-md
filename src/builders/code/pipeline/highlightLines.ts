@@ -1,6 +1,6 @@
 import { identity, pipe } from 'fp-ts/lib/function'
-import type { IElement } from 'happy-wrapper'
-import { addClass, select } from 'happy-wrapper'
+import type { IElement } from '@yankeeinlondon/happy-wrapper'
+import { addClass, select } from '@yankeeinlondon/happy-wrapper'
 import type { CodeBlockMeta, CodeOptions } from '../code-types'
 
 /** converts HighlightTokens to lines of code */

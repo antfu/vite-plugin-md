@@ -1,4 +1,4 @@
-import { select, toHtml } from 'happy-wrapper'
+import { select, toHtml } from '@yankeeinlondon/happy-wrapper'
 import { describe, expect, it } from 'vitest'
 import { composeFixture } from './utils'
 

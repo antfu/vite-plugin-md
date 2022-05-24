@@ -1,5 +1,5 @@
 import { pipe } from 'fp-ts/lib/function'
-import { addClass, addVueEvent, append, select } from 'happy-wrapper'
+import { addClass, addVueEvent, append, select } from '@yankeeinlondon/happy-wrapper'
 import type { Pipeline, PipelineStage } from '../../../types'
 import type { BlockCallback, CodeBlockMeta, CodeOptions } from '../code-types'
 

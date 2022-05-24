@@ -1,5 +1,5 @@
 import { pipe } from 'fp-ts/lib/function'
-import type { Fragment, UpdateCallback_Native } from 'happy-wrapper'
+import type { Fragment, UpdateCallback_Native } from '@yankeeinlondon/happy-wrapper'
 import {
   addClass,
   before,
@@ -8,7 +8,7 @@ import {
   createElement,
   filterClasses,
   select,
-} from 'happy-wrapper'
+} from '@yankeeinlondon/happy-wrapper'
 import type { Pipeline, PipelineStage } from '../../../../types'
 import type { CodeBlockMeta } from '../../code-types'
 

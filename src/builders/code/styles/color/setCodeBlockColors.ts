@@ -1,4 +1,4 @@
-import type { InlineStyle } from 'happy-wrapper'
+import type { InlineStyle } from '@yankeeinlondon/happy-wrapper'
 import type { CodeBlockMeta, CodeOptions } from '../../code-types'
 import { themes } from './color-themes'
 import type { CodeColorTheme } from './color-types'

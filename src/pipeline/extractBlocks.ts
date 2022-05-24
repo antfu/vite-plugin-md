@@ -1,5 +1,5 @@
-import { extract, select, toHtml } from 'happy-wrapper'
-import type { HTML, IElement } from 'happy-wrapper'
+import { extract, select, toHtml } from '@yankeeinlondon/happy-wrapper'
+import type { HTML, IElement } from '@yankeeinlondon/happy-wrapper'
 import { isVue2, transformer, wrap } from '../utils'
 import type {
   Pipeline,

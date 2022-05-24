@@ -1,5 +1,5 @@
 import { flow, identity } from 'fp-ts/lib/function'
-import { addClass, select, setAttribute } from 'happy-wrapper'
+import { addClass, select, setAttribute } from '@yankeeinlondon/happy-wrapper'
 import type { Pipeline, PipelineStage } from '../../../types'
 import type { CodeBlockMeta, CodeOptions } from '../code-types'
 import { Modifier } from '../code-types'

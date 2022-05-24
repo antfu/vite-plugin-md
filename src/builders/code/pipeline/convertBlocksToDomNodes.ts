@@ -1,4 +1,4 @@
-import { createFragment, safeString, select } from 'happy-wrapper'
+import { createFragment, safeString, select } from '@yankeeinlondon/happy-wrapper'
 import type { Pipeline, PipelineStage } from '../../../types'
 import type { BlockCallback, CodeBlockMeta, CodeOptions } from '../code-types'
 

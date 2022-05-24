@@ -1,4 +1,4 @@
-import { toHtml } from 'happy-wrapper'
+import { toHtml } from '@yankeeinlondon/happy-wrapper'
 import type { Pipeline, PipelineStage } from '../../../types'
 import type { CodeBlockMeta, CodeOptions } from '../code-types'
 import { flexLines } from './rendering/flex-lines'

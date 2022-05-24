@@ -1,4 +1,4 @@
-import { createFragment } from 'happy-wrapper'
+import { createFragment } from '@yankeeinlondon/happy-wrapper'
 import { transformer } from '../utils'
 
 export const convertToDom = transformer('convertToDom', 'parsed', 'dom', (payload) => {

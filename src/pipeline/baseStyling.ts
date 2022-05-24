@@ -1,4 +1,4 @@
-import { createInlineStyle } from 'happy-wrapper'
+import { createInlineStyle } from '@yankeeinlondon/happy-wrapper'
 import { transformer } from '../utils'
 
 /**

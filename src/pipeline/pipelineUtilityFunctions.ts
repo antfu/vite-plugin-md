@@ -1,6 +1,6 @@
 import type { MaybeRef } from '@vueuse/core'
-import type { IElement } from 'happy-wrapper'
-import { createElement, isElement } from 'happy-wrapper'
+import type { IElement } from '@yankeeinlondon/happy-wrapper'
+import { createElement, isElement } from '@yankeeinlondon/happy-wrapper'
 import { isRef, ref } from 'vue'
 import type { LinkProperty, Pipeline, PipelineStage, PipelineUtilityFunctions, ScriptProperty, StyleProperty } from '../types'
 

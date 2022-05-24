@@ -29,9 +29,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "run-s build:happy-wrapper build:core",
-    "build:core": "tsup src/index.ts --dts --format cjs,esm",
-    "build:happy-wrapper": "pnpm --filter 'happy-wrapper' build",
+    "build": "tsup src/index.ts --dts --format cjs,esm",
     "watch": "tsup src/index.ts --dts --format cjs,esm --watch",
     "dev": "npm run build -- --watch",
     "example:build": "cp README.md example/README.md && npm -C example run build",
@@ -56,11 +54,11 @@
     "@vitejs/plugin-vue": "^2.3.3",
     "@vue/runtime-core": "^3.2.36",
     "@vueuse/core": "^8.5.0",
+    "@yankeeinlondon/happy-wrapper": "1.0.0",
     "cypress-types": "^0.1.0",
     "fp-ts": "^2.12.1",
     "gray-matter": "^4.0.3",
     "happy-dom": "^3.2.2",
-    "happy-wrapper": "workspace:*",
     "markdown-it": "^13.0.1",
     "prismjs": "^1.28.0",
     "vue-router": "^4.0.15"

@@ -1,6 +1,6 @@
 import { readFile } from 'fs/promises'
 import { beforeAll, describe, expect, it } from 'vitest'
-import { select, toHtml } from 'happy-wrapper'
+import { select, toHtml } from '@yankeeinlondon/happy-wrapper'
 import { resolveOptions } from '../src/options'
 import { meta } from '../src/index'
 import type { Options } from '../src/types'

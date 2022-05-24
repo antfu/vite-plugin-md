@@ -1,4 +1,4 @@
-import { createInlineStyle } from 'happy-wrapper'
+import { createInlineStyle } from '@yankeeinlondon/happy-wrapper'
 import type { Pipeline, PipelineStage } from '../../../types'
 import type { CodeBlockMeta, CodeOptions } from '../code-types'
 import { setCodeBlockColors } from '../styles/color/setCodeBlockColors'
