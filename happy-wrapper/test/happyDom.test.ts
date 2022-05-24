@@ -63,7 +63,7 @@ describe('HappyDom\'s can be idempotent', () => {
     expect(toHtml(f2)).toEqual(bareCode)
   })
 
-  it('HTML remains unchanged when passed into and out of DocumentFragment', () => {
+  it('HTML remains unchanged when passed into and out of Fragment', () => {
     const html1 = createFragment(tokenizedCode)
     const html2 = createFragment(bareCode)
     const html3 = createFragment('\n\t<span>foobar</span>\n')
@@ -551,7 +551,7 @@ describe('HappyDom\'s can be idempotent', () => {
     expect(pipe(plusTwo, getClassList)).contains('two')
   })
 
-  it('addClass() utility is able to add a class to the top-most node in DocumentFragment', () => {
+  it('addClass() utility is able to add a class to the top-most node in Fragment', () => {
     const html = '<div class="foobar">testing</div>'
     const frag = createFragment(html)
     const plusOne = pipe(frag, addOne)

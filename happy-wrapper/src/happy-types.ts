@@ -1,5 +1,5 @@
-import type { Document, DocumentFragment, IElement, INode, IText } from 'happy-dom'
 import type { getNodeType } from './utils'
+import type { Document, Fragment, IElement, INode, IText } from './index'
 export type InspectionTuple = [msg: string, item: unknown]
 
 export type HTML = string
@@ -29,10 +29,10 @@ export type NodeSolverInput<T extends NodeType> = T extends 'html'
         : T extends 'document'
           ? Document
           : T extends 'fragment'
-            ? DocumentFragment
+            ? Fragment
             : unknown
 
-export type DocRoot = Document | DocumentFragment
+export type DocRoot = Document | Fragment
 export type DomNode = IElement | IText | INode
 export type Container = DocRoot | DomNode
 export type ContainerOrHtml = Container | HTML
@@ -82,7 +82,7 @@ export interface NodeSolverDict<O> {
   element: (input: IElement, parent?: IElement | DocRoot) => O extends 'mirror' ? IElement : O
   node: (input: INode) => O extends 'mirror' ? INode : O
   document: (input: Document) => O extends 'mirror' ? Document : O
-  fragment: (input: DocumentFragment) => O extends 'mirror' ? DocumentFragment : O
+  fragment: (input: Fragment) => O extends 'mirror' ? Fragment : O
 }
 
 /**
@@ -169,7 +169,7 @@ export interface NodeSelector<T extends Container | 'html'> {
    * Returns the root node with all mutations included
    */
   toContainer: () => undefined extends T
-    ? DocumentFragment
+    ? Fragment
     : T extends 'html'
       ? string
       : T

@@ -1,6 +1,7 @@
 import { pipe } from 'fp-ts/lib/function'
-import type { IElement, INode } from 'happy-dom'
+import type { IElement } from 'happy-wrapper'
 import type { Events } from 'vue'
+import type { INode } from 'happy-dom'
 import type { Container, ContainerOrHtml, DocRoot, GetAttribute, HTML } from './happy-types'
 import { createElement, createFragment, createNode } from './create'
 import { HappyMishap } from './errors'

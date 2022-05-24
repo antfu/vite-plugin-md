@@ -1,11 +1,11 @@
 import { identity } from 'fp-ts/lib/function'
 import { Text, Window } from 'happy-dom'
 import { dasherize } from 'native-dash'
-import type { Document, DocumentFragment, IElement, IText } from 'happy-dom'
 import { HappyMishap } from './errors'
 import type { Container, HTML } from './happy-types'
 import { isElement, isElementLike, isTextNodeLike } from './type-guards'
 import { clone, solveForNodeType, toHtml } from './utils'
+import type { Document, Fragment, IElement, IText } from './index'
 
 /**
  * Converts an HTML string into a Happy DOM document tree
@@ -20,16 +20,16 @@ export function createDocument(body: string, head?: string): Document {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export type FragmentFrom<_T extends Container | 'html'> = DocumentFragment
+export type FragmentFrom<_T extends Container | 'html'> = Fragment
 
-export function createFragment<C extends Container | HTML>(content?: C): FragmentFrom<C extends string ? 'html' : DocumentFragment> {
+export function createFragment<C extends Container | HTML>(content?: C): FragmentFrom<C extends string ? 'html' : Fragment> {
   const window = new Window()
   const document = window.document
-  const fragment = document.createDocumentFragment() as DocumentFragment
+  const fragment = document.createDocumentFragment() as Fragment
   if (content)
     fragment.append(clone(content))
 
-  return fragment as FragmentFrom<C extends string ? 'html' : DocumentFragment>
+  return fragment as FragmentFrom<C extends string ? 'html' : Fragment>
 }
 
 /**

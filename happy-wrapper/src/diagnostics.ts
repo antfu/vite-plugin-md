@@ -1,11 +1,11 @@
 import { flow, pipe } from 'fp-ts/lib/function'
-import type { Document, DocumentFragment, IElement, INode } from 'happy-dom'
 import { getClassList } from './attributes'
 import { createFragment } from './create'
 import type { Container, ContainerOrHtml, HTML, NodeSolverReady, Tree, TreeSummary, UpdateSignature } from './happy-types'
 import { getChildren, into } from './nodes'
 import { isContainer, isElement, isElementLike, isTextNode, isTextNodeLike, isUpdateSignature } from './type-guards'
 import { getNodeType, solveForNodeType, toHtml } from './utils'
+import type { Document, Fragment, IElement, INode } from './index'
 
 export const describeNode = (node: Container | HTML | null | UpdateSignature | any[]): string => {
   if (!node)
@@ -35,7 +35,7 @@ export const inspect = <T extends boolean>(item?: unknown, toJSON: T = false as 
       .solver({
         html: h => pipe(h, createFragment, f => inspect(f)),
         fragment: x => ({
-          kind: 'DocumentFragment',
+          kind: 'Fragment',
           children: `${x.children.length} / ${x.childNodes.length}`,
           ...(x.childNodes.length > 1
             ? {
@@ -180,7 +180,7 @@ export const tree = (node: Container | HTML): Tree => {
         }
         case 'fragment':
         {
-          const f = n.node as DocumentFragment
+          const f = n.node as Fragment
           ts = {
             node: `frag(${f.firstElementChild ? f.firstElementChild.tagName.toLowerCase() : removeSpecialChars(f.textContent).trim().slice(0, 10)})`,
             children: n.children.map(c => summary(c)),
@@ -262,7 +262,7 @@ export const tree = (node: Container | HTML): Tree => {
 
 /**
  * Allows various content-types to be wrapped into a single
- * DocumentFragment which contains each element as a sibling
+ * Fragment which contains each element as a sibling
  */
 export const siblings = <C extends UpdateSignature | ContainerOrHtml[]>
   (...content: C) => {
@@ -274,7 +274,7 @@ function descClass(n: Container) {
   return list.length > 0 ? `{ ${list.join(' ')} }` : ''
 }
 
-function descFrag(n: DocumentFragment) {
+function descFrag(n: Fragment) {
   const children = getChildren(n).map(i => describeNode(i))
   return isElementLike(n)
     ? `[el: ${n.firstElementChild.tagName.toLowerCase()}]${descClass}`

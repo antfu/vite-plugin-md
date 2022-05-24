@@ -1,7 +1,7 @@
-import type { Document, DocumentFragment, IElement, IText } from 'happy-dom'
 import { createFragment } from './create'
 import type { Container, DocRoot, InspectionTuple, UpdateSignature } from './happy-types'
 import type { HappyMishap } from './errors'
+import type { Document, Fragment, IElement, IText } from './index'
 
 export function isHappyWrapperError(err: unknown): err is HappyMishap {
   return typeof err === 'object' && (err as any).kind === 'HappyWrapper'
@@ -35,15 +35,15 @@ export function isTextNodeLike(node: unknown) {
 export function isDocument(dom: unknown): dom is Document {
   return typeof dom === 'object' && dom !== null && !isElement(dom) && 'body' in dom
 }
-export function isFragment(dom: unknown): dom is DocumentFragment {
+export function isFragment(dom: unknown): dom is Fragment {
   return typeof dom === 'object' && dom !== null && !isElement(dom) && !isTextNode(dom) && !('body' in dom)
 }
 
 export const nodeStartsWithElement = <D extends DocRoot>(node: D) => {
   return !!(
-    'firstElementChild' in node
-    && 'firstChild' in node
-    && 'firstElementChild' in node
+    'firstElementChild'
+    && 'firstChild'
+    && 'firstElementChild'
     && (node as any).firstChild === (node as any).firstElementChild
   )
 }

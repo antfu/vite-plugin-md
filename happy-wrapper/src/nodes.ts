@@ -1,10 +1,10 @@
-import type { Document, DocumentFragment, IElement, IText } from 'happy-dom'
 import { pipe } from 'fp-ts/lib/function'
 import { HappyMishap } from './errors'
 import { createDocument, createElement, createFragment, createNode } from './create'
 import type { Container, ContainerOrHtml, DocRoot, HTML, UpdateSignature } from './happy-types'
 import { isDocument, isElement, isElementLike, isFragment, isTextNode, isTextNodeLike, isUpdateSignature } from './type-guards'
 import { clone, getNodeType, solveForNodeType, toHtml } from './utils'
+import type { Document, Fragment, IElement, IText } from './index'
 
 /**
  * converts a IHTMLCollection or a INodeList to an array
@@ -121,7 +121,7 @@ export type IntoChildren<P extends DocRoot | IElement | HTML | undefined> =
   ) => A extends UpdateSignature
     ? IElement | false
     : undefined extends P
-      ? DocumentFragment
+      ? Fragment
       : P
 
 /**
@@ -140,7 +140,7 @@ export const into = <P extends DocRoot | IElement | HTML | undefined>(
 ): IntoChildren<P> =>
     <C extends UpdateSignature | ContainerOrHtml[] | ContainerOrHtml[][]>(
       ...content: C
-    ): C extends UpdateSignature ? IElement | false : undefined extends P ? DocumentFragment : P => {
+    ): C extends UpdateSignature ? IElement | false : undefined extends P ? Fragment : P => {
     /**
      * Keeps track of whether the incoming parent was wrapped in a temporary
      * document fragment.
@@ -198,11 +198,11 @@ export const into = <P extends DocRoot | IElement | HTML | undefined>(
 
       return (wrapped && !isUpdateSignature(content)
         ? toHtml(normalizedParent)
-        : normalizedParent) as C extends UpdateSignature ? IElement | false : undefined extends P ? DocumentFragment : P
+        : normalizedParent) as C extends UpdateSignature ? IElement | false : undefined extends P ? Fragment : P
     }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export type ChangeTagNameTo<T extends string> = <E extends [IElement | HTML | Document | DocumentFragment] | UpdateSignature>(...el: E) => E extends UpdateSignature ? IElement : E
+export type ChangeTagNameTo<T extends string> = <E extends [IElement | HTML | Document | Fragment] | UpdateSignature>(...el: E) => E extends UpdateSignature ? IElement : E
 
 /**
  * Changes the tag name for the top level container element passed in
@@ -214,7 +214,7 @@ export type ChangeTagNameTo<T extends string> = <E extends [IElement | HTML | Do
  */
 export const changeTagName = <T extends string>(
   tagName: T,
-): ChangeTagNameTo<T> => <A extends [IElement | HTML | Document | DocumentFragment] | UpdateSignature>(
+): ChangeTagNameTo<T> => <A extends [IElement | HTML | Document | Fragment] | UpdateSignature>(
     ...args: A
   ): A extends UpdateSignature ? IElement : A => {
   const node = args[0]
@@ -294,7 +294,7 @@ export const prepend = (prepend: IElement | IText | HTML) => (el: IElement): IEl
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export type Before<_T extends ContainerOrHtml> = <A extends [IElement | HTML | Document | DocumentFragment] | UpdateSignature>(
+export type Before<_T extends ContainerOrHtml> = <A extends [IElement | HTML | Document | Fragment] | UpdateSignature>(
     ...afterNode: A
   ) => A extends UpdateSignature ? IElement : A extends string ? string : A
 
@@ -310,7 +310,7 @@ export type Before<_T extends ContainerOrHtml> = <A extends [IElement | HTML | D
  */
 export const before = <B extends ContainerOrHtml>(
   beforeNode: B,
-): Before<B> => <A extends [IElement | HTML | Document | DocumentFragment] | UpdateSignature>(
+): Before<B> => <A extends [IElement | HTML | Document | Fragment] | UpdateSignature>(
     ...afterNode: A
   ): A extends UpdateSignature ? IElement : A extends string ? string : A => {
   const outputIsHtml = (typeof afterNode[0] === 'string')
@@ -333,7 +333,7 @@ export const before = <B extends ContainerOrHtml>(
 
   const noParent = (n: string | Container) =>
     new HappyMishap(
-      'the before() utility for depends on having a parent element in the "afterNode" as the parent\'s value must be mutated. If you do genuinely want this behavior then use a DocumentFragment (or just HTML strings)',
+      'the before() utility for depends on having a parent element in the "afterNode" as the parent\'s value must be mutated. If you do genuinely want this behavior then use a Fragment (or just HTML strings)',
       { name: `before(${getNodeType(beforeNode)})(${getNodeType(n)})` },
     )
 
@@ -374,7 +374,7 @@ export const before = <B extends ContainerOrHtml>(
 
 export const after = (
   afterNode: IElement | IText | HTML,
-) => <B extends IElement | DocumentFragment | HTML>(
+) => <B extends IElement | Fragment | HTML>(
   beforeNode: B,
 ): B => {
   const afterNormalized = typeof afterNode === 'string'
@@ -411,7 +411,7 @@ export const after = (
         }
         else {
           throw new HappyMishap(
-            'the after() utility for depends on having a parent element in the "afterNode" as the parent\'s value must be mutated. If you do genuinely want this behavior then use a DocumentFragment (or just HTML strings)',
+            'the after() utility for depends on having a parent element in the "afterNode" as the parent\'s value must be mutated. If you do genuinely want this behavior then use a Fragment (or just HTML strings)',
             { name: `after(${getNodeType(afterNode)})(IElement)` },
           )
         }
@@ -423,7 +423,7 @@ export const after = (
 export type ReadyForWrapper<C extends UpdateSignature | ContainerOrHtml[]> =
   <P extends DocRoot | IElement | HTML | undefined>(
     parent: P,
-  ) => undefined extends P ? DocumentFragment : P
+  ) => undefined extends P ? Fragment : P
 
 /**
  * **wrap**
@@ -443,6 +443,6 @@ export const wrap = <C extends UpdateSignature | ContainerOrHtml[]>(
 ): ReadyForWrapper<C> => <P extends DocRoot | IElement | HTML | undefined>(
     parent?: P,
   ) => {
-  return into(parent)(...children) as undefined extends P ? DocumentFragment : P
+  return into(parent)(...children) as undefined extends P ? Fragment : P
 }
 

@@ -1,4 +1,3 @@
-import type { Document, DocumentFragment, IElement, INode, IText } from 'happy-dom'
 import { createFragment } from './create'
 import { describeNode, inspect } from './diagnostics'
 import { HappyMishap } from './errors'
@@ -6,15 +5,16 @@ import type { HTML, MapCallback, NodeSelector, UpdateCallback, UpdateCallback_Na
 import { getChildElements } from './nodes'
 import { isDocument, isElement, isElementLike, isFragment } from './type-guards'
 import { clone, getNodeType, toHtml } from './utils'
+import type { Document, Fragment, IElement, INode, IText } from './index'
 
 /**
  * Allows the _selection_ of HTML or a container type which is
  * then wrapped and a helpful query and mutation API is provided
  * to work with this DOM element.
  */
-export const select = <D extends Document | DocumentFragment | IElement | HTML>(node: D) => {
+export const select = <D extends Document | Fragment | IElement | HTML>(node: D) => {
   const originIsHtml = typeof node === 'string'
-  const rootNode: Document | DocumentFragment | IElement = originIsHtml
+  const rootNode: Document | Fragment | IElement = originIsHtml
     ? createFragment(node)
     : isElement(node)
       ? node as IElement
@@ -25,7 +25,7 @@ export const select = <D extends Document | DocumentFragment | IElement | HTML>(
   if (!rootNode)
     throw new HappyMishap(`Attempt to select() an invalid node type: ${getNodeType(node)}`, { name: 'select(INode)', inspect: node })
 
-  type T = undefined extends D ? DocumentFragment : D extends string ? 'html' : D
+  type T = undefined extends D ? Fragment : D extends string ? 'html' : D
   const api: NodeSelector<T> = {
     type: () => {
       return originIsHtml
@@ -208,7 +208,7 @@ export const select = <D extends Document | DocumentFragment | IElement | HTML>(
           ? toHtml(rootNode)
           : rootNode
       ) as undefined extends T
-        ? DocumentFragment
+        ? Fragment
         : T extends 'html'
           ? string
           : T

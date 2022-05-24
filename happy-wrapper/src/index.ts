@@ -1,4 +1,4 @@
-export { Document, DocumentFragment as Fragment, IElement, IText } from 'happy-dom'
+export { Document, DocumentFragment as Fragment, IElement, IText, INode } from 'happy-dom'
 
 export * from './attributes'
 export * from './create'

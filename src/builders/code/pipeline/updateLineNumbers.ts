@@ -1,5 +1,8 @@
 import { pipe } from 'fp-ts/lib/function'
-import type { DocumentFragment, IElement } from 'happy-dom'
+import type {
+  Fragment,
+  IElement,
+} from 'happy-wrapper'
 import {
   addClass,
   createElement,
@@ -32,7 +35,7 @@ const specificLine = (i: number, aboveTheFold: number) => {
  * lines if there are any
  */
 const addLinesToContainer = (fence: CodeBlockMeta<'dom'>, o: CodeOptions, aboveTheFold = 0) => {
-  return (wrapper: DocumentFragment) => {
+  return (wrapper: Fragment) => {
     const children: IElement[] = []
     for (let lineNumber = 1 - aboveTheFold; fence.codeLinesCount >= lineNumber; lineNumber++) {
       const tagName = 'span'
@@ -74,7 +77,7 @@ export const updateLineNumbers = (o: CodeOptions) =>
       : undefined
 
     /** the code with meta-classes added and including the "aboveTheFold" code */
-    const code: DocumentFragment = pipe(
+    const code: Fragment = pipe(
       aboveTheFoldCode
         ? into()(aboveTheFoldCode, fence.code)
         : fence.code,
