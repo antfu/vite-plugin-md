@@ -6,11 +6,11 @@ Put your markdown under `./src/pages/xx.md`, then you can access the page via ro
 
 ```ts
 import Markdown from 'vite-plugin-md'
-import Voie from 'vite-plugin-voie'
+import Pages from 'vite-plugin-pages'
 
 export default {
   plugins: [
-    Voie({
+    Pages({
       extensions: ['vue', 'md'],
     }),
     Markdown(),
@@ -29,18 +29,18 @@ Put your markdown under `./src/pages/xx.md`, then you can access the page via ro
 
 ```ts
 import Markdown from 'vite-plugin-md'
-import ViteComponents from 'vite-plugin-components'
+import Components from 'unplugin-vue-components/vite'
 
 export default {
   plugins: [
     Markdown(),
     // should be placed after `Markdown()`
-    ViteComponents({
+    Components({
       // allow auto load markdown components under `./src/components/`
       extensions: ['vue', 'md'],
 
       // allow auto import and register components used in markdown
-      customLoaderMatcher: path => path.endsWith('.md'),
+      include: [/\.vue$/, /\.vue\?vue/, /\.md$/],
     }),
   ],
 }
