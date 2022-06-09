@@ -13,6 +13,7 @@ import {
   inlineStyles,
   renderHtml,
   updateCodeBlockWrapper,
+  updateFrontmatterWithCodeBlock,
   updateLineNumbers,
   updatePreWrapper,
   useHighlighter, userRules,
@@ -46,6 +47,7 @@ export const fence = async (payload: Pipeline<PipelineStage.parser>, options: Co
         highlightLines(options),
         updatePreWrapper(payload),
         inlineStyles(payload, options),
+        updateFrontmatterWithCodeBlock(payload, options),
         userRules('after', payload, options),
 
         addLanguage(options),

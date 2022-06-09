@@ -2,7 +2,8 @@
 import type MarkdownIt from 'markdown-it'
 import type { FilterPattern } from '@rollup/pluginutils'
 import type { Plugin, UserConfig } from 'vite'
-import type { BuilderRegistration } from './pipeline'
+import type { CodeBlockProperties } from '../builders/code/code-types'
+import type { BuilderRegistration } from './builder'
 
 export type ViteConfig = Parameters<Exclude<Plugin['configResolved'], undefined>>[0]
 
@@ -72,6 +73,19 @@ export interface LinkElement {
   [key: string]: unknown
 }
 
+export interface CodeBlockSummary {
+  /** the source filename (if stated) */
+  source?: string
+  /** the language as described by the author */
+  requestedLang: string
+  /** the actual language setting used to parse the code block */
+  parsedLang: string
+  linesHighlighted: number[]
+  /** the number of lines in the code block */
+  codeLines: number
+  props: CodeBlockProperties
+}
+
 /**
  * Frontmatter content is represented as key/value dictionary
  */
@@ -86,6 +100,13 @@ export interface Frontmatter {
   layout?: string
   requiresAuth?: boolean
   meta?: MetaProperty[]
+  /**
+   * Brief summary info about code blocks found on page.
+   *
+   * Will be populated when using the `code()` builder, there are at least one code
+   * blocks on page, and when `injectIntoFrontmatter` is set to true.
+   */
+  _codeBlocks?: CodeBlockSummary[]
   [key: string]: unknown
 }
 

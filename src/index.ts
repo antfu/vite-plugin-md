@@ -4,7 +4,8 @@ import type { TransformResult } from 'rollup'
 import { createSfcComponent } from './createSfcComponent'
 import { resolveOptions } from './options'
 import type { Options } from './types'
-export { link, meta, code } from './builders'
+export * from './builders'
+export * from './types/builder'
 export { mergeColorThemes } from './builders/code/styles/color/mergeColorThemes'
 
 function VitePluginMarkdown(userOptions: Options = {}): Plugin {

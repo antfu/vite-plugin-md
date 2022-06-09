@@ -5,6 +5,7 @@ import type { UserConfig } from 'vite'
 import type { Either } from 'fp-ts/lib/Either'
 import type { Fragment, IElement } from '@yankeeinlondon/happy-wrapper'
 import type { EnumValues, Frontmatter, MetaProperty, ResolvedOptions } from './core'
+import type { BuilderApi, BuilderDependencyApi } from './builder'
 
 export enum PipelineStage {
   /**
@@ -63,43 +64,6 @@ export interface RulesUse {
 }
 
 export type PipelineInitializer = (i?: Pipeline<PipelineStage.initialize>) => Pipeline<PipelineStage.initialize>
-
-export interface BuilderRegistration<O extends BuilderOptions, S extends IPipelineStage> {
-  name: string
-  description?: string
-  /** The lifecycle event/hook which this builder will respond to */
-  lifecycle: S
-  /**
-   * The builder's handler function which receives the _payload_ for the
-   * event lifecycle hook configured and then is allowed to mutate these
-   * properties and pass back a similarly structured object to continue
-   * on in that pipeline stage.
-   */
-  handler: BuilderHandler<O, S>
-
-  /**
-   * The options _specific_ to the builder
-   */
-  options: O
-
-  /**
-   * This isn't strictly required, but it is nice to express which rules you have used
-   * modified, or added from the MarkdownIt parser.
-   *
-   * Note: builders should try to avoid mutating core rules; if they need a modification
-   * for their purposes consider _monkey patching_ the rule so that downstream rules
-   * have a better understanding of current rule state.
-   */
-  parserRules?: RulesUse[]
-
-  /**
-   * If this plugin needs to modify the configuration in some way at initialization
-   * it can add a function here to do that. In most cases, the builder can simply
-   * wait for their event hook to be called (at which point they will get the configuration
-   * passed to them).
-   */
-  initializer?: BuilderHandler<O, PipelineStage.initialize>
-}
 
 export type Parser<S extends IPipelineStage> = S extends 'parser' | 'parsed' | 'dom' | 'sfcBlocksExtracted' | 'closeout'
   ? {
@@ -188,6 +152,13 @@ export interface HeadProps {
   [key: string]: unknown
 }
 
+/** types available _only_ during initialization */
+export type Initialization<S extends IPipelineStage> = S extends 'initialize'
+  ? {
+      /** allows a Builder API to express a dependency on another Builder API */
+      usesBuilder: <T extends BuilderApi<any, any>>(builder: T) => BuilderDependencyApi<T>
+    }
+  : {}
 export interface PipelineUtilityFunctions {
   /**
    * Adds a `<link>` to the page's header section
@@ -286,6 +257,7 @@ export type Completed<S extends IPipelineStage> = S extends 'closeout'
   : {}
 
 export type Pipeline<S extends IPipelineStage> = {
+  /** the underlying filename of the source */
   fileName: string
   /** the raw content in the file being processed */
   content: string
@@ -331,43 +303,7 @@ export type Pipeline<S extends IPipelineStage> = {
    * for Vue2; this will allows you to export variables you've defined.
    */
   vueCodeBlocks: Record<string, string | [base: string, vue2Exports: string[]]>
-} & Parser<S> & MetaExtracted<S> & HtmlContent<S> & Blocks<S> & Completed<S>
-
-/**
- * The Builder's event listener/handler
- */
-export type BuilderHandler<
-  O extends BuilderOptions,
-  S extends IPipelineStage,
-> = (payload: Pipeline<S>, options: O) => Promise<Pipeline<S>>
-
-/**
- * Users configure a `BuilderHandler` and we wrap this up functionality
- * with a higher-order `BuilderTask`.
- *
- * @returns TaskEither<string, Pipeline<S>>
- */
-export type BuilderTask<
-  S extends IPipelineStage,
-> = () => (payload: Pipeline<S>) => TE.TaskEither<string, Pipeline<S>>
-
-/**
- * Builder's must provide an export which meets this API constraint. Basic
- * structure of this higher order function is:
- *
- * - options( ) -> register( ) -> { handler( payload ) -> payload }
- */
-export type BuilderApi<O extends {}, S extends IPipelineStage> = (options?: O) => () => BuilderRegistration<O, S>
-
-export type InlineBuilder = <N extends string, L extends IPipelineStage>(name: N, lifecycle: L) => (payload: Pipeline<L>) => Pipeline<L>
-
-/**
- * Builder options are expected to be a key/value dictionary but must
- * be allowed to be an empty object
- * */
-export type BuilderOptions = Record<string, any> | {}
-
-export type BuilderConfig = Record<IPipelineStage, BuilderRegistration<any, any>[] | []>
+} & Parser<S> & MetaExtracted<S> & HtmlContent<S> & Blocks<S> & Completed<S> & Initialization<S>
 
 /**
  * Carries an Either<T> condition which is either:

@@ -18,6 +18,7 @@ export const code = createBuilder('code', PipelineStage.parser)
       lineNumbers: false,
       showLanguage: true,
       clipboard: false,
+      injectIntoFrontmatter: false,
       lineClass: 'code-line',
       headingClasses: ['heading'],
       footerClasses: ['footer'],

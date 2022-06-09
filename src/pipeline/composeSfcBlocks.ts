@@ -3,11 +3,13 @@ import { isRight } from 'fp-ts/lib/Either'
 import { resolveOptions } from '../options'
 import { PipelineStage } from '../types'
 import type {
+  BuilderDependency,
   Options,
   Pipeline,
   ViteConfigPassthrough,
 } from '../types'
 import {
+  addDependencies,
   applyMarkdownItOptions,
   baseStyling,
   convertToDom,
@@ -22,6 +24,7 @@ import {
   parseHtml,
   repairFrontmatterLinks,
   transformsBefore,
+  usesBuilder,
   wrapHtml,
 } from '../pipeline'
 import { lift } from '../utils'
@@ -33,10 +36,7 @@ import { MdError } from '../MdError'
  */
 export async function composeSfcBlocks(id: string, raw: string, opts: Omit<Options, 'usingBuilder'> = {}, config: Partial<ViteConfigPassthrough> = {}) {
   const options = resolveOptions(opts)
-  /**
-   * The initial pipeline state
-   */
-  const payload: Pipeline<PipelineStage.initialize> = {
+  const p0 = {
     fileName: id,
     content: raw.trimStart(),
     head: {},
@@ -50,6 +50,14 @@ export async function composeSfcBlocks(id: string, raw: string, opts: Omit<Optio
     },
     options,
   }
+  const dependencies: BuilderDependency[] = []
+  /**
+   * The initial pipeline state
+   */
+  const payload: Pipeline<PipelineStage.initialize> = {
+    ...p0,
+    usesBuilder: usesBuilder(p0 as unknown as Pipeline<PipelineStage.initialize>, dependencies),
+  }
 
   const handlers = gatherBuilderEvents(options)
 
@@ -58,6 +66,7 @@ export async function composeSfcBlocks(id: string, raw: string, opts: Omit<Optio
     lift('initialize'),
     transformsBefore,
     handlers(PipelineStage.initialize),
+    addDependencies(dependencies),
   )
 
   /** extract the meta-data from the MD content */

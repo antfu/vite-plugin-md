@@ -154,6 +154,15 @@ export interface CodeOptions {
   languageGrammars?: Record<string, Grammar>
 
   /**
+   * Allows stating whether you want meta-data about the code block injected
+   * into the Frontmatter. When resolving to a `true` the code block will be added
+   * to the Frontmatter property "_codeBlocks".
+   *
+   * @default false
+   */
+  injectIntoFrontmatter?: boolean | BlockCallback<boolean>
+
+  /**
    * Code blocks will default to the following inline style:
    * ```css
    * .code-block {
@@ -264,6 +273,7 @@ export interface CodeBlockMeta<S extends CodeParsingStage> {
    */
   html: S extends 'complete' ? string : never
 
+  /** the <pre> block wrapper */
   pre: S extends 'code' ? string : Fragment
   lineNumbersWrapper: S extends 'code' ? string : Fragment
   codeBlockWrapper: S extends 'code' ? string : Fragment
@@ -293,7 +303,7 @@ export interface CodeBlockMeta<S extends CodeParsingStage> {
   showFilename: CodeFilename
 
   /**
-   * Typically not used but when a code block references an external file
+   * Typically _not_ used but when a code block references an external file
    * AND the local code block _also_ has code, then it will be placed here
    */
   aboveTheFoldCode?: S extends 'code' ? string : Fragment
