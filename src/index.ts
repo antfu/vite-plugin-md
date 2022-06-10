@@ -12,6 +12,7 @@ function VitePluginMarkdown(userOptions: Options = {}): Plugin {
   const options = resolveOptions(userOptions)
   const markdownToVue = createSfcComponent(options)
 
+  /** filter out files which aren't Markdown files */
   const filter = createFilter(
     userOptions.include || /\.md$/,
     userOptions.exclude,
@@ -30,11 +31,12 @@ function VitePluginMarkdown(userOptions: Options = {}): Plugin {
       if (!filter(id))
         return
 
-      try {
+      try {    
+        /** converts Markdown to VueJS SFC string */
         const convert = markdownToVue(config)
-        const code = await convert(id, raw)
+        const sfc = await convert(id, raw)
         return {
-          code,
+          code: sfc,
         }
       }
       catch (e: any) {

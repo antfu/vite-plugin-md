@@ -8,6 +8,7 @@ declare module '@vue/runtime-core' {
     Clippy: typeof import('./components/Clippy.vue')['default']
     Counter: typeof import('./components/Counter.vue')['default']
     DarkMode: typeof import('./components/DarkMode.vue')['default']
+    Routed: typeof import('./components/Routed.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

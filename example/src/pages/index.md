@@ -1,14 +1,12 @@
 ---
 title: Hello
 description: "home page to example app"
+routeName: "home"
 route:
-  - howdy: doody
+  howdy: doody
+  color: Blue
+layout: default
 ---
-
-<route lang="yaml">
-meta:
-  foo: "bar"
-</route>
 
 ## Installation
 
@@ -61,7 +59,7 @@ etc: "..."
 
 Whenever you need more than what Markdown provides, simply drop a VueJS components onto the page and it just works:
 
-<counter></counter>
+<counter />
 
 ## Builders
 

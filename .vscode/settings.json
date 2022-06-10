@@ -2,7 +2,6 @@
   "prettier.enable": false,
   "prettier": false,
   "editor.codeActionsOnSave": {
-
     "source.fixAll": true
   },
   "eslint.validate": [
@@ -35,6 +34,7 @@
     "pathe",
     "pluginutils",
     "prefetch",
+    "SFC's",
     "Shiki",
     "unocss",
     "unplugin",

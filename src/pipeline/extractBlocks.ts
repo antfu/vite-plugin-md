@@ -6,6 +6,7 @@ import type {
   PipelineStage,
   ResolvedOptions,
 } from '../types'
+import { Project } from 'ts-morph';
 
 const elementHashToArray = (hash?: Record<string, IElement>): IElement[] => hash
   ? Object.keys(hash).reduce(
@@ -89,6 +90,7 @@ export const extractBlocks = transformer('extractBlocks', 'dom', 'sfcBlocksExtra
   const hoistedScripts: string[] = hoistScripts.scripts
 
   const { templateBlock, customBlocks } = extractCustomBlock(html, options)
+  
   const templateBlocks = {
     /** adds the lines needed to include useHead() */
     useHead: head && options.headEnabled
@@ -100,7 +102,7 @@ export const extractBlocks = transformer('extractBlocks', 'dom', 'sfcBlocksExtra
       : '',
     /** variable declaration which must be placed in a manner that external actors can reach it */
     frontmatter: options.frontmatter && options.exposeFrontmatter
-      ? `/** frontmatter meta-data for MD page **/\n  export const frontmatter = ${JSON.stringify(frontmatter)}`
+      ? `/** frontmatter meta-data for MD page **/\n  export const frontmatter: Frontmatter = ${JSON.stringify(frontmatter)}`
       : '',
     /** returning the 'frontmatter' property for external actors using Vue3 */
     vue3CompositionReturn: options.frontmatter ? 'return { frontmatter }' : '',
@@ -138,7 +140,7 @@ export const extractBlocks = transformer('extractBlocks', 'dom', 'sfcBlocksExtra
 
   const scriptBlock = isVue2(options)
     ? [
-        wrap('script', [
+        wrap('script lang="ts"', [
           templateBlocks.localVariables,
           templateBlocks.frontmatter,
           templateBlocks.vue2DataExport,
@@ -150,7 +152,7 @@ export const extractBlocks = transformer('extractBlocks', 'dom', 'sfcBlocksExtra
       ].filter(i => i).join('\n')
     // Vue3
     : [
-        wrap('script setup', [
+        wrap('script setup lang="ts"', [
           ...importDirectives,
           templateBlocks.useHead,
           templateBlocks.exposeFrontmatter,
@@ -158,12 +160,9 @@ export const extractBlocks = transformer('extractBlocks', 'dom', 'sfcBlocksExtra
           nonImportDirectives,
           ...codeBlocksToArray(payload.vueCodeBlocks),
         ].filter(i => i).join('\n  ')),
-        wrap('script', templateBlocks.frontmatter),
+        wrap('script lang="ts"', templateBlocks.frontmatter),
         regularScriptBlocks,
       ].filter(i => i).join('\n')
-
-  if (routeMeta)
-    customBlocks.push(`<route lang="json">${JSON.stringify(routeMeta)}</route>\n`)
 
   return {
     ...payload,

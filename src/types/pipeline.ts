@@ -1,11 +1,12 @@
 import type MarkdownIt from 'markdown-it'
 import type { MaybeRef } from '@vueuse/core'
 import type * as TE from 'fp-ts/TaskEither'
-import type { UserConfig } from 'vite'
+import type { HmrContext, UserConfig } from 'vite'
 import type { Either } from 'fp-ts/lib/Either'
 import type { Fragment, IElement } from '@yankeeinlondon/happy-wrapper'
 import type { EnumValues, Frontmatter, MetaProperty, ResolvedOptions } from './core'
 import type { BuilderApi, BuilderDependencyApi } from './builder'
+import { TransformPluginContext } from 'rollup'
 
 export enum PipelineStage {
   /**
@@ -79,9 +80,12 @@ export type Parser<S extends IPipelineStage> = S extends 'parser' | 'parsed' | '
  * Note: this is best done with the _meta_ builder
  */
 export interface RouteConfig {
+  /** The Route's name */
   name?: string
+  /** The Route's path */
   path?: string
-  meta?: Record<string, any>
+  /** A dictionary of key/value pairs for the route */
+  meta?: Frontmatter
 }
 
 export interface LinkProperty {
@@ -271,7 +275,7 @@ export type Pipeline<S extends IPipelineStage> = {
    */
   head: HeadProps
   /**
-   * Meta properties associated with a page's route; typically used
+   * Meta properties associated with a page's route; used
    * and managed with the "meta" builder.
    */
   routeMeta?: RouteConfig

@@ -47,7 +47,7 @@ const config = defineConfig({
       headEnabled: true,
       builders: [
         meta({
-          routeProps: ['layout', 'requireAuth'],
+          routeProps: ['layout', 'requireAuth', 'foo', 'route'],
           defaults: {
             requireAuth: () => false,
           },

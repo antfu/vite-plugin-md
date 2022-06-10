@@ -1,4 +1,5 @@
 import type { Frontmatter, MetaProperty, Pipeline, PipelineStage, RouteConfig } from '../../types'
+import { keys, ReturnValues, valueOrCallback } from '../../utils'
 import { createBuilder } from '../createBuilder'
 
 export type MetaFlag = [prop: string, defVal: boolean]
@@ -26,7 +27,7 @@ function addMetaTag(k: string, v: any): MetaProperty {
 /**
  * A callback for meta-builder callbacks
  */
-export type MetaCallback<T> = (filename: string, frontmatter: Pipeline<PipelineStage.parser>['frontmatter']) => T
+export type MetaCallback<T extends ReturnValues> = (filename: string, frontmatter: Pipeline<PipelineStage.parser>['frontmatter']) => T
 
 export interface MetaConfig {
   /**
@@ -48,7 +49,7 @@ export interface MetaConfig {
    * Allows the user to configure a bespoke scheme for setting a page's route path.
    * By default the path is simply a direct artifact of the filename and directory.
    */
-  routePath?: MetaCallback<string>
+  routePath?: string | MetaCallback<string>
 
   /**
    * You can pass in a callback to resolve route names; you'll be passed
@@ -57,7 +58,7 @@ export interface MetaConfig {
    *
    * @default undefined
    */
-  routeName?: MetaCallback<string>
+  routeName?: string | MetaCallback<string>
 
   /**
    * Properties in frontmatter dictionary which will be treated as HEAD properties
@@ -66,6 +67,14 @@ export interface MetaConfig {
    * @default ['title']
    */
   headProps: HeadProperties[]
+
+  /**
+   * If turned on, this will ensure that all query parameters on the given route
+   * are made available under the `queryParams` variable.
+   * 
+   * @default false
+   */
+  queryParameters: Boolean
 
   /**
    * Default values for a frontmatter property if none was stated in the doc. Property defaults
@@ -99,7 +108,8 @@ export const meta = createBuilder('meta', 'metaExtracted')
     const c: MetaConfig = {
       metaProps: ['image', 'title', 'description', 'url', 'image_width', 'image_height'],
       routeProps: ['layout', 'requiresAuth'],
-
+      routeName: 'routeName',
+      queryParameters: false,
       headProps: ['title'],
       defaults: {},
 
@@ -126,7 +136,7 @@ export const meta = createBuilder('meta', 'metaExtracted')
 
     head = {
       ...head,
-      ...c.headProps.reduce(
+      ...c?.headProps.reduce(
         (acc, p) => ({ ...acc, [p]: frontmatter[p as string] }),
         {},
       ),
@@ -153,9 +163,52 @@ export const meta = createBuilder('meta', 'metaExtracted')
 
     const routeMeta: RouteConfig = {
       ...p.routeMeta,
-      ...(c.routeName ? { name: c.routeName(p.fileName, p.frontmatter) } : {}),
-      ...(c.routePath ? { path: c.routePath(p.fileName, p.frontmatter) } : {}),
+      ...(c.routeName ? { name: valueOrCallback(c.routeName, [p.fileName, p.frontmatter]) as string } : {}),
+      ...(c.routePath ? { path: valueOrCallback(c.routePath, [p.fileName, p.frontmatter]) as string } : {}),
       ...(Object.keys(routeMetaProps).length > 0 ? { meta: routeMetaProps } : {}),
+    }
+    const hasRouteConfig = Object.keys(routeMeta).length > 0;
+
+    // ROUTE META
+    if (hasRouteConfig || o.queryParameters ) {
+      const router = [
+        'import { useRouter, useRoute } from \'vue-router\'',
+      ]
+      if (o.queryParameters) {
+        router.push('const route = useRoute()')
+        router.push('const queryParams: Record<string, string|boolean|number> = route.query')
+      }
+
+      if (hasRouteConfig) {
+        router.push('const router = useRouter()')
+        if(routeMeta.name) {
+          router.push(`router.currentRoute.value.name = ${routeMeta.name}`)
+        }
+        if(routeMeta.path) {
+          router.push(`router.currentRoute.value.path = ${routeMeta.path}`)
+        }
+        if(routeMeta.meta) {
+          router.push('router.currentRoute.value.meta = {')
+          router.push('  ...router.currentRoute.value.meta,')
+
+          keys(routeMeta.meta).forEach(key => {
+            const value = (routeMeta.meta as Frontmatter)[key];
+            if(!Array.isArray(value) && value !== null && typeof value === "object") {
+              // a dictionary of key/values ... most typically associated to the "route" prop
+              keys(value as Object).forEach(subKey => {
+                const subValue = ((routeMeta.meta as Frontmatter)[key] as Record<string, any>)[subKey];
+                router.push(`  ${subKey}: ${JSON.stringify(subValue)},`)
+              })
+            } else {
+              router.push(`  ${key}: ${JSON.stringify(value)},`)
+            }
+          })
+
+          router.push('}')
+        }
+      }
+      
+      p.addCodeBlock("route-meta", router.join('\n'));
     }
 
     return {

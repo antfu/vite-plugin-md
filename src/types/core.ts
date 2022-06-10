@@ -218,7 +218,7 @@ export interface Options {
    *
    * @default auto detected
    */
-  vueVersion?: string
+  vueVersion?: '2' | '3'
 
   /**
    * Enable head support, need to install @vueuse/head and register to App in main.js
