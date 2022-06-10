@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-md",
-  "version": "0.14.0",
+  "version": "0.14.1",
   "packageManager": "pnpm@7.1.7",
   "description": "Markdown for Vite",
   "author": "Anthony Fu <anthonyfu117@hotmail.com>",
