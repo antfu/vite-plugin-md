@@ -65,9 +65,9 @@ import fantastic from './superFantastic'
 
 export default defineConfig({
   plugins: [
-    Markdown(
-      builders: [ fantastic({ foo: 'bar' }) ]
-    )
+    Markdown({
+      builders: [fantastic({ foo: 'bar' })]
+    })
   ]
 })
 ```

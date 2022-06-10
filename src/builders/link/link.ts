@@ -1,4 +1,4 @@
-import { join } from 'path'
+import { join } from 'pathe'
 import { pipe } from 'fp-ts/lib/function'
 import { normalizePath } from 'vite'
 import type { LinkElement } from '../../types'
