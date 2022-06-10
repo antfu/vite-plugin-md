@@ -1,5 +1,5 @@
 import { readFileSync } from 'fs'
-import { dirname, join } from 'path'
+import { dirname, join } from 'pathe'
 import type Token from 'markdown-it/lib/token'
 import { toHtml } from '@yankeeinlondon/happy-wrapper'
 import type { Pipeline, PipelineStage } from '../../../types'

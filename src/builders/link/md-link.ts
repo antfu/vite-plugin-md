@@ -1,4 +1,4 @@
-import { dirname, join } from 'node:path'
+import { dirname, join } from 'pathe'
 import { normalizePath } from 'vite'
 import type Token from 'markdown-it/lib/token'
 import type MarkdownIt from 'markdown-it'
