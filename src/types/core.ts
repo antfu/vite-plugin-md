@@ -1,4 +1,3 @@
-/* eslint-disable no-use-before-define */
 import type MarkdownIt from 'markdown-it'
 import type { FilterPattern } from '@rollup/pluginutils'
 import type { Plugin, UserConfig } from 'vite'

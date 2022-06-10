@@ -7,7 +7,7 @@ title: Code block with Indentation
 this test is intended to validate testing of code blocks
 
 ```ts
-export default defineConfig(() => {
+export default defineConfig({
   plugins: [
     Markdown({
       builders: [code(), link(), meta()]
