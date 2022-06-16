@@ -9,7 +9,6 @@ import type {
 } from '../types'
 import {
   applyMarkdownItOptions,
-  baseStyling,
   convertToDom,
   createParser,
   escapeCodeTagInterpolation,
