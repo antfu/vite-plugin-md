@@ -38,7 +38,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "prepublishOnly": "npm run build",
-    "release": "bumpp --commit --tag --push",
+    "release": "bumpp",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:update": "vitest -u",
