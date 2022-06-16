@@ -44,7 +44,7 @@ const plugin = (o: MdLinkOptions): PluginSimple => (
     throw new Error('link plugin requires a transform function to do it\'s job!')
   }
   else {
-    const base = normalizePath(join(o.base || '/', dirname(o.file)))
+    const base = normalizePath(join('/', o.base || dirname(o.file)))
     md.renderer.rules.link_open = function (tokens, idx, options, env, self) {
       const link = tokens[idx]
       const original = toDictionary(link, base)

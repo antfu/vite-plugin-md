@@ -127,7 +127,7 @@ describe('link testing', () => {
 
     for (const l of links) {
       expect(
-        l.getAttribute('to').startsWith('one'),
+        l.getAttribute('to').startsWith('/one'),
         `when we have a "base" of "one" all internal URLs should start with that URL but the URL was "${l.getAttribute('to')}"\n`,
       ).toBeTruthy()
     }
@@ -142,7 +142,7 @@ describe('link testing', () => {
 
     for (const l of links) {
       expect(
-        l.getAttribute('to').startsWith('one'),
+        l.getAttribute('to').startsWith('/one'),
         `when we have a "base" of "foo" all internal URLs should start with that URL. Url was:  ${l.getAttribute('to')}\n`,
       ).toBeTruthy()
     }
