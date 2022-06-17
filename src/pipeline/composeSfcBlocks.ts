@@ -11,7 +11,6 @@ import type {
 import {
   addDependencies,
   applyMarkdownItOptions,
-  baseStyling,
   convertToDom,
   createParser,
   escapeCodeTagInterpolation,
@@ -78,7 +77,7 @@ export async function composeSfcBlocks(
   /** extract the meta-data from the MD content */
   const metaExtracted = flow(
     extractFrontmatter,
-    baseStyling,
+    // baseStyling,
     frontmatterPreprocess,
     handlers(PipelineStage.metaExtracted),
   )
