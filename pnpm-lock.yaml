@@ -53,6 +53,7 @@ importers:
       fp-ts: 2.12.1
       gray-matter: 4.0.3
       markdown-it: 13.0.1
+      prismjs: 1.28.0
     devDependencies:
       '@antfu/eslint-config': 0.25.1_ud6rd4xtew5bv4yhvkvu24pzm4
       '@antfu/ni': 0.16.2
@@ -80,7 +81,6 @@ importers:
       happy-dom: 5.3.1
       npm-run-all: 4.1.5
       pathe: 0.3.0
-      prismjs: 1.28.0
       rollup: 2.75.6
       shiki: 0.10.1
       tsup: 6.1.2_typescript@4.7.3
@@ -5150,7 +5150,6 @@ packages:
     resolution: {integrity: sha512-8aaXdYvl1F7iC7Xm1spqSaY/OJBpYW3v+KJ+F17iYxvdc8sfjW194COK5wVhMZX45tGteiBQgdvD/nhxcRwylw==}
     engines: {node: '>=6'}
     requiresBuild: true
-    dev: true
 
   /process-nextick-args/2.0.1:
     resolution: {integrity: sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==}
