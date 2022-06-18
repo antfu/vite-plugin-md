@@ -141,7 +141,9 @@ export const extractBlocks = transformer('extractBlocks', 'dom', 'sfcBlocksExtra
   }).filter(i => i).join('\n')
 
   const scriptSetup = isVue2(options)
+    // Vue 2
     ? ''
+    // Vue 3
     : wrap('script setup lang="ts"', [
       ...importDirectives,
       template.useHead,

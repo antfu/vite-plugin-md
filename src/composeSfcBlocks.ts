@@ -1,13 +1,13 @@
 import { flow, pipe } from 'fp-ts/lib/function'
 import { isRight } from 'fp-ts/lib/Either'
-import { resolveOptions } from '../options'
-import { PipelineStage } from '../types'
+import { resolveOptions } from './options'
+import { PipelineStage } from './types'
 import type {
   BuilderDependency,
   Options,
   Pipeline,
   ViteConfigPassthrough,
-} from '../types'
+} from './types'
 import {
   addDependencies,
   applyMarkdownItOptions,
@@ -25,9 +25,10 @@ import {
   transformsBefore,
   usesBuilder,
   wrapHtml,
-} from '../pipeline'
-import { lift } from '../utils'
-import { MdError } from '../MdError'
+} from './pipeline'
+import { lift } from './utils'
+import { MdError } from './MdError'
+import { kebabCaseComponents } from './pipeline/kebabCaseComponents'
 
 /**
  * Composes the `template` and `script` blocks, along with any other `customBlocks` from
@@ -94,6 +95,7 @@ export async function composeSfcBlocks(
    */
   const parsed = flow(
     parseHtml,
+    kebabCaseComponents,
     repairFrontmatterLinks,
     wrapHtml,
     handlers(PipelineStage.parsed),
