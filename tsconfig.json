@@ -11,10 +11,25 @@
     "strictNullChecks": true,
     "moduleResolution": "Node",
     "resolveJsonModule": true,
-    "skipLibCheck": true
-
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "~/*": [
+        "src/*"
+      ],
+      "~/fixtures/*": [
+        "test/fixtures/*"
+      ],
+      "~/utils/*": [
+        "test/utils/*"
+      ]
+    }
   },
-  "include": ["src", "test", "vite.config.ts"],
+  "include": [
+    "src",
+    "test",
+    "vite.config.ts"
+  ],
   "exclude": [
     "**/dist",
     "**/node_modules"

@@ -11,12 +11,7 @@ exports[`excerpt snapshots > HTML is consistent 1`] = `
 </div>"
 `;
 
-exports[`excerpt snapshots > custom blocks are consistent 1`] = `
-[
-  "<route lang=\\"json\\">{}</route>
-",
-]
-`;
+exports[`excerpt snapshots > custom blocks are consistent 1`] = `[]`;
 
 exports[`excerpt snapshots > frontmatter is consistent 1`] = `
 {
@@ -25,17 +20,4 @@ exports[`excerpt snapshots > frontmatter is consistent 1`] = `
 }
 `;
 
-exports[`excerpt snapshots > script blocks are consistent 1`] = `
-"
-<script setup>
-  defineExpose({ frontmatter: {\\"title\\":\\"Excerpt with default separator\\"} })
-  
- const title = \\"Excerpt with default separator\\"
- const excerpt = undefined
-</script>
-
-<script>
-  /** frontmatter meta-data for MD page **/
-  export const frontmatter = {\\"title\\":\\"Excerpt with default separator\\"}
-</script>"
-`;
+exports[`excerpt snapshots > script blocks are consistent 1`] = `undefined`;

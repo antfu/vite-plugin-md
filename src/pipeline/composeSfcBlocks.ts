@@ -28,16 +28,15 @@ import {
 } from '../pipeline'
 import { lift } from '../utils'
 import { MdError } from '../MdError'
-import { TransformPluginContext } from 'rollup'
 
 /**
  * Composes the `template` and `script` blocks, along with any other `customBlocks` from
  * the raw markdown content along with user options.
  */
 export async function composeSfcBlocks(
-  id: string, 
-  raw: string, 
-  opts: Omit<Options, 'usingBuilder'> = {}, 
+  id: string,
+  raw: string,
+  opts: Omit<Options, 'usingBuilder'> = {},
   config: Partial<ViteConfigPassthrough> = {},
 ) {
   const options = resolveOptions(opts)

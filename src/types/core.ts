@@ -388,3 +388,5 @@ export interface ViteConfigPassthrough {
 }
 
 export type WithConfig<T extends ResolvedOptions> = ViteConfigPassthrough & T
+
+export type ReturnValues = string | string[] | number | boolean | Object

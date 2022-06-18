@@ -4,25 +4,28 @@ import { composeFixture } from './utils'
 
 describe('hoisted script blocks', () => {
   it('snapshot of hoisted scripts section remains the same', async () => {
-    const { hoistedScripts } = await composeFixture('hoisted')
+    const { hoistedScripts } = await composeFixture('hoisted-2')
     expect(hoistedScripts).toMatchSnapshot()
   })
 
   it('snapshot of component section remains the same', async () => {
-    const { component } = await composeFixture('hoisted')
+    const { component } = await composeFixture('hoisted-2')
     expect(component).toMatchSnapshot()
   })
 
   it('script sections all identified in hoistedScripts array', async () => {
-    const { hoistedScripts } = await composeFixture('hoisted')
+    const { hoistedScripts } = await composeFixture('hoisted-2')
+
     expect(hoistedScripts).toHaveLength(4)
     expect(hoistedScripts.filter(s => s.includes('setup'))).toHaveLength(2)
   })
 
-  it('all "script setup" blocks merged into one block with frontmatter defined first', async () => {
-    const { component } = await composeFixture('hoisted')
+  it.only('all "script setup" blocks merged into one block with frontmatter defined first', async () => {
+    const { component } = await composeFixture('hoisted-2')
     const scriptSetup = select(component).findAll('script[setup]')
+    expect(scriptSetup, 'there should only be ONE scriptSetup block').toHaveLength(1)
     const script = toHtml(scriptSetup[0])
+
     // ordering
     const imports = script.indexOf('from \'some-other-place\'')
     const defineExposure = script.indexOf('defineExpose')
@@ -38,7 +41,7 @@ describe('hoisted script blocks', () => {
   })
 
   it('userland script blocks defined as separate blocks and after script setup', async () => {
-    const { component } = await composeFixture('hoisted')
+    const { component } = await composeFixture('hoisted-2')
 
     const scriptBlocks = select(component).filterAll('script[setup]').findAll('script')
 

@@ -1,12 +1,12 @@
-import { extract, select, toHtml } from '@yankeeinlondon/happy-wrapper'
-import type { HTML, IElement } from '@yankeeinlondon/happy-wrapper'
+import { extract, getAttribute, select, toHtml } from '@yankeeinlondon/happy-wrapper'
+import type { IElement } from '@yankeeinlondon/happy-wrapper'
+import { pipe } from 'fp-ts/lib/function'
 import { isVue2, transformer, wrap } from '../utils'
 import type {
   Pipeline,
   PipelineStage,
   ResolvedOptions,
 } from '../types'
-import { Project } from 'ts-morph';
 
 const elementHashToArray = (hash?: Record<string, IElement>): IElement[] => hash
   ? Object.keys(hash).reduce(
@@ -42,56 +42,69 @@ const createVue2ScriptBlock = (codeBlocks: Record<string, string | [base: string
 }
 
 /**
- * Finds any references to `<script>` blocks and extracts it
- * from the html portion. This is then added to scriptBlocks
- * which been accumulated by calls to `addStyleBlock()`
+ * Finds any references to `<script>` and `<script setup>` blocks and extracts it
+ * from the html. The pipeline's HTML is updated and the two varieties of scripts
+ * are returned.
  */
-function extractScriptBlocks(html: HTML, p: Pipeline<PipelineStage.dom>) {
+function extractScriptBlocks(p: Pipeline<PipelineStage.dom>) {
   const scripts: IElement[] = []
   const extractor = extract(scripts)
-  html = select(html)
+  const html = select(p.html)
     .updateAll('script')(extractor)
-    .append(elementHashToArray(p.vueStyleBlocks))
     .toContainer()
 
-  return { html, scripts: scripts.map(el => toHtml(el)) }
+  p.html = html
+
+  const lang = getAttribute('lang')
+  const scriptSetups = select(scripts.join('\n')).findAll('script[setup]')
+  scriptSetups.forEach((ss) => {
+    const l = pipe(ss, lang)
+    if (l && l.length > 0 && l !== 'ts')
+      throw new Error(`Detected a <script setup> block which was using "${l}" as a language setting; if you want to write code in "${l}" try putting it into a normal <script> block as <script setup> is reserved for Typescript when using the vite-plugin-md plugin.\n - [ file: ${p.fileName}, node: ${toHtml(ss)} ]`)
+  })
+
+  const traditionalScripts = select(scripts.join('\n')).findAll('script:not([setup])')
+
+  return { scriptSetups, traditionalScripts }
 }
 
 /**
- * Separates SFC blocks from within the HTML into separate variables
+ * Extracts "style" blocks along with any other custom blocks defined in the options
+ * for this plugin. This call also mutates the `html` property to extract these custom
+ * blocks.
  */
-function extractCustomBlock(html: string, options: ResolvedOptions) {
-  const customBlocks: string[] = []
-  let templateBlock = html
+function extractCustomBlocks(p: Pipeline<PipelineStage.dom>, options: ResolvedOptions) {
+  const styleBlocks = [
+    ...select(p.html).findAll('style'),
+    ...elementHashToArray(p.vueStyleBlocks),
+  ]
+  const html = select(p.html)
+    .updateAll('style')(extract())
+  let customBlocks: IElement[] = []
   for (const tag of options.customSfcBlocks) {
-    templateBlock = templateBlock.replace(new RegExp(`<${tag}[^>]*\\b[^>]*>[^<>]*<\\/${tag}>`, 'mg'), (code) => {
-      customBlocks.push(code)
-      return ''
-    })
+    const found = select(p.html).findAll(tag)
+    html.updateAll(tag)(extract())
+    if (found.length > 0)
+      customBlocks = [...customBlocks, ...found]
   }
 
-  return { templateBlock, customBlocks }
+  p.html = html.toContainer()
+
+  return { styleBlocks, customBlocks }
 }
 
 /**
- * Separates the various "blocks" in an SFC component. This includes the
- * template and script section(s) but can also include custom blocks (which
- * typically is the Router metadata being moved into the route's meta prop)
+ * Separates the various "blocks" in an SFC component
  */
 export const extractBlocks = transformer('extractBlocks', 'dom', 'sfcBlocksExtracted', (payload) => {
   // eslint-disable-next-line prefer-const
-  let { options, frontmatter, head, routeMeta } = payload
+  let { options, frontmatter, head } = payload
 
-  /** HTML converted back to a string */
-  let html = toHtml(payload.html)
-  // extract script blocks, adjust HTML
-  const hoistScripts = extractScriptBlocks(html, payload)
-  html = hoistScripts.html
-  const hoistedScripts: string[] = hoistScripts.scripts
+  const { scriptSetups, traditionalScripts } = extractScriptBlocks(payload)
+  const { styleBlocks, customBlocks } = extractCustomBlocks(payload, options)
 
-  const { templateBlock, customBlocks } = extractCustomBlock(html, options)
-  
-  const templateBlocks = {
+  /** template blocks that will be applied below */
+  const template = {
     /** adds the lines needed to include useHead() */
     useHead: head && options.headEnabled
       ? `import { useHead } from "@vueuse/head"\n  const head = ${JSON.stringify(head)}\n  useHead(head)`
@@ -115,22 +128,11 @@ export const extractBlocks = transformer('extractBlocks', 'dom', 'sfcBlocksExtra
     ),
   }
 
-  const regularScriptBlocks = hoistScripts.scripts.map(
-    s => select(s).filterAll('script[setup]').toContainer(),
-  ).filter(i => i).join('\n')
-  /** all `<setup script>` blocks */
-  const scriptSetupBlocks = hoistScripts.scripts
-    .map(
-      s => select(s)
-      // unwrap the <script>...</script> tag and return only interior content
-        .mapAll('script[setup]')(el => el.innerHTML),
-    )
-    .join('\n')
-  /** userland `<setup script>` import directives */
   const importDirectives: string[] = []
+  const scriptSetupBlocks = scriptSetups.map(el => el.innerHTML)
 
   /** all userland non-import lines in `<setup script>` blocks */
-  const nonImportDirectives = scriptSetupBlocks.split('\n').map((line) => {
+  const nonImportDirectives = scriptSetupBlocks.map((line) => {
     if (/^import/.test(line)) {
       importDirectives.push(line)
       return ''
@@ -138,38 +140,46 @@ export const extractBlocks = transformer('extractBlocks', 'dom', 'sfcBlocksExtra
     else { return line }
   }).filter(i => i).join('\n')
 
-  const scriptBlock = isVue2(options)
+  const scriptSetup = isVue2(options)
+    ? ''
+    : wrap('script setup lang="ts"', [
+      ...importDirectives,
+      template.useHead,
+      template.exposeFrontmatter,
+      template.localVariables,
+      nonImportDirectives,
+      ...codeBlocksToArray(payload.vueCodeBlocks),
+    ].filter(i => i).join('\n  '))
+
+  const scriptBlocks = isVue2(options)
+    // Vue 2
     ? [
         wrap('script lang="ts"', [
-          templateBlocks.localVariables,
-          templateBlocks.frontmatter,
-          templateBlocks.vue2DataExport,
+          template.localVariables,
+          template.frontmatter,
+          template.vue2DataExport,
         ].join('\n')),
         [
-          ...hoistScripts.scripts,
+          ...traditionalScripts.map(el => el.outerHTML),
           createVue2ScriptBlock(payload.vueCodeBlocks),
         ].join('\n'),
-      ].filter(i => i).join('\n')
+      ].filter(i => i)
     // Vue3
     : [
-        wrap('script setup lang="ts"', [
-          ...importDirectives,
-          templateBlocks.useHead,
-          templateBlocks.exposeFrontmatter,
-          templateBlocks.localVariables,
-          nonImportDirectives,
-          ...codeBlocksToArray(payload.vueCodeBlocks),
-        ].filter(i => i).join('\n  ')),
-        wrap('script lang="ts"', templateBlocks.frontmatter),
-        regularScriptBlocks,
-      ].filter(i => i).join('\n')
+        wrap('script lang="ts"', template.frontmatter),
+        // userland script blocks
+        traditionalScripts.map(s => s.outerHTML).join('\n'),
+      ].filter(i => i)
+
+  const html = toHtml(payload.html)
 
   return {
     ...payload,
     html,
-    hoistedScripts,
-    templateBlock,
-    scriptBlock,
-    customBlocks,
-  }
+    templateBlock: html,
+    scriptSetup,
+    scriptBlocks,
+    styleBlocks: styleBlocks.map(s => s.outerHTML),
+    customBlocks: customBlocks.map(s => s.outerHTML),
+  } as Pipeline<PipelineStage.sfcBlocksExtracted>
 })

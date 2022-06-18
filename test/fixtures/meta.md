@@ -1,6 +1,6 @@
 ---
 title: Metadata Rules
-name: My Name
+name: MetaBuilder
 byline: who loves ya baby?
 layout: yowza
 image: facebook.png

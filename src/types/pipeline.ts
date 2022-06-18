@@ -1,12 +1,11 @@
 import type MarkdownIt from 'markdown-it'
 import type { MaybeRef } from '@vueuse/core'
 import type * as TE from 'fp-ts/TaskEither'
-import type { HmrContext, UserConfig } from 'vite'
+import type { UserConfig } from 'vite'
 import type { Either } from 'fp-ts/lib/Either'
 import type { Fragment, IElement } from '@yankeeinlondon/happy-wrapper'
 import type { EnumValues, Frontmatter, MetaProperty, ResolvedOptions } from './core'
 import type { BuilderApi, BuilderDependencyApi } from './builder'
-import { TransformPluginContext } from 'rollup'
 
 export enum PipelineStage {
   /**
@@ -237,18 +236,26 @@ export type HtmlContent<S extends IPipelineStage> = S extends 'parsed' | 'sfcBlo
 
 export type Blocks<S extends IPipelineStage> = S extends 'sfcBlocksExtracted' | 'closeout'
   ? {
-      /**
-       * all hoisted scripts
-       */
-      hoistedScripts: string[]
 
       /** the SFC's template block (aka, html content) */
       templateBlock: string
 
-      /** the `<script [setup] ...>` block */
-      scriptBlock: string
+      /**
+       * The `<script setup ...>` block.
+       *
+       * Since there can only be one block, if the markdown has multiple <script setup>
+       * blocks then the interior code will be moved into the single code block to retain
+       * the required cardinality.
+       */
+      scriptSetup: string
 
-      /** any other top-level SFC blocks besides "template" and "script" */
+      /** the traditional <script> blocks found on the page */
+      scriptBlocks: string[]
+
+      /** the style blocks found on the page */
+      styleBlocks: string[]
+
+      /** any other top-level SFC blocks besides the traditional */
       customBlocks: string[]
     }
   : {}

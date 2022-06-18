@@ -31,7 +31,7 @@ function VitePluginMarkdown(userOptions: Options = {}): Plugin {
       if (!filter(id))
         return
 
-      try {    
+      try {
         /** converts Markdown to VueJS SFC string */
         const convert = markdownToVue(config)
         const sfc = await convert(id, raw)

@@ -10,13 +10,17 @@ export default defineConfig({
   test: {
     dir: 'test',
     exclude: ['**/*.spec.ts'],
+    environment: 'happy-dom',
+    api: {
+      host: '0.0.0.0',
+    },
   },
   plugins: [
     Pages({
       extensions: ['vue', 'md'],
     }),
     Layouts(),
-    Markdown({ builders: [link(), meta(), code({ theme: 'base' })] }),
+    Markdown({ builders: [link(), code({ theme: 'base' }), meta()] }),
     Vue({
       include: [/\.vue$/, /\.md$/],
     }),

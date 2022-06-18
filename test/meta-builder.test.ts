@@ -1,6 +1,5 @@
 import { readFile } from 'fs/promises'
 import { beforeAll, describe, expect, it } from 'vitest'
-import { select, toHtml } from '@yankeeinlondon/happy-wrapper'
 import { resolveOptions } from '../src/options'
 import { meta } from '../src/index'
 import type { Options } from '../src/types'
@@ -70,27 +69,6 @@ describe('use "meta" builder for frontmatterPreprocess', async () => {
     expect(output.includes('defineExpose({ ')).toBeTruthy()
   })
 
-  it('default route prop "layout" converted to route meta when present', async () => {
-    const sfc = await composeFixture('meta', {
-      builders: [meta()],
-    })
-
-    const route = sfc.customBlocks.find(i => i.includes('<route'))
-    expect(route).toBeDefined()
-    expect(route).toContain('layout')
-  })
-
-  it('configuring a property to be a route meta property results in a Route custom block being created for a given page', async () => {
-    const sfc = await composeFixture('route-meta-custom', {
-      builders: [meta({ routeProps: ['requiresAuth', 'layout'] })],
-    })
-
-    const routes = sfc.customBlocks.filter(i => i.includes('<route'))
-    expect(routes).toHaveLength(1)
-    expect(routes[0], `custom block was: ${sfc.customBlocks[0]}`).toContain('layout')
-    expect(routes[0]).toContain('requiresAuth')
-  })
-
   it('setting static and callback based default values works', async () => {
     const sfc = await composeFixture('route-meta-custom', {
       builders: [meta({
@@ -139,50 +117,31 @@ describe('use "meta" builder for frontmatterPreprocess', async () => {
 })
 
 describe('meta() can manage route meta', () => {
-  it('manually entering a route in markdown content is picked up and used', async () => {
-    const sfc = await composeFixture('meta', { builders: [meta()] })
+  it('router not brought into script section when Markdown doesn\'t have route meta', async () => {
+    const { scriptSetup } = await composeFixture('simple', { builders: [meta()] })
 
-    expect(sfc.frontmatter.layout).toBe('yowza')
-    // custom blocks were created
-    expect(sfc.customBlocks.length).toBeGreaterThan(0)
-    expect(sfc.component).toContain('<route')
-    // isolate route config
-    const routes = select(sfc.component).findAll('route')
-    expect(routes).toHaveLength(1)
-    expect(routes[0].textContent).toContain('"layout":"yowza"')
+    expect(scriptSetup).not.toContain('useRouter')
   })
 
-  it('setting "layout" adds a custom block for a route', async () => {
-    const sfc = await composeFixture('meta-manual', { builders: [meta()] })
-
-    expect(sfc.frontmatter.layout).not.toBe('yowza')
-    // custom blocks were created
-    expect(sfc.customBlocks.length).toBeGreaterThan(0)
-    expect(sfc.component).toContain('<route')
-    // isolate route config
-    const routes = select(sfc.component).findAll('route')
-    expect(routes).toHaveLength(1)
-    // TODO: this is bizarre, the quotes are being translated from
-    // normal quotes to fancy quotes when manually put into page
-    // maybe this is ok but it was surprising
-    expect(
-      toHtml(routes[0]),
-      toHtml(routes[0]),
-    ).toContain('“yowza”')
+  it('router IS imported when a a \'route prop\' is defined in frontmatter', async () => {
+    const { scriptSetup, frontmatter } = await composeFixture('meta', { builders: [meta()] })
+    expect(frontmatter.layout).toBeDefined()
+    expect(scriptSetup).toContain('useRouter')
   })
 
-  it('configuring a name callback allows us to give a name to our routes', async () => {
-    const sfc = await composeFixture('meta', {
+  it('using routeName callback ensures that router is imported and route name is set', async () => {
+    const { frontmatter, scriptSetup } = await composeFixture('no-route', {
       builders: [meta({
-        routeName: (filename, fm) => fm.name ? fm.name : `bespoke-${filename}`,
+        routeName: (filename, fm) => fm.title ? `bespoke-${fm.title}` : 'nada',
       })],
     })
 
-    expect(sfc.frontmatter.name).toBe('My Name')
-    // isolate route config
-    const routes = select(sfc.component).findAll('route')
-    expect(routes).toHaveLength(1)
-    expect(routes[0].textContent).toContain('"name":"My Name"')
+    expect(frontmatter.title).toBe('NoRoute')
+    expect(scriptSetup, 'should have included an import of useRouter!').toContain('useRouter')
+    expect(
+      scriptSetup,
+      `The scriptSetup block was:\n${scriptSetup}\n\n`,
+    ).toContain('router.currentRoute.value.name = "bespoke-NoRoute"')
   })
 })
 
@@ -202,8 +161,8 @@ describe('meta() snapshots', async () => {
   })
 
   it('script blocks are consistent', async () => {
-    const { scriptBlock } = await composeSfcBlocks('/foobar/meta.md', md)
-    expect(scriptBlock).toMatchSnapshot()
+    const { scriptBlocks } = await composeSfcBlocks('/foobar/meta.md', md)
+    expect(scriptBlocks).toMatchSnapshot()
   })
 
   it('custom blocks are consistent', async () => {

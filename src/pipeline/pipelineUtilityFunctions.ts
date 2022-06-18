@@ -23,6 +23,7 @@ export const pipelineUtilityFunctions = (
 
     add(ctx.head.link, link)
   },
+  /** add a <script> block which references a URL as a source */
   addScriptReference(script) {
     if (!ctx.head.script)
       ctx.head.script = ref([] as ScriptProperty[])
@@ -30,6 +31,7 @@ export const pipelineUtilityFunctions = (
     add(ctx.head.script, isElement(script) ? convertToDictionary(script) : script)
   },
 
+  /** add inline code to a script block on the page */
   addCodeBlock(name, script, forVue2) {
     ctx.vueCodeBlocks[name] = forVue2 ? [script, forVue2] : script
   },

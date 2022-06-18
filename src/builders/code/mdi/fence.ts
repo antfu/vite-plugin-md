@@ -16,7 +16,8 @@ import {
   updateFrontmatterWithCodeBlock,
   updateLineNumbers,
   updatePreWrapper,
-  useHighlighter, userRules,
+  useHighlighter,
+  userRules,
 } from '../pipeline'
 import { establishHighlighter } from './establishHighlighter'
 

@@ -1,8 +1,17 @@
 // Vitest Snapshot v1
 
 exports[`link testing > component snapshot is consistent 1`] = `
-"<route lang=\\"json\\">{}</route>
-
+"
+<script setup lang=\\"ts\\">
+  defineExpose({ frontmatter: {\\"title\\":\\"Links Testing\\"} })
+  
+ const title = \\"Links Testing\\"
+ const excerpt = undefined
+</script>
+<script lang=\\"ts\\">
+  /** frontmatter meta-data for MD page **/
+  export const frontmatter: Frontmatter = {\\"title\\":\\"Links Testing\\"}
+</script>
 <template>
   <div class=\\"markdown-body\\"><h1>Links</h1>
 <ul>
@@ -32,17 +41,5 @@ exports[`link testing > component snapshot is consistent 1`] = `
 <p><a href=\\"mailto:yur-da-best@dev.null\\" class=\\" mailto-link\\">contact us</a></p>
 </div>
 </template>
-
-<script setup>
-  defineExpose({ frontmatter: {\\"title\\":\\"Links Testing\\"} })
-  
- const title = \\"Links Testing\\"
- const excerpt = undefined
-</script>
-
-<script>
-  /** frontmatter meta-data for MD page **/
-  export const frontmatter = {\\"title\\":\\"Links Testing\\"}
-</script>
 "
 `;

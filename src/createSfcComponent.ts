@@ -1,6 +1,5 @@
 import type { Options, ViteConfig } from './types'
 import { composeSfcBlocks } from './pipeline/index'
-import { TransformPluginContext } from 'rollup'
 
 /**
  * Produces a _string_ which represents the parsed Markdown as a SFC component.
