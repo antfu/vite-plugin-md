@@ -106,7 +106,7 @@ import { Counter } from './Counter.vue'
 
 Or you can use [`vite-plugin-components`](#work-with-vite-plugin-components) for auto components registration.
 
-Please pay attention to the name of the component. `kebab-case` is recommended because it meets the standard
+Please pay attention to the name of the component. `kebab-case` is recommended because it meets the standard.
 
 ## Frontmatter
 
