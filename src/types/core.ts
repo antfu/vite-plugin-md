@@ -2,7 +2,7 @@ import type MarkdownIt from 'markdown-it'
 import type { FilterPattern } from '@rollup/pluginutils'
 import type { Plugin, UserConfig } from 'vite'
 import type { CodeBlockProperties } from '../builders/code/code-types'
-import type { BuilderRegistration } from './builder'
+import type { BuilderRegistration } from '~/builders'
 
 export type ViteConfig = Parameters<Exclude<Plugin['configResolved'], undefined>>[0]
 
@@ -137,36 +137,7 @@ export type ExcerptFunction = (contents: string, options: GraymatterOptions) => 
  */
 export interface GraymatterOptions {
   /**
-   * Extract an excerpt that directly follows front-matter, or is the
-   * first thing in the string if no front-matter exists.
-   *
-   * If set to excerpt `true`, it will look for the frontmatter delimiter,
-   * --- by default and grab everything leading up to it.
-   *
-   * You can also set excerpt to a function. This function that receives the
-   * full page contents and Graymatter Options as parameters and lets you
-   * decide what should be included.
-   *
-   * @default undefined
-   *
-   * @deprecated use the root option of `excerpt` instead
-   */
-  excerpt?: boolean | ExcerptFunction
-
-  /**
-   * Define a custom separator to use for excerpts.
-   *
-   * This will be used only when the `excerpt` property is set
-   * to `true`.
-   *
-   * @default undefined
-   *
-   * @deprecated use a string value in the root `excerpt` option instead
-   */
-  excerpt_separator?: string
-
-  /**
-   * Define custom engines for parsing and/or stringifying front-matter.
+   * Define custom engines for parsing and/or stringifying frontmatter.
    *
    * Engines may either be an object with `parse` and (optionally) stringify
    * methods, or a function that will be used for parsing only.
