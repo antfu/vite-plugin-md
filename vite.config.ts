@@ -6,19 +6,27 @@ import Vue from '@vitejs/plugin-vue'
 import Markdown, { code, link, meta } from './src'
 
 // used for testing, library code uses TSUP to build exports
-export default defineConfig(() => ({
+export default defineConfig({
   test: {
     dir: 'test',
     exclude: ['**/*.spec.ts'],
+    environment: 'happy-dom',
+    api: {
+      host: '0.0.0.0',
+    },
   },
   plugins: [
     Pages({
       extensions: ['vue', 'md'],
     }),
     Layouts(),
-    Markdown({ builders: [link(), meta(), code({ theme: 'base' })] }),
+    Markdown({
+      builders: [link(), code({ theme: 'base' }), meta()],
+      excerpt: true,
+      exposeExcerpt: true,
+    }),
     Vue({
       include: [/\.vue$/, /\.md$/],
     }),
   ],
-}))
+})

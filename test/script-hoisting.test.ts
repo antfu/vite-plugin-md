@@ -1,62 +1,41 @@
-import { select, toHtml } from '@yankeeinlondon/happy-wrapper'
 import { describe, expect, it } from 'vitest'
 import { composeFixture } from './utils'
 
 describe('hoisted script blocks', () => {
-  it('snapshot of hoisted scripts section remains the same', async () => {
-    const { hoistedScripts } = await composeFixture('hoisted')
-    expect(hoistedScripts).toMatchSnapshot()
-  })
-
-  it('snapshot of component section remains the same', async () => {
-    const { component } = await composeFixture('hoisted')
-    expect(component).toMatchSnapshot()
-  })
-
-  it('script sections all identified in hoistedScripts array', async () => {
-    const { hoistedScripts } = await composeFixture('hoisted')
-    expect(hoistedScripts).toHaveLength(4)
-    expect(hoistedScripts.filter(s => s.includes('setup'))).toHaveLength(2)
-  })
-
   it('all "script setup" blocks merged into one block with frontmatter defined first', async () => {
-    const { component } = await composeFixture('hoisted')
-    const scriptSetup = select(component).findAll('script[setup]')
-    const script = toHtml(scriptSetup[0])
+    const { scriptSetup } = await composeFixture('hoisted-2', {
+      headEnabled: true,
+    })
+
     // ordering
-    const imports = script.indexOf('from \'some-other-place\'')
-    const defineExposure = script.indexOf('defineExpose')
-    const title = script.indexOf('const title')
-    const sayHi = script.indexOf('const sayHi')
+    const imports = scriptSetup.indexOf('import ')
+    const title = scriptSetup.indexOf('const title')
+    const defineExpose = scriptSetup.indexOf('defineExpose')
+    const sayHi = scriptSetup.indexOf('const sayHi')
 
     // imports should be first
-    expect(defineExposure).toBeGreaterThan(imports)
-    // then defineExports, then the frontmatter props
-    expect(title).toBeGreaterThan(defineExposure)
+    expect(title).toBeGreaterThan(imports)
+    // then the frontmatter props, followed by defineExpose
+    expect(defineExpose).toBeGreaterThan(title)
     // finally, non-import user blocks are injected
-    expect(sayHi).toBeGreaterThan(title)
+    expect(sayHi).toBeGreaterThan(defineExpose)
   })
 
   it('userland script blocks defined as separate blocks and after script setup', async () => {
-    const { component } = await composeFixture('hoisted')
+    const { scriptSetup, scriptBlocks, component } = await composeFixture('hoisted-2')
 
-    const scriptBlocks = select(component).filterAll('script[setup]').findAll('script')
+    expect(scriptSetup).toContain('const sayHi')
+    expect(scriptSetup).toContain('const test')
 
-    // we should see two blocks from userland but there is also one created
-    // by the library code to export the frontmatter
-    expect(scriptBlocks).toHaveLength(3)
+    const script = scriptBlocks.join('\n')
 
-    const positions = scriptBlocks.map(b => component.indexOf(toHtml(b)))
-    const setupScriptLocation = component.indexOf(
-      toHtml(
-        select(component)
-          .findFirst(
-            'script[setup]',
-            'No script setup section found in component!',
-          ),
-      ),
-    )
-    // all traditional script blocks are declared _after_ the script setup block
-    positions.forEach(pos => expect(pos).toBeGreaterThan(setupScriptLocation))
+    expect(script).toContain('const sayBye')
+    expect(script).toContain('const test1')
+    expect(script).toContain('const test2')
+    expect(script).not.toContain('const test =')
+
+    const sayHi = component.indexOf('const sayHi')
+    const sayBye = component.indexOf('const sayBye')
+    expect(sayHi).lessThan(sayBye)
   })
 })

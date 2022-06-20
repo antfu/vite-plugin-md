@@ -1,10 +1,24 @@
 // Vitest Snapshot v1
 
 exports[`link testing > component snapshot is consistent 1`] = `
-"<route lang=\\"json\\">{}</route>
+"
+<script setup lang=\\"ts\\">
+const title = \\"Links Testing\\"
+ const excerpt = undefined
+  defineExpose({ frontmatter: {\\"title\\":\\"Links Testing\\"}, excerpt: undefined })
+</script>
+<script lang=\\"ts\\">
+/** frontmatter meta-data for MD page **/
+export interface Frontmatter {
+  title?: string; description?: string; subject?: string; category?: string; name?: string; excerpt?: string; image?: string; layout?: string; requiredAuth?: boolean; meta?: Record<string, any>[];
+  [key: string]: unknown
+}
+export const frontmatter: Frontmatter = {\\"title\\":\\"Links Testing\\"}
+export const excerpt: string | undefined = \\"\\"
 
+</script>
 <template>
-  <div class=\\"markdown-body\\"><h1>Links</h1>
+<div class=\\"markdown-body\\"><h1>Links</h1>
 <ul>
 <li>An <a href=\\"https://google.com\\" class=\\" external-link\\" target=\\"_blank\\" rel=\\"noreferrer noopenner\\">external link</a> is one which links to another site whereas an <router-link class=\\" internal-link router-link\\" to=\\"/simple\\">internal link</router-link> links to content on the same site.</li>
 <li>Within the category of “internal links” we have <router-link class=\\" internal-link router-link\\" to=\\"/foo/bar\\">fully qualified links</router-link> and <router-link class=\\" internal-link router-link\\" to=\\"/foo/bar\\">relative links</router-link> where with relative links we must ensure that the current page’s route is understood and incorporated into the link</li>
@@ -32,17 +46,5 @@ exports[`link testing > component snapshot is consistent 1`] = `
 <p><a href=\\"mailto:yur-da-best@dev.null\\" class=\\" mailto-link\\">contact us</a></p>
 </div>
 </template>
-
-<script setup>
-  defineExpose({ frontmatter: {\\"title\\":\\"Links Testing\\"} })
-  
- const title = \\"Links Testing\\"
- const excerpt = undefined
-</script>
-
-<script>
-  /** frontmatter meta-data for MD page **/
-  export const frontmatter = {\\"title\\":\\"Links Testing\\"}
-</script>
 "
 `;

@@ -18,6 +18,7 @@ export const code = createBuilder('code', PipelineStage.parser)
       lineNumbers: false,
       showLanguage: true,
       clipboard: false,
+      injectIntoFrontmatter: false,
       lineClass: 'code-line',
       headingClasses: ['heading'],
       footerClasses: ['footer'],
@@ -32,6 +33,6 @@ export const code = createBuilder('code', PipelineStage.parser)
     return p
   })
   .meta({
-    description: 'Provides highlighted code blocks via the Prism or Shiki styling ecosystems',
+    description: 'Provides highlighted code blocks via Prism or Shiki styling ecosystems',
     parserRules: [{ ruleName: 'fence', usage: 'patches' }],
   })

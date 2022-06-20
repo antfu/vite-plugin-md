@@ -2,39 +2,14 @@ import { identity, pipe } from 'fp-ts/lib/function'
 import type { IElement } from '@yankeeinlondon/happy-wrapper'
 import { addClass, select } from '@yankeeinlondon/happy-wrapper'
 import type { CodeBlockMeta, CodeOptions } from '../code-types'
-
-/** converts HighlightTokens to lines of code */
-function linesToHighlight(fence: CodeBlockMeta<'dom'>): number[] {
-  const lines: number[] = []
-
-  fence.highlightTokens.forEach((t) => {
-    switch (t.kind) {
-      case 'line':
-        lines.push(t.line)
-        break
-      case 'range':
-        {
-          let i = t.from
-          while (i <= t.to) {
-            lines.push(i)
-            i++
-          }
-        }
-        break
-      case 'symbol':
-        // TODO: need to implement this
-    }
-  })
-
-  return lines
-}
+import { highlightTokensToLines } from '../utils'
 
 /**
  * If highlighted line numbers are configured, will add "highlight" class to lines specified
  * using both traditional Vuepress/Vitepress nomenclature or attribute/object notation
  */
 export const highlightLines = (_o: CodeOptions) => (fence: CodeBlockMeta<'dom'>): CodeBlockMeta<'dom'> => {
-  const hl = linesToHighlight(fence)
+  const hl = highlightTokensToLines(fence)
 
   const highlight = (el: IElement, idx: number) => pipe(
     el,

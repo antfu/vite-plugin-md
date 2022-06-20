@@ -1,11 +1,15 @@
 import type {
-  BuilderApi,
-  BuilderHandler,
-  BuilderOptions,
-  BuilderRegistration,
   IPipelineStage,
   PipelineStage,
 } from '../types'
+import { createFnWithProps } from '../utils'
+import type { BuilderApi, BuilderApiMeta, BuilderApiWithoutMeta, BuilderHandler, BuilderOptions, BuilderRegistration } from './builder-types'
+
+function createAboutSection<N extends string>(name: N, description: string): BuilderApiMeta {
+  return {
+    about: { name, description },
+  } as BuilderApiMeta
+}
 
 /**
  * A utility function to help you build a type-safe "builder".
@@ -61,10 +65,13 @@ export function createBuilder<E extends IPipelineStage>(name: string, lifecycle:
                   }
 
                   // return a function so that the consumer can add in their options
-                  return (
-                    (options: Partial<O> = {}) =>
-                      () => ({ ...registration, options }) as BuilderRegistration<O, E>
-                  ) as BuilderApi<O, E>
+                  const fn: BuilderApiWithoutMeta<O, E> = (options: Partial<O> = {}) =>
+                    () => ({ ...registration, options }) as BuilderRegistration<O, E>
+
+                  const apiMeta = createAboutSection(name, meta.description || '')
+                  const api = createFnWithProps(fn, apiMeta)
+
+                  return api as BuilderApi<O, E>
                 },
               }
             },

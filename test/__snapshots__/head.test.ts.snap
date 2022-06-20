@@ -2,36 +2,24 @@
 
 exports[`using HEAD variables > when headEnabled property is set to \`false\`, behavior is same as the default 1`] = `
 "
-<script setup>
-  defineExpose({ frontmatter: {\\"title\\":\\"Hello World\\",\\"description\\":\\"testing is the path to true happiness\\"} })
-  
- const title = \\"Hello World\\"
+<script setup lang=\\"ts\\">
+const title = \\"Hello World\\"
  const description = \\"testing is the path to true happiness\\"
  const excerpt = undefined
-</script>
-
-<script>
-  /** frontmatter meta-data for MD page **/
-  export const frontmatter = {\\"title\\":\\"Hello World\\",\\"description\\":\\"testing is the path to true happiness\\"}
+  defineExpose({ frontmatter: {\\"title\\":\\"Hello World\\",\\"description\\":\\"testing is the path to true happiness\\"}, excerpt: undefined })
 </script>"
 `;
 
 exports[`using HEAD variables > when the headEnabled property is set to \`true\`, all interaction with useHead is enabled 1`] = `
 "
-<script setup>
-  import { useHead } from \\"@vueuse/head\\"
+<script setup lang=\\"ts\\">
+import { useHead } from \\"@vueuse/head\\"
   const head = {\\"title\\":\\"Hello World\\",\\"meta\\":[{\\"property\\":\\"og:title\\",\\"content\\":\\"Hello World\\"},{\\"property\\":\\"og:description\\",\\"content\\":\\"testing is the path to true happiness\\"},{\\"name\\":\\"description\\",\\"content\\":\\"testing is the path to true happiness\\"}]}
   useHead(head)
-  defineExpose({ frontmatter: {\\"title\\":\\"Hello World\\",\\"description\\":\\"testing is the path to true happiness\\",\\"meta\\":[{\\"property\\":\\"og:title\\",\\"content\\":\\"Hello World\\"},{\\"property\\":\\"og:description\\",\\"content\\":\\"testing is the path to true happiness\\"},{\\"name\\":\\"description\\",\\"content\\":\\"testing is the path to true happiness\\"}]} })
-  
- const title = \\"Hello World\\"
+  const title = \\"Hello World\\"
  const description = \\"testing is the path to true happiness\\"
  const excerpt = undefined
  const meta = [{\\"property\\":\\"og:title\\",\\"content\\":\\"Hello World\\"},{\\"property\\":\\"og:description\\",\\"content\\":\\"testing is the path to true happiness\\"},{\\"name\\":\\"description\\",\\"content\\":\\"testing is the path to true happiness\\"}]
-</script>
-
-<script>
-  /** frontmatter meta-data for MD page **/
-  export const frontmatter = {\\"title\\":\\"Hello World\\",\\"description\\":\\"testing is the path to true happiness\\",\\"meta\\":[{\\"property\\":\\"og:title\\",\\"content\\":\\"Hello World\\"},{\\"property\\":\\"og:description\\",\\"content\\":\\"testing is the path to true happiness\\"},{\\"name\\":\\"description\\",\\"content\\":\\"testing is the path to true happiness\\"}]}
+  defineExpose({ frontmatter: {\\"title\\":\\"Hello World\\",\\"description\\":\\"testing is the path to true happiness\\",\\"meta\\":[{\\"property\\":\\"og:title\\",\\"content\\":\\"Hello World\\"},{\\"property\\":\\"og:description\\",\\"content\\":\\"testing is the path to true happiness\\"},{\\"name\\":\\"description\\",\\"content\\":\\"testing is the path to true happiness\\"}]}, excerpt: undefined })
 </script>"
 `;

@@ -4,7 +4,8 @@ import type { Pipeline, PipelineStage } from '../../../types'
 import type { BlockCallback, CodeBlockMeta, CodeOptions } from '../code-types'
 
 /**
- * provides initial defaults for the `pre`, `codeBlockWrapper`, and `lineNumbersWrapper`
+ * provides initial defaults for the `pre`, `codeBlockWrapper`, and `lineNumbersWrapper` as
+ * well as establish the blocks for `heading` and `footer`.
  */
 export const defaultBlocks = (payload: Pipeline<PipelineStage.parser>, o: CodeOptions) => (fence: CodeBlockMeta<'code'>): CodeBlockMeta<'code'> => {
   /**
@@ -47,7 +48,7 @@ export const defaultBlocks = (payload: Pipeline<PipelineStage.parser>, o: CodeOp
   )
 
   const footer = fence.props.footer
-    ? `<div class="footer">${fence.props.footer}</div`
+    ? `<div class="footer">${fence.props.footer}</div>`
     : undefined
 
   const codeBlockWrapper = `<div class="code-wrapper">${heading || ''}<div class="code-block"></div>${footer || ''}</div>`

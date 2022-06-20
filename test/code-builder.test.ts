@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { getAttribute, getClassList, select, toHtml } from '@yankeeinlondon/happy-wrapper'
+import {
+  getAttribute,
+  getClassList,
+  select,
+  toHtml,
+} from '@yankeeinlondon/happy-wrapper'
 import { composeSfcBlocks } from '../src/pipeline'
 import { code } from '../src/index'
 import { getPrismGrammar } from '../src/builders/code/mdi/establishHighlighter'
@@ -314,11 +319,9 @@ describe('code() builder using Prism (incl generalized tests)', () => {
   it.todo('highlighting code symbol\'s block from imported code')
 
   it('adding a heading and footer in props creates proper HTML output', async () => {
-    const { html } = await composeSfcBlocks(
-      'test/fixtures/external-reference-obj.md',
-      (await getFixture('external-reference-inline.md')),
-      { builders: [code()] },
-    )
+    const { html } = await composeFixture('external-reference-inline.md', {
+      builders: [code()],
+    })
     const sel = select(html)
 
     const heading = sel.findFirst('.heading')
@@ -329,7 +332,7 @@ describe('code() builder using Prism (incl generalized tests)', () => {
     ).toBe('Using CSV format')
     const footer = sel.findFirst('.footer')
     expect(footer).not.toBeNull()
-    expect(footer?.textContent).toBe('to be or not to be')
+    expect(footer?.textContent, toHtml(footer)).toBe('to be or not to be')
   })
 
   it('having a code block results in inline styles are included', async () => {
@@ -356,9 +359,8 @@ describe('code() builder using Prism (incl generalized tests)', () => {
 
     expect(sfc.vueStyleBlocks?.codeStyle).toBeDefined()
 
-    const styles = sfc.customBlocks.filter(i => i.includes('prism'))
     // resulting in only one VueJS block which contains prism colors
-    expect(styles.length).toBe(1)
+    expect(sfc.styleBlocks.length).toBe(1)
     // TODO: need to find way to compile SFC so this test can be more end-to-end
   })
 

@@ -4,13 +4,15 @@ import type { TransformResult } from 'rollup'
 import { createSfcComponent } from './createSfcComponent'
 import { resolveOptions } from './options'
 import type { Options } from './types'
-export { link, meta, code } from './builders'
+export * from './builders'
+export * from './types'
 export { mergeColorThemes } from './builders/code/styles/color/mergeColorThemes'
 
 function VitePluginMarkdown(userOptions: Options = {}): Plugin {
   const options = resolveOptions(userOptions)
   const markdownToVue = createSfcComponent(options)
 
+  /** filter out files which aren't Markdown files */
   const filter = createFilter(
     userOptions.include || /\.md$/,
     userOptions.exclude,
@@ -30,10 +32,10 @@ function VitePluginMarkdown(userOptions: Options = {}): Plugin {
         return
 
       try {
-        const convert = markdownToVue(config)
-        const code = await convert(id, raw)
+        /** converts Markdown to VueJS SFC string */
+        const sfc = await markdownToVue(config)(id, raw)
         return {
-          code,
+          code: sfc,
         }
       }
       catch (e: any) {

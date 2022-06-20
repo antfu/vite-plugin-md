@@ -21,7 +21,9 @@ export default defineConfig({
     ],
   ],
   rules: [
-    ['happy', { color: 'green' }],
+    [
+      'happy', { color: 'green' },
+    ],
   ],
   variants: [
     matcher => !matcher.startsWith('lg:')

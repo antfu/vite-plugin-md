@@ -1,14 +1,15 @@
 import { flow, pipe } from 'fp-ts/lib/function'
 import { isRight } from 'fp-ts/lib/Either'
-import { resolveOptions } from '../options'
-import { PipelineStage } from '../types'
+import { resolveOptions } from './options'
+import { PipelineStage } from './types'
 import type {
   Options,
   Pipeline,
   ViteConfigPassthrough,
-} from '../types'
+} from './types'
 import {
   applyMarkdownItOptions,
+  baseStyling,
   convertToDom,
   createParser,
   escapeCodeTagInterpolation,
@@ -17,28 +18,34 @@ import {
   finalize,
   frontmatterPreprocess,
   gatherBuilderEvents,
+  injectUtilityFunctions,
   loadMarkdownItPlugins,
   parseHtml,
   repairFrontmatterLinks,
   transformsBefore,
+  usesBuilder,
   wrapHtml,
-} from '../pipeline'
-import { lift } from '../utils'
-import { MdError } from '../MdError'
+} from './pipeline'
+import { lift } from './utils'
+import { MdError } from './MdError'
+import { kebabCaseComponents } from './pipeline/kebabCaseComponents'
 
 /**
  * Composes the `template` and `script` blocks, along with any other `customBlocks` from
  * the raw markdown content along with user options.
  */
-export async function composeSfcBlocks(id: string, raw: string, opts: Omit<Options, 'usingBuilder'> = {}, config: Partial<ViteConfigPassthrough> = {}) {
+export async function composeSfcBlocks(
+  id: string,
+  raw: string,
+  opts: Omit<Options, 'usingBuilder'> = {},
+  config: Partial<ViteConfigPassthrough> = {},
+) {
   const options = resolveOptions(opts)
-  /**
-   * The initial pipeline state
-   */
-  const payload: Pipeline<PipelineStage.initialize> = {
+  const p0 = {
     fileName: id,
     content: raw.trimStart(),
     head: {},
+    frontmatter: undefined,
     routeMeta: undefined,
     viteConfig: config,
     vueStyleBlocks: {},
@@ -50,6 +57,14 @@ export async function composeSfcBlocks(id: string, raw: string, opts: Omit<Optio
     options,
   }
 
+  /**
+   * The initial pipeline state
+   */
+  const payload: Pipeline<PipelineStage.initialize> = {
+    ...p0,
+    usesBuilder: usesBuilder(p0 as unknown as Pipeline<PipelineStage.initialize>, []),
+  }
+
   const handlers = gatherBuilderEvents(options)
 
   /** initialize the configuration */
@@ -57,12 +72,14 @@ export async function composeSfcBlocks(id: string, raw: string, opts: Omit<Optio
     lift('initialize'),
     transformsBefore,
     handlers(PipelineStage.initialize),
+    // addBuilderDependencies([]),
   )
 
   /** extract the meta-data from the MD content */
   const metaExtracted = flow(
+    injectUtilityFunctions,
     extractFrontmatter,
-    // baseStyling,
+    baseStyling,
     frontmatterPreprocess,
     handlers(PipelineStage.metaExtracted),
   )
@@ -80,6 +97,7 @@ export async function composeSfcBlocks(id: string, raw: string, opts: Omit<Optio
    */
   const parsed = flow(
     parseHtml,
+    kebabCaseComponents,
     repairFrontmatterLinks,
     wrapHtml,
     handlers(PipelineStage.parsed),
@@ -94,11 +112,6 @@ export async function composeSfcBlocks(id: string, raw: string, opts: Omit<Optio
     escapeCodeTagInterpolation,
     handlers(PipelineStage.dom),
   )
-
-  // TODO: broken into "flow groups" defined above because it would
-  // appear that fp-ts _typing_ breaks down after some set number
-  // of steps ... actually prefer a single list so might be worth
-  // investigating whether there's a way to work around
 
   // construct the async pipeline
   const result = await pipe(

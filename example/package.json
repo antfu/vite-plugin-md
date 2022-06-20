@@ -5,28 +5,28 @@
     "dev": "cross-env DEBUG=vite-plugin-md:* vite"
   },
   "dependencies": {
-    "@vueuse/core": "^8.6.0",
+    "@vueuse/core": "^8.7.4",
     "@vueuse/head": "^0.7.6",
     "vue": "^3.2.37",
     "vue-router": "^4.0.16"
   },
   "devDependencies": {
-    "@iconify/json": "^2.1.59",
-    "@unocss/preset-wind": "^0.38.2",
+    "@iconify/json": "^2.1.63",
+    "@unocss/preset-wind": "^0.39.3",
     "@vitejs/plugin-vue": "^2.3.3",
     "cross-env": "^7.0.3",
     "markdown-it-prism": "^2.2.4",
     "prismjs": "^1.28.0",
-    "typescript": "^4.7.3",
-    "unocss": "^0.38.2",
-    "unplugin-auto-import": "^0.8.7",
+    "typescript": "^4.7.4",
+    "unocss": "^0.39.3",
+    "unplugin-auto-import": "^0.8.8",
     "unplugin-vue-components": "^0.19.6",
-    "vite": "^2.9.10",
+    "vite": "^2.9.12",
     "vite-plugin-inspect": "^0.5.0",
     "vite-plugin-md": "workspace:*",
-    "vite-plugin-pages": "^0.23.0",
+    "vite-plugin-pages": "^0.24.2",
     "vite-plugin-vue-layouts": "^0.6.0",
     "vite-ssg": "^0.20.1",
-    "vue-tsc": "^0.37.3"
+    "vue-tsc": "^0.38.0"
   }
 }

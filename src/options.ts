@@ -5,15 +5,21 @@ import { getVueVersion } from './utils'
 
 export function resolveOptions(userOptions: Omit<Options, 'usingBuilder'> = {}): ResolvedOptions {
   const defaultOptions: Omit<ResolvedOptions, 'frontmatterPreprocess' | 'usingBuilder'> = {
+    style: {
+      baseStyle: 'none',
+    },
     builders: [],
     headEnabled: false,
     headField: '',
     frontmatter: true,
+    frontmatterDefaults: {},
+    frontmatterOverrides: {},
     include: null,
     exclude: null,
     excerpt: false,
+    excerptExtract: false,
     exposeFrontmatter: true,
-    exposeExcerpt: false,
+    exposeExcerpt: true,
     escapeCodeTagInterpolation: true,
     customSfcBlocks: ['route', 'i18n', 'style'],
     markdownItOptions: {},
@@ -26,10 +32,21 @@ export function resolveOptions(userOptions: Omit<Options, 'usingBuilder'> = {}):
     wrapperClasses: 'markdown-body',
   }
   const options = userOptions.frontmatterPreprocess === null
-    ? { ...defaultOptions, ...userOptions }
+    ? {
+        ...defaultOptions,
+        ...userOptions,
+        style: {
+          ...defaultOptions.style,
+          ...userOptions.style,
+        },
+      }
     : {
         ...defaultOptions,
         ...userOptions,
+        style: {
+          ...defaultOptions.style,
+          ...userOptions.style,
+        },
         usingBuilder: (name: string) => {
           return !options.builders.every(b => b().name !== name)
         },

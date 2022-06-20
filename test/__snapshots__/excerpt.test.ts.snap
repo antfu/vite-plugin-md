@@ -1,41 +1,21 @@
 // Vitest Snapshot v1
 
-exports[`excerpt snapshots > HTML is consistent 1`] = `
-"<div class=\\"markdown-body\\"><h2>The default excerpt is assumed to be the text up to the “—” separator, so basically it is this text here.</h2>
-<h1>Hello</h1>
-<ul>
-<li>A</li>
-<li>B</li>
-<li><strong>C</strong></li>
-</ul>
-</div>"
-`;
-
-exports[`excerpt snapshots > custom blocks are consistent 1`] = `
-[
-  "<route lang=\\"json\\">{}</route>
-",
-]
-`;
-
 exports[`excerpt snapshots > frontmatter is consistent 1`] = `
 {
-  "excerpt": undefined,
-  "title": "Excerpt with default separator",
+  "description": "using the default triple-dash delimiter to demarcate the end of the excerpt",
+  "title": "Excerpt Default",
 }
 `;
 
-exports[`excerpt snapshots > script blocks are consistent 1`] = `
+exports[`excerpt snapshots > markdown is consistent 1`] = `
 "
-<script setup>
-  defineExpose({ frontmatter: {\\"title\\":\\"Excerpt with default separator\\"} })
-  
- const title = \\"Excerpt with default separator\\"
- const excerpt = undefined
-</script>
+The default excerpt is assumed to be the text up to the triple-dash separator, so basically it is this text here.
+---
 
-<script>
-  /** frontmatter meta-data for MD page **/
-  export const frontmatter = {\\"title\\":\\"Excerpt with default separator\\"}
-</script>"
+# Hello
+
+- A
+- B
+- **C**
+"
 `;

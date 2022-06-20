@@ -14,4 +14,3 @@ const foo = 'hello world'
 const bar = ', how are you?'
 const foobar = `${foo}${bar}`
 ```
-

@@ -2,7 +2,6 @@
   "prettier.enable": false,
   "prettier": false,
   "editor.codeActionsOnSave": {
-
     "source.fixAll": true
   },
   "eslint.validate": [
@@ -32,9 +31,12 @@
     "monospace",
     "nord",
     "Opengraph",
+    "pathe",
     "pluginutils",
     "prefetch",
+    "SFC's",
     "Shiki",
+    "stringifying",
     "unocss",
     "unplugin",
     "userland",

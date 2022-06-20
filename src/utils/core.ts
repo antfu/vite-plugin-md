@@ -34,9 +34,9 @@ export function keys<T extends {}, W extends readonly string[]>(obj: T, ...witho
 }
 
 export function isVue2(options: ResolvedOptions) {
-  return options.vueVersion.startsWith('2.')
+  return options.vueVersion.startsWith('2')
 }
 
 export function wrap(tag: string, content: string) {
-  return `\n<${tag}>\n  ${content}\n</${tag?.split(/ /)[0]}>`
+  return `\n<${tag}>\n${content}\n</${tag?.split(/ /)[0]}>`
 }

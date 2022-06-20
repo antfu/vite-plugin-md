@@ -1,17 +1,10 @@
 // Vitest Snapshot v1
 
-exports[`transform snapshots > customBlocks remain the same 1`] = `
-[
-  "<style>h1 { color: red }</style>",
-  "<route lang=\\"json\\">{}</route>
-",
-]
-`;
+exports[`transform snapshots > customBlocks remain the same 1`] = `[]`;
 
 exports[`transform snapshots > frontmatter remains the same 1`] = `
 {
   "description": "hello world",
-  "excerpt": undefined,
   "hello": "how friendly",
   "title": "transform tests",
 }
@@ -28,7 +21,7 @@ exports[`transform snapshots > head props remains the same 1`] = `
 
 exports[`transform snapshots > html remains the same 1`] = `
 "<div class=\\"markdown-body\\"><h1>Hello</h1>
-<style>h1 { color: red }</style>
+
 
 <ul>
 <li>A</li>
@@ -48,20 +41,4 @@ exports[`transform snapshots > html remains the same 1`] = `
 
 exports[`transform snapshots > meta props remains the same 1`] = `[]`;
 
-exports[`transform snapshots > script blocks remain the same 1`] = `
-"
-<script setup>
-  import Foo from './Foo.vue'
-  defineExpose({ frontmatter: {\\"title\\":\\"transform tests\\",\\"description\\":\\"hello world\\",\\"hello\\":\\"how friendly\\"} })
-  
- const title = \\"transform tests\\"
- const description = \\"hello world\\"
- const hello = \\"how friendly\\"
- const excerpt = undefined
-</script>
-
-<script>
-  /** frontmatter meta-data for MD page **/
-  export const frontmatter = {\\"title\\":\\"transform tests\\",\\"description\\":\\"hello world\\",\\"hello\\":\\"how friendly\\"}
-</script>"
-`;
+exports[`transform snapshots > script blocks remain the same 1`] = `undefined`;

@@ -3,7 +3,6 @@
 exports[`frontmatter pre-processor > frontmatter is unchanged 1`] = `
 {
   "description": "testing is the path to true happiness",
-  "excerpt": undefined,
   "meta": [
     {
       "content": "Hello World",

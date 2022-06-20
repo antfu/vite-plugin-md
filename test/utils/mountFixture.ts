@@ -1,29 +1,67 @@
-import { join } from 'path'
-import type { MountingOptions } from '@vue/test-utils'
-import { HappyMishap } from '../../src/builders/code/utils'
-import type { Options } from '../../src/types'
-import { composeFixture } from './composeFixture'
+import { mount } from '@vue/test-utils'
+import type { DefineComponent } from 'vue'
+import { createApp, defineComponent } from 'vue'
+import { createRouter, createWebHistory } from 'vue-router'
+import type { Frontmatter } from '../../src/types'
 
-export const mountFixture = async (fixture: string, pluginOptions: Options = {}) => {
-  const sfc = await composeFixture(fixture, pluginOptions)
-  const file = fixture = join(process.cwd(), 'test/fixtures', fixture.endsWith('.md')
-    ? fixture
-    : `${fixture}.md`)
+async function importFixture(fixture: string) {
+  const assets = (await import(fixture)) as {
+    default: DefineComponent
+    frontmatter: Frontmatter
+    excerpt?: string
+  }
+  return {
+    frontmatter: assets.frontmatter,
+    component: assets.default,
+    excerpt: assets.excerpt,
+  }
+}
 
-  const Component = await import(file)
-
-  return <T extends MountingOptions<any>>(_mountOptions: T = {} as T) => {
-    try {
-      // const wrapper = mount(Component.default, mountOptions)
-      // console.log(`wrapper mounted: ${typeof wrapper}`)
-
-      return {
-        frontmatter: Component().frontmatter,
-        component: Component().default,
-      }
+/**
+ * attempts to asynchronously import the Markdown file and returns
+ * the `frontmatter` and `component`; it also provides the `sfc` object
+ * for comparison purposes to aid in testing.
+ */
+export const mountFixture = async (fixture: string) => {
+  try {
+    // const sfc = await composeFixture(fixture)
+    const assets = await importFixture(fixture)
+    const wrapper = mount(assets.component, { global: { plugins: [] } })
+    return {
+      ...assets,
+      wrapper,
     }
-    catch (error) {
-      throw new HappyMishap(`Problem mounting "${fixture}" into DOM [${file}]. The markdown of the file was:\n${sfc.md}`, { error, name: 'mountFixture' })
+  }
+  catch (error) {
+    throw new Error(`Problem mounting "${fixture}" into DOM. The markdown of the file was:\n: ${error instanceof Error ? error.message : String(error)}`)
+  }
+}
+
+export const mountFixtureWithRouter = async (fixture: string) => {
+  try {
+    // const sfc = await composeFixture(fixture, pluginOptions)
+    const assets = await importFixture(fixture)
+    const router = createRouter({
+      history: createWebHistory(),
+      routes: [{
+        path: '/',
+        component: assets.component,
+      }],
+    })
+
+    const App = defineComponent({
+      template: '<div class="wrapper"><router-link /></div>',
+    })
+
+    const app = createApp(App)
+    app.use(router)
+    const wrapper = mount(assets.component, { global: { plugins: [router] } })
+    return {
+      ...assets,
+      wrapper,
     }
+  }
+  catch (error) {
+    throw new Error(`Problem mounting "${fixture}" into DOM. The markdown of the file was:\n: ${error instanceof Error ? error.message : String(error)}`)
   }
 }
