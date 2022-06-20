@@ -1,5 +1,18 @@
 // Vitest Snapshot v1
 
+exports[`excerpt snapshots > HTML is consistent 1`] = `
+"<div class=\\"markdown-body\\"><h2>The default excerpt is assumed to be the text up to the “—” separator, so basically it is this text here.</h2>
+<h1>Hello</h1>
+<ul>
+<li>A</li>
+<li>B</li>
+<li><strong>C</strong></li>
+</ul>
+</div>"
+`;
+
+exports[`excerpt snapshots > custom blocks are consistent 1`] = `[]`;
+
 exports[`excerpt snapshots > frontmatter is consistent 1`] = `
 {
   "excerpt": "The default excerpt is assumed to be the text up to the \\"",
@@ -18,4 +31,24 @@ The default excerpt is assumed to be the text up to the \\"---\\" separator, so 
 - B
 - **C**
 "
+`;
+
+exports[`excerpt snapshots > script blocks are consistent 1`] = `
+"
+<script setup lang=\\"ts\\">
+  defineExpose({ frontmatter: {\\"title\\":\\"Excerpt Default\\"} })
+  
+ const title = \\"Excerpt Default\\"
+ const excerpt = undefined
+</script>"
+`;
+
+exports[`excerpt snapshots > script blocks are consistent 2`] = `
+[
+  "
+<script lang=\\"ts\\">
+  /** frontmatter meta-data for MD page **/
+  export const frontmatter: Frontmatter = {\\"title\\":\\"Excerpt Default\\"}
+</script>",
+]
 `;

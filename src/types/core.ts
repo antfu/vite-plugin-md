@@ -216,6 +216,10 @@ export interface ProcessedFrontmatter {
 }
 
 export interface Options {
+  style?: {
+    baseStyle?: 'none' | 'github'
+  }
+
   /** allows adding in Builder's which help to expand functionality of this plugin */
   builders?: (() => BuilderRegistration<any, any>)[]
 

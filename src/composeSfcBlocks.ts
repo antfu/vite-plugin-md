@@ -3,14 +3,13 @@ import { isRight } from 'fp-ts/lib/Either'
 import { resolveOptions } from './options'
 import { PipelineStage } from './types'
 import type {
-  BuilderDependency,
   Options,
   Pipeline,
   ViteConfigPassthrough,
 } from './types'
 import {
-  addBuilderDependencies,
   applyMarkdownItOptions,
+  baseStyling,
   convertToDom,
   createParser,
   escapeCodeTagInterpolation,
@@ -57,13 +56,13 @@ export async function composeSfcBlocks(
     },
     options,
   }
-  const dependencies: BuilderDependency[] = []
+
   /**
    * The initial pipeline state
    */
   const payload: Pipeline<PipelineStage.initialize> = {
     ...p0,
-    usesBuilder: usesBuilder(p0 as unknown as Pipeline<PipelineStage.initialize>, dependencies),
+    usesBuilder: usesBuilder(p0 as unknown as Pipeline<PipelineStage.initialize>, []),
   }
 
   const handlers = gatherBuilderEvents(options)
@@ -73,14 +72,14 @@ export async function composeSfcBlocks(
     lift('initialize'),
     transformsBefore,
     handlers(PipelineStage.initialize),
-    addBuilderDependencies(dependencies),
+    // addBuilderDependencies([]),
   )
 
   /** extract the meta-data from the MD content */
   const metaExtracted = flow(
     injectUtilityFunctions,
     extractFrontmatter,
-    // baseStyling,
+    baseStyling,
     frontmatterPreprocess,
     handlers(PipelineStage.metaExtracted),
   )

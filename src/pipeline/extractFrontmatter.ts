@@ -1,5 +1,11 @@
 import matter from 'gray-matter'
-import type { ExcerptFunction, Frontmatter, GraymatterOptions, Pipeline, PipelineStage } from '../types'
+import type {
+  ExcerptFunction,
+  Frontmatter,
+  GraymatterOptions,
+  Pipeline,
+  PipelineStage,
+} from '../types'
 import { transformer } from '../utils'
 import { MdError } from '../MdError'
 

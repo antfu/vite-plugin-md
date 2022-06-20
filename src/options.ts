@@ -5,6 +5,9 @@ import { getVueVersion } from './utils'
 
 export function resolveOptions(userOptions: Omit<Options, 'usingBuilder'> = {}): ResolvedOptions {
   const defaultOptions: Omit<ResolvedOptions, 'frontmatterPreprocess' | 'usingBuilder'> = {
+    style: {
+      baseStyle: 'none',
+    },
     builders: [],
     headEnabled: false,
     headField: '',
