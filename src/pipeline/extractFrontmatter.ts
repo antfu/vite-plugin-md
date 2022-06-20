@@ -9,6 +9,15 @@ import type {
 import { transformer } from '../utils'
 import { MdError } from '../MdError'
 
+/**
+ * Given the frontmatter passed in, plus the pipeline data,
+ * resolves the frontmatter data to it's appropriate state.
+ * It considers:
+ *
+ * - default values
+ * - overrides
+ * - and for `excerpt` property it gives precedent to any value
+ */
 function resolveFrontmatter(
   fm: Frontmatter,
   p: Pipeline<PipelineStage.initialize>,
@@ -88,6 +97,7 @@ export const extractFrontmatter = transformer('extractFrontmatter', 'initialize'
     [key: string]: unknown
   }
 
+  /** the "excerpt" value for the GrayMatter API */
   const excerpt: boolean | Function = typeof p.options.excerpt === 'function'
     ? (file: GrayFile) => {
         const frontmatter = resolveFrontmatter(file.data, p)
@@ -117,15 +127,14 @@ export const extractFrontmatter = transformer('extractFrontmatter', 'initialize'
       ...p.options,
       grayMatterOptions: go,
     },
-    frontmatter: resolveFrontmatter(
-      {
-        ...r.data,
-        excerpt: r?.excerpt?.trim() || r?.data?.excerpt?.trim() || undefined,
-      },
-      p,
-    ),
+    frontmatter: resolveFrontmatter({
+      ...r.data,
+      excerpt: r.excerpt || r.data?.excerpt,
+    }, p),
     md,
-    excerpt: p.options.excerpt === false ? undefined : r.excerpt || r.data?.excerpt || undefined,
+    excerpt: p.options.excerpt === false
+      ? undefined
+      : r.excerpt || r.data?.excerpt || undefined,
     meta: [],
     head: [],
     routeMeta: {},

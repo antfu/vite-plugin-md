@@ -32,10 +32,21 @@ export function resolveOptions(userOptions: Omit<Options, 'usingBuilder'> = {}):
     wrapperClasses: 'markdown-body',
   }
   const options = userOptions.frontmatterPreprocess === null
-    ? { ...defaultOptions, ...userOptions }
+    ? {
+        ...defaultOptions,
+        ...userOptions,
+        style: {
+          ...defaultOptions.style,
+          ...userOptions.style,
+        },
+      }
     : {
         ...defaultOptions,
         ...userOptions,
+        style: {
+          ...defaultOptions.style,
+          ...userOptions.style,
+        },
         usingBuilder: (name: string) => {
           return !options.builders.every(b => b().name !== name)
         },

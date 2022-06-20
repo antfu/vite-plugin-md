@@ -56,16 +56,16 @@ describe('use "meta" builder for frontmatterPreprocess', async () => {
   })
 
   it('frontmatter props exported', async () => {
-    const output = (await composeSfcBlocks('', md)).component
+    const { component } = await composeFixture('meta')
 
-    expect(output.includes('const title')).toBeTruthy()
-    expect(output.includes('const byline')).toBeTruthy()
-    expect(output.includes('const layout')).toBeTruthy()
-    expect(output.includes('const image')).toBeTruthy()
+    expect(component.includes('const title')).toBeTruthy()
+    expect(component.includes('const byline')).toBeTruthy()
+    expect(component.includes('const layout')).toBeTruthy()
+    expect(component.includes('const image')).toBeTruthy()
 
-    expect(output.includes('const frontmatter')).toBeTruthy()
-    expect(output.includes('export const frontmatter')).toBeTruthy()
-    expect(output.includes('defineExpose({ ')).toBeTruthy()
+    expect(component.includes('const frontmatter')).toBeTruthy()
+    expect(component.includes('export const frontmatter')).toBeTruthy()
+    expect(component.includes('defineExpose({ ')).toBeTruthy()
   })
 })
 

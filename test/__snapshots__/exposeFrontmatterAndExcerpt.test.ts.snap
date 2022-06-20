@@ -1,0 +1,105 @@
+// Vitest Snapshot v1
+
+exports[`exposeFrontmatter snapshots > vue2 (no expose) 1`] = `
+"
+<script lang=\\"ts\\">
+export const title = \\"Hello World\\"
+export const description = \\"testing is the path to true happiness\\"
+export const excerpt = undefined
+/** frontmatter meta-data for MD page **/
+export interface Frontmatter {
+  title?: string; description?: string; subject?: string; category?: string; name?: string; excerpt?: string; image?: string; layout?: string; requiredAuth?: boolean; meta?: Record<string, any>[];
+  [key: string]: unknown
+}
+export const frontmatter: Frontmatter = {}
+export default { data() { return { frontmatter, excerpt } } }
+</script>
+<template>
+<div class=\\"markdown-body\\"><h1>My H1</h1>
+<p>lorem ipsum</p>
+<h2>Transformed</h2>
+<p>base: {{ title }}</p>
+</div>
+</template>
+"
+`;
+
+exports[`exposeFrontmatter snapshots > vue2 1`] = `
+"
+<script lang=\\"ts\\">
+export const title = \\"Hello World\\"
+export const description = \\"testing is the path to true happiness\\"
+export const excerpt = undefined
+/** frontmatter meta-data for MD page **/
+export interface Frontmatter {
+  title?: string; description?: string; subject?: string; category?: string; name?: string; excerpt?: string; image?: string; layout?: string; requiredAuth?: boolean; meta?: Record<string, any>[];
+  [key: string]: unknown
+}
+export const frontmatter: Frontmatter = {\\"title\\":\\"Hello World\\",\\"description\\":\\"testing is the path to true happiness\\"}
+export default { data() { return { frontmatter, excerpt } } }
+</script>
+<template>
+<div class=\\"markdown-body\\"><h1>My H1</h1>
+<p>lorem ipsum</p>
+<h2>Transformed</h2>
+<p>base: {{ title }}</p>
+</div>
+</template>
+"
+`;
+
+exports[`exposeFrontmatter snapshots > vue3 (no expose) 1`] = `
+"
+<script setup lang=\\"ts\\">
+const title = \\"Hello World\\"
+ const description = \\"testing is the path to true happiness\\"
+ const excerpt = undefined
+  defineExpose({ frontmatter: {}, excerpt: undefined })
+</script>
+<script lang=\\"ts\\">
+/** frontmatter meta-data for MD page **/
+export interface Frontmatter {
+  title?: string; description?: string; subject?: string; category?: string; name?: string; excerpt?: string; image?: string; layout?: string; requiredAuth?: boolean; meta?: Record<string, any>[];
+  [key: string]: unknown
+}
+export const frontmatter: Frontmatter = {}
+export const excerpt: string | undefined = \\"\\"
+
+</script>
+<template>
+<div class=\\"markdown-body\\"><h1>My H1</h1>
+<p>lorem ipsum</p>
+<h2>Transformed</h2>
+<p>base: {{ title }}</p>
+</div>
+</template>
+"
+`;
+
+exports[`exposeFrontmatter snapshots > vue3 1`] = `
+"
+<script setup lang=\\"ts\\">
+const title = \\"Hello World\\"
+ const description = \\"testing is the path to true happiness\\"
+ const excerpt = undefined
+  defineExpose({ frontmatter: {\\"title\\":\\"Hello World\\",\\"description\\":\\"testing is the path to true happiness\\"}, excerpt: undefined })
+</script>
+<script lang=\\"ts\\">
+/** frontmatter meta-data for MD page **/
+export interface Frontmatter {
+  title?: string; description?: string; subject?: string; category?: string; name?: string; excerpt?: string; image?: string; layout?: string; requiredAuth?: boolean; meta?: Record<string, any>[];
+  [key: string]: unknown
+}
+export const frontmatter: Frontmatter = {\\"title\\":\\"Hello World\\",\\"description\\":\\"testing is the path to true happiness\\"}
+export const excerpt: string | undefined = \\"\\"
+
+</script>
+<template>
+<div class=\\"markdown-body\\"><h1>My H1</h1>
+<p>lorem ipsum</p>
+<h2>Transformed</h2>
+<p>base: {{ title }}</p>
+</div>
+</template>
+"
+`;

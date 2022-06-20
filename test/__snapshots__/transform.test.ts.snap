@@ -5,7 +5,6 @@ exports[`transform snapshots > customBlocks remain the same 1`] = `[]`;
 exports[`transform snapshots > frontmatter remains the same 1`] = `
 {
   "description": "hello world",
-  "excerpt": undefined,
   "hello": "how friendly",
   "title": "transform tests",
 }

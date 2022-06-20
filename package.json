@@ -41,6 +41,7 @@
     "release": "bumpp",
     "test": "vitest",
     "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage",
     "test:update": "vitest -u",
     "test:component": "npx cypress open-ct -p 4000"
   },

@@ -10,11 +10,10 @@ async function importFixture(fixture: string) {
     frontmatter: Frontmatter
     excerpt?: string
   }
-  const mountPoint = mount(assets.default, { global: { plugins: [] } })
   return {
     frontmatter: assets.frontmatter,
     component: assets.default,
-    mountPoint,
+    excerpt: assets.excerpt,
   }
 }
 

@@ -93,6 +93,22 @@ function extractCustomBlocks(p: Pipeline<PipelineStage.dom>, options: ResolvedOp
   return { styleBlocks, customBlocks }
 }
 
+/** produces the defineExpose() call based on config */
+function expose(p: Pipeline<'dom'>) {
+  const fm = p.frontmatter
+  delete fm.excerpt
+
+  const frontmatter = p.options.frontmatter && p.options.exposeFrontmatter
+    ? fm
+    : {}
+
+  const excerpt = p.options.excerpt && p.options.exposeExcerpt
+    ? JSON.stringify(p.excerpt)
+    : undefined
+
+  return `defineExpose({ frontmatter: ${JSON.stringify(frontmatter)}, excerpt: ${excerpt} })`
+}
+
 /**
  * Separates the various "blocks" in an SFC component
  */
@@ -110,22 +126,28 @@ export const extractBlocks = transformer('extractBlocks', 'dom', 'sfcBlocksExtra
       ? `import { useHead } from "@vueuse/head"\n  const head = ${JSON.stringify(head)}\n  useHead(head)`
       : '',
     importDefineExpose: options.frontmatter ? 'import { defineExpose } from \'vue\'' : '',
-    exposeFrontmatter: options.frontmatter && options.exposeFrontmatter
-      ? `defineExpose({ frontmatter: ${JSON.stringify(frontmatter)} })`
-      : '',
-    /** variable declaration which must be placed in a manner that external actors can reach it */
-    frontmatter: options.frontmatter && options.exposeFrontmatter
-      ? `/** frontmatter meta-data for MD page **/\n  export const frontmatter: Frontmatter = ${JSON.stringify(frontmatter)}`
-      : '',
+    /** exports the excerpt in a `<script>` block */
+    excerptExport: `export const excerpt: string | undefined = ${JSON.stringify(payload.excerpt || '')}\n`,
+    /**
+     * export of frontmatter variable; intended for `<script>` block
+     */
+    frontmatter: [
+      '/** frontmatter meta-data for MD page **/',
+      'export interface Frontmatter {',
+      '  title?: string; description?: string; subject?: string; category?: string; name?: string; excerpt?: string; image?: string; layout?: string; requiredAuth?: boolean; meta?: Record<string, any>[];',
+      '  [key: string]: unknown',
+      '}',
+      `export const frontmatter: Frontmatter = ${options.exposeFrontmatter ? JSON.stringify(frontmatter) : '{}'}`,
+    ].join('\n'),
     /** returning the 'frontmatter' property for external actors using Vue3 */
     vue3CompositionReturn: options.frontmatter ? 'return { frontmatter }' : '',
     /** return 'frontmatter' on the data property for Vue2 users */
-    vue2DataExport: 'export default { data() { return { frontmatter } } }',
+    vue2DataExport: 'export default { data() { return { frontmatter, excerpt } } }',
     /** variables usable in page template */
     localVariables: Object.entries(frontmatter).reduce(
       (acc, [key, value]) => `${acc}\n${isVue2(options) ? 'export' : ''} const ${key} = ${JSON.stringify(value)}`,
       '',
-    ),
+    ).trimStart(),
   }
 
   const importDirectives: string[] = []
@@ -147,8 +169,8 @@ export const extractBlocks = transformer('extractBlocks', 'dom', 'sfcBlocksExtra
     : wrap('script setup lang="ts"', [
       ...importDirectives,
       template.useHead,
-      template.exposeFrontmatter,
       template.localVariables,
+      expose(payload),
       nonImportDirectives,
       ...codeBlocksToArray(payload.vueCodeBlocks),
     ].filter(i => i).join('\n  '))
@@ -163,12 +185,18 @@ export const extractBlocks = transformer('extractBlocks', 'dom', 'sfcBlocksExtra
         ].join('\n')),
         [
           ...traditionalScripts.map(el => el.outerHTML),
-          createVue2ScriptBlock(payload.vueCodeBlocks),
+          ...(Object.keys(payload.vueCodeBlocks).length > 0
+            ? createVue2ScriptBlock(payload.vueCodeBlocks)
+            : []
+          ),
         ].join('\n'),
       ].filter(i => i)
     // Vue3
     : [
-        wrap('script lang="ts"', template.frontmatter),
+        wrap('script lang="ts"', [
+          template.frontmatter,
+          template.excerptExport,
+        ].join('\n')),
         // userland script blocks
         traditionalScripts.map(s => s.outerHTML).join('\n'),
       ].filter(i => i)

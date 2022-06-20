@@ -20,7 +20,11 @@ export default defineConfig({
       extensions: ['vue', 'md'],
     }),
     Layouts(),
-    Markdown({ builders: [link(), code({ theme: 'base' }), meta()] }),
+    Markdown({
+      builders: [link(), code({ theme: 'base' }), meta()],
+      excerpt: true,
+      exposeExcerpt: true,
+    }),
     Vue({
       include: [/\.vue$/, /\.md$/],
     }),

@@ -1,11 +1,23 @@
 import { describe, expect, it } from 'vitest'
-import { mountFixture } from '../utils'
+import { composeFixture, mountFixture } from '../utils'
 
-describe('Frontmatter is exposed by components', () => {
+describe('Async import of components and exposed variables', () => {
   it('direct import of frontmatter', async () => {
     const t = await mountFixture('../fixtures/simple.md')
     expect(t.frontmatter).toBeDefined()
     expect(t.frontmatter.title).toBe('Hello World')
+  })
+
+  it('both frontmatter and excerpt available', async () => {
+    const t = await mountFixture('../fixtures/excerpt-default.md')
+    const sfc = await composeFixture('excerpt-default', {
+      exposeExcerpt: true,
+      excerpt: true,
+    })
+
+    expect(sfc.excerpt).toBeDefined()
+    expect(t.frontmatter.title).toBe('Excerpt Default')
+    expect(t.excerpt).toContain(sfc.excerpt)
   })
 
   it.skip('a markdown file can import another and get metadata props', async () => {

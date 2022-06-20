@@ -45,7 +45,7 @@ describe('excerpt', () => {
     const sfc = await composeFixture('excerpt-default', { excerpt: true, excerptExtract: true })
     expect(sfc.excerpt).toBeDefined()
     expect(sfc.excerpt).toContain('The default excerpt is assumed to be the text up to')
-    expect(sfc.frontmatter.excerpt).not.toContain('Hello')
+    expect(sfc.excerpt).not.toContain('Hello')
     expect(
       sfc.md,
       'when excerptExtract is set the excerpt should have been removed!',
@@ -58,8 +58,8 @@ describe('excerpt', () => {
       excerpt: '<!-- more -->',
     })
 
-    expect(sfc.frontmatter.excerpt).toContain('This is an excerpt')
-    expect(sfc.frontmatter.excerpt).not.toContain('Hello')
+    expect(sfc.excerpt).toContain('This is an excerpt')
+    expect(sfc.excerpt).not.toContain('Hello')
   })
 
   it('frontmatter default is overridden by body excerpt', async () => {
@@ -70,8 +70,8 @@ describe('excerpt', () => {
       },
     })
 
-    expect(sfc.frontmatter.excerpt).toContain('The default excerpt is assumed to be the text up to')
-    expect(sfc.frontmatter.excerpt).not.toContain('Hello')
+    expect(sfc.excerpt).toContain('The default excerpt is assumed to be the text up to')
+    expect(sfc.excerpt).not.toContain('Hello')
   })
 
   it('excerpt can be defined using a callback function', async () => {
