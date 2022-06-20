@@ -1,10 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import type { DefineComponent } from 'vue'
-import { defineComponent } from 'vue'
 // import { ssrRenderStyle } from 'vue/server-renderer'
-import { composeFixture } from '../utils'
 import type { Frontmatter } from '../../src/types'
-import { link } from '../../src'
 
 describe.skip('converting SFC\'s to Components', () => {
   it.skip('get component via an async import', async () => {
@@ -20,19 +17,19 @@ describe.skip('converting SFC\'s to Components', () => {
   })
 
   it('use vue\'s server render', async () => {
-    const sfc = await composeFixture('links', {
-      builders: [
-        link({ useRouterLinks: false }),
-      ],
-    })
+    // const sfc = await composeFixture('links', {
+    //   builders: [
+    //     link({ useRouterLinks: false }),
+    //   ],
+    // })
 
-    const c = defineComponent({
-      name: 'SimpleMD',
-      setup: () => sfc.scriptSetup,
-      template: sfc.templateBlock,
-      expose: ['frontmatter'],
+    // const c = defineComponent({
+    //   name: 'SimpleMD',
+    //   setup: () => sfc.scriptSetup,
+    //   template: sfc.templateBlock,
+    //   expose: ['frontmatter'],
 
-    })
+    // })
     // console.log(c)
 
     // console.log('SCRIPT BLOCKS\n', sfc.scriptBlocks)

@@ -1,4 +1,5 @@
-import type { BuilderApi, BuilderDependency, BuilderDependencyApi, OptionsFor, Pipeline, PipelineStage } from '../types/index'
+import type { Pipeline, PipelineStage } from '../types'
+import type { BuilderApi, BuilderDependency, BuilderDependencyApi, OptionsFor } from '~/builders/builder-types'
 
 export const usesBuilder = (payload: Pipeline<PipelineStage.initialize>, deps: BuilderDependency[]) => <
   T extends BuilderApi<any, any>,
@@ -9,7 +10,7 @@ export const usesBuilder = (payload: Pipeline<PipelineStage.initialize>, deps: B
       deps[idx] = [builder, options]
       return api<E | 'withConfig'>()
     },
-    usingExposedCallback: (cb: any) => {
+    usingExposedCallback: (_cb: any) => {
       return api<E>()
     },
   }) as BuilderDependencyApi<T, E>
