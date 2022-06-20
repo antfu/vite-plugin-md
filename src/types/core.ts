@@ -128,7 +128,7 @@ export interface ExcerptMeta {
  * Example:
  * ```ts
  * function firstFourLines(content, meta) {
- *    content = content
+ *    return content
  *      .split('\n')
  *      .slice(0, 4)
  *      .join(' ')
