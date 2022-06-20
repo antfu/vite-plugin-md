@@ -3,6 +3,7 @@ import type { IElement } from '@yankeeinlondon/happy-wrapper'
 import { createElement, isElement } from '@yankeeinlondon/happy-wrapper'
 import { isRef, ref } from 'vue'
 import type { LinkProperty, Pipeline, PipelineStage, PipelineUtilityFunctions, ScriptProperty, StyleProperty } from '../types'
+import { transformer } from '../utils'
 
 const add = (p: MaybeRef<any[]>, v: any) => isRef(p) ? p.value.push(v) : p.push(v)
 
@@ -14,8 +15,8 @@ const convertToDictionary = (link: IElement): Record<string, any> => {
   )
 }
 
-export const pipelineUtilityFunctions = (
-  ctx: Pipeline<PipelineStage.metaExtracted>,
+const pipelineUtilityFunctions = (
+  ctx: Pipeline<PipelineStage.initialize>,
 ): PipelineUtilityFunctions => ({
   addLink(link) {
     if (!ctx.head.link)
@@ -49,3 +50,10 @@ export const pipelineUtilityFunctions = (
   },
 })
 
+/**
+ * Adds some helpful utility functions to the pipeline for Builder authors
+ */
+export const injectUtilityFunctions = transformer('injectUtilityFunctions', 'initialize', 'initialize', p => ({
+  ...p,
+  ...pipelineUtilityFunctions(p),
+}))

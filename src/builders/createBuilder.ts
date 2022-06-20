@@ -1,14 +1,9 @@
 import type {
-  BuilderApi,
-  BuilderApiMeta,
-  BuilderApiWithoutMeta,
-  BuilderHandler,
-  BuilderOptions,
-  BuilderRegistration,
   IPipelineStage,
   PipelineStage,
 } from '../types'
 import { createFnWithProps } from '../utils'
+import type { BuilderApi, BuilderApiMeta, BuilderApiWithoutMeta, BuilderHandler, BuilderOptions, BuilderRegistration } from './builder-types'
 
 function createAboutSection<N extends string>(name: N, description: string): BuilderApiMeta {
   return {

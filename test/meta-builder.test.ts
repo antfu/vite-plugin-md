@@ -29,13 +29,12 @@ describe('use "meta" builder for frontmatterPreprocess', async () => {
 
   it('default value is used when no frontmatter is present', async () => {
     const options: Options = {
+      frontmatterDefaults: {
+        title: 'nada',
+        description: 'there I was, there I was',
+      },
       builders: [
-        meta({
-          defaults: {
-            title: 'nada',
-            description: 'there I was, there I was',
-          },
-        }),
+        meta(),
       ],
     }
     const sfc = await composeSfcBlocks('', md, resolveOptions(options))
@@ -67,52 +66,6 @@ describe('use "meta" builder for frontmatterPreprocess', async () => {
     expect(output.includes('const frontmatter')).toBeTruthy()
     expect(output.includes('export const frontmatter')).toBeTruthy()
     expect(output.includes('defineExpose({ ')).toBeTruthy()
-  })
-
-  it('setting static and callback based default values works', async () => {
-    const sfc = await composeFixture('route-meta-custom', {
-      builders: [meta({
-        defaults: {
-          foo: 'bar',
-          title: 'default title',
-          requiresAuth: (_, file) => !!file.includes('secure'),
-        },
-      })],
-    })
-
-    expect(sfc.frontmatter.foo).toBe('bar') // no page value
-    expect(sfc.frontmatter.title).toBe('Metadata for your Route') // overridden
-    expect(sfc.frontmatter.requiresAuth).toBe(true) // overridden
-
-    const sfc2 = await composeFixture('meta', {
-      builders: [meta({
-        defaults: {
-          requiresAuth: (_, file) => !!file.includes('secure'),
-        },
-      })],
-    })
-    expect(sfc2.frontmatter.requiresAuth).toBe(false) // callback used
-
-    const sfc3 = await composeFixture('secure', {
-      builders: [meta({
-        defaults: {
-          requiresAuth: (_, file) => !!file.includes('secure'),
-        },
-      })],
-    })
-    expect(sfc3.frontmatter.requiresAuth).toBe(true) // callback used
-  })
-
-  it('override callback has ability to modify frontmatter to it\'s liking', async () => {
-    const sfc4 = await composeFixture('secure', {
-      builders: [meta({
-        defaults: {
-          requiresAuth: (_, file) => !!file.includes('secure'),
-        },
-        override: (fm, file) => ({ ...fm, category: file.includes('secure') ? 'top-secret' : 'pedestrian' }),
-      })],
-    })
-    expect(sfc4.frontmatter.category).toBe('top-secret')
   })
 })
 

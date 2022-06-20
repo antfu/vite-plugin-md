@@ -1,5 +1,5 @@
 import type * as TE from 'fp-ts/TaskEither'
-import type { IPipelineStage, Pipeline, PipelineStage, RulesUse } from './pipeline'
+import type { IPipelineStage, Pipeline, PipelineStage, RulesUse } from '~/types'
 
 export interface BuilderRegistration<O extends BuilderOptions, S extends IPipelineStage> {
   name: Readonly<string>

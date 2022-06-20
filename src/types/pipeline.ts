@@ -5,7 +5,7 @@ import type { UserConfig } from 'vite'
 import type { Either } from 'fp-ts/lib/Either'
 import type { Fragment, IElement } from '@yankeeinlondon/happy-wrapper'
 import type { EnumValues, Frontmatter, MetaProperty, ResolvedOptions } from './core'
-import type { BuilderApi, BuilderDependencyApi } from './builder'
+import type { BuilderApi, BuilderDependencyApi } from '~/builders'
 
 export enum PipelineStage {
   /**
@@ -287,6 +287,7 @@ export type Pipeline<S extends IPipelineStage> = {
    */
   routeMeta?: RouteConfig
 
+  frontmatter?: Frontmatter
   /**
    * Indicates which _languages_ were found on the page; this property typically
    * shouldn't be set but rather is managed by the `code()` builder and provided

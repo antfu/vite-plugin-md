@@ -5,11 +5,11 @@ import { transformer } from '../utils'
  * Ensures that any builders which have expressed dependencies on other Builders
  * will have this dependency available.
  */
-export const addDependencies = (deps: BuilderDependency[]) => transformer('addDependencies', 'initialize', 'initialize', (p) => {
+export const addBuilderDependencies = (deps: BuilderDependency[]) => transformer('addDependencies', 'initialize', 'initialize', (p) => {
   const depNames = deps.map(([d, _o]) => d.name)
   const configuredNames = p.options.builders.map(b => b.name)
   const missing = depNames.filter(d => !configuredNames.includes(d))
-  const overlaps = depNames.filter(d => configuredNames.includes(d))
+  // const overlaps = depNames.filter(d => configuredNames.includes(d))
 
   // missing deps who's need arises from a BuilderAPI exclusively
   missing.forEach((dep) => {

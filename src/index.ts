@@ -5,7 +5,6 @@ import { createSfcComponent } from './createSfcComponent'
 import { resolveOptions } from './options'
 import type { Options } from './types'
 export * from './builders'
-export * from './types/builder'
 export { mergeColorThemes } from './builders/code/styles/color/mergeColorThemes'
 
 function VitePluginMarkdown(userOptions: Options = {}): Plugin {
@@ -33,8 +32,7 @@ function VitePluginMarkdown(userOptions: Options = {}): Plugin {
 
       try {
         /** converts Markdown to VueJS SFC string */
-        const convert = markdownToVue(config)
-        const sfc = await convert(id, raw)
+        const sfc = await markdownToVue(config)(id, raw)
         return {
           code: sfc,
         }

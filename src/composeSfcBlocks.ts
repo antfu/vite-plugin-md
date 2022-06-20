@@ -9,7 +9,7 @@ import type {
   ViteConfigPassthrough,
 } from './types'
 import {
-  addDependencies,
+  addBuilderDependencies,
   applyMarkdownItOptions,
   convertToDom,
   createParser,
@@ -19,6 +19,7 @@ import {
   finalize,
   frontmatterPreprocess,
   gatherBuilderEvents,
+  injectUtilityFunctions,
   loadMarkdownItPlugins,
   parseHtml,
   repairFrontmatterLinks,
@@ -45,6 +46,7 @@ export async function composeSfcBlocks(
     fileName: id,
     content: raw.trimStart(),
     head: {},
+    frontmatter: undefined,
     routeMeta: undefined,
     viteConfig: config,
     vueStyleBlocks: {},
@@ -71,11 +73,12 @@ export async function composeSfcBlocks(
     lift('initialize'),
     transformsBefore,
     handlers(PipelineStage.initialize),
-    addDependencies(dependencies),
+    addBuilderDependencies(dependencies),
   )
 
   /** extract the meta-data from the MD content */
   const metaExtracted = flow(
+    injectUtilityFunctions,
     extractFrontmatter,
     // baseStyling,
     frontmatterPreprocess,
@@ -110,11 +113,6 @@ export async function composeSfcBlocks(
     escapeCodeTagInterpolation,
     handlers(PipelineStage.dom),
   )
-
-  // TODO: broken into "flow groups" defined above because it would
-  // appear that fp-ts _typing_ breaks down after some set number
-  // of steps ... actually prefer a single list so might be worth
-  // investigating whether there's a way to work around
 
   // construct the async pipeline
   const result = await pipe(

@@ -16,12 +16,6 @@
     "paths": {
       "~/*": [
         "src/*"
-      ],
-      "~/fixtures/*": [
-        "test/fixtures/*"
-      ],
-      "~/utils/*": [
-        "test/utils/*"
       ]
     }
   },

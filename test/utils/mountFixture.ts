@@ -8,6 +8,7 @@ async function importFixture(fixture: string) {
   const assets = (await import(fixture)) as {
     default: DefineComponent
     frontmatter: Frontmatter
+    excerpt?: string
   }
   const mountPoint = mount(assets.default, { global: { plugins: [] } })
   return {
