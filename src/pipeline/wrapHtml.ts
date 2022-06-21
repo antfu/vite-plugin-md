@@ -15,7 +15,7 @@ export const wrapHtml = transformer('wrapHtml', 'parsed', 'parsed', (payload) =>
   // if we wrap with component, make sure frontmatter props
   // are passed down
   if (wrapperComponent)
-    updated = `<${wrapperComponent}${frontmatter ? ' :frontmatter="frontmatter"' : ''}${updated}</${wrapperComponent}>`
+    updated = `<${wrapperComponent}${frontmatter ? ' :frontmatter="frontmatter"' : ''}>${updated}</${wrapperComponent}>`
 
   return { ...payload, html: updated }
 })

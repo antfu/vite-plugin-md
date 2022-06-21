@@ -20,21 +20,21 @@ export const excerpt: string | undefined = \\"\\"
 <template>
 <div class=\\"markdown-body\\"><h1>Links</h1>
 <ul>
-<li>An <a href=\\"https://google.com\\" class=\\" external-link\\" target=\\"_blank\\" rel=\\"noreferrer noopenner\\">external link</a> is one which links to another site whereas an <router-link class=\\" internal-link router-link\\" to=\\"/simple\\">internal link</router-link> links to content on the same site.</li>
+<li>An <a href=\\"https://google.com\\" class=\\" external-link\\" target=\\"_blank\\" rel=\\"noreferrer noopener\\">external link</a> is one which links to another site whereas an <router-link class=\\" internal-link router-link\\" to=\\"/simple\\">internal link</router-link> links to content on the same site.</li>
 <li>Within the category of “internal links” we have <router-link class=\\" internal-link router-link\\" to=\\"/foo/bar\\">fully qualified links</router-link> and <router-link class=\\" internal-link router-link\\" to=\\"/foo/bar\\">relative links</router-link> where with relative links we must ensure that the current page’s route is understood and incorporated into the link</li>
 <li>Check out <router-link class=\\" internal-link anchor-tag router-link\\" to=\\"/#section-2\\">Section 2</router-link> for the good stuff … well actually to be fair it’s just an example of an “anchor tag” where we’re linking to the another part of the same page</li>
-<li>External links are great but some aren’t safe: <a href=\\"http://bad-juju.com\\" class=\\" external-link insecure\\" target=\\"_blank\\" rel=\\"noreferrer noopenner\\">scary link</a></li>
+<li>External links are great but some aren’t safe: <a href=\\"http://bad-juju.com\\" class=\\" external-link insecure\\" target=\\"_blank\\" rel=\\"noreferrer noopener\\">scary link</a></li>
 </ul>
 <h2>Markdown file in a link</h2>
 <ul>
 <li>When we reference an index MD file the <router-link class=\\" internal-link router-link\\" to=\\"/foobar/\\">index route</router-link> is left with just the path component, no file component</li>
 <li>Similarly if an <em>internal</em> link to a <router-link class=\\" internal-link router-link\\" to=\\"/foo/bar\\">non-index route</router-link> has a <code class=\\"\\">.md</code> reference in it … this is cleaned up.</li>
-<li>NOTE: <em>external</em> links for both <a href=\\"https://dev.null/foo/index.md\\" class=\\" external-link\\" target=\\"_blank\\" rel=\\"noreferrer noopenner\\">external index routes</a> and <a href=\\"https://dev.null/foo/bar.md\\" class=\\" external-link\\" target=\\"_blank\\" rel=\\"noreferrer noopenner\\">external non-index routes</a> are not changed (but shouldn’t really be happening a lot)</li>
+<li>NOTE: <em>external</em> links for both <a href=\\"https://dev.null/foo/index.md\\" class=\\" external-link\\" target=\\"_blank\\" rel=\\"noreferrer noopener\\">external index routes</a> and <a href=\\"https://dev.null/foo/bar.md\\" class=\\" external-link\\" target=\\"_blank\\" rel=\\"noreferrer noopener\\">external non-index routes</a> are not changed (but shouldn’t really be happening a lot)</li>
 </ul>
 <h2>Content Types</h2>
 <ul>
-<li>If we link to <a href=\\"https://my-photos.com/profile.jpg\\" class=\\" external-link image-reference\\" target=\\"_blank\\" rel=\\"noreferrer noopenner\\">images</a>, <a href=\\"https://xyz.com/profile.doc\\" class=\\" external-link doc-reference\\" target=\\"_blank\\" rel=\\"noreferrer noopenner\\">documents</a>, or <a href=\\"https://example.com/foobar.wasm\\" class=\\" external-link\\" target=\\"_blank\\" rel=\\"noreferrer noopenner\\">code</a> we should get classes which indicate the content type</li>
-<li>My favorite colors are <a href=\\"https://colors.com/red\\" class=\\" external-link\\" target=\\"_blank\\" rel=\\"noreferrer noopenner\\">red</a>, <a href=\\"https://colors.com/blue\\" class=\\" external-link\\" target=\\"_blank\\" rel=\\"noreferrer noopenner\\">blue</a>, and <a href=\\"https://colors.com/green\\" class=\\" external-link\\" target=\\"_blank\\" rel=\\"noreferrer noopenner\\">green</a></li>
+<li>If we link to <a href=\\"https://my-photos.com/profile.jpg\\" class=\\" external-link image-reference\\" target=\\"_blank\\" rel=\\"noreferrer noopener\\">images</a>, <a href=\\"https://xyz.com/profile.doc\\" class=\\" external-link doc-reference\\" target=\\"_blank\\" rel=\\"noreferrer noopener\\">documents</a>, or <a href=\\"https://example.com/foobar.wasm\\" class=\\" external-link\\" target=\\"_blank\\" rel=\\"noreferrer noopener\\">code</a> we should get classes which indicate the content type</li>
+<li>My favorite colors are <a href=\\"https://colors.com/red\\" class=\\" external-link\\" target=\\"_blank\\" rel=\\"noreferrer noopener\\">red</a>, <a href=\\"https://colors.com/blue\\" class=\\" external-link\\" target=\\"_blank\\" rel=\\"noreferrer noopener\\">blue</a>, and <a href=\\"https://colors.com/green\\" class=\\" external-link\\" target=\\"_blank\\" rel=\\"noreferrer noopener\\">green</a></li>
 </ul>
 <h2>Router Awareness</h2>
 <ul>

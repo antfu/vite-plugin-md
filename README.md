@@ -7,7 +7,7 @@ Markdown for Vite
 
 [![NPM version](https://img.shields.io/npm/v/vite-plugin-md?color=a1b858)](https://www.npmjs.com/package/vite-plugin-md)
 
-> From v0.13, we introduced a pipline and builder engine ([#54](https://github.com/antfu/vite-plugin-md/pull/54), [#77](https://github.com/antfu/vite-plugin-md/pull/77)) to provide full customizability. If you still prefer the simple Markdown-to-Vue transformation prior to v0.13, it has been moved to [`vite-plugin-vue-markdown`](https://github.com/antfu/vite-plugin-vue-markdown).
+> From v0.13, we introduced a pipeline and builder engine ([#54](https://github.com/antfu/vite-plugin-md/pull/54), [#77](https://github.com/antfu/vite-plugin-md/pull/77)) to provide full customizability. If you still prefer the simple Markdown-to-Vue transformation prior to v0.13, it has been moved to [`vite-plugin-vue-markdown`](https://github.com/antfu/vite-plugin-vue-markdown).
 
 ## Install
 
@@ -190,7 +190,7 @@ For more options available, please refer to [`@vueuse/head`'s docs](https://gith
 
    The configuration for this plugin is a fully typed dictionary of options and therefore is largely self-documenting.
 
-   See [the tsdoc](./src/types.ts) for more advanced options
+   See [the ts-doc](./src/types.ts) for more advanced options
 
 2. **Markdown-It** plugins (and options)
 
@@ -225,8 +225,8 @@ For more options available, please refer to [`@vueuse/head`'s docs](https://gith
 
       Builder API's are mini-configurators for a particular feature area. The idea behind them is to allow extending functionality quickly with _sensible defaults_ but also providing their own configurations to allow users to grow into and configure that feature area. The builder APIs available are:
 
-        - [Link Builder](./docs/LinkBuilder.md)
-        - [Meta Builder](./docs/MetaBuilder.md)
+     - [Link Builder](./docs/LinkBuilder.md)
+     - [Meta Builder](./docs/MetaBuilder.md)
 
       If you wanted to use both of these builders in their default configuration, you would simply add the following to your options config for this plugin:
 
