@@ -122,7 +122,7 @@ export interface LinkifyConfig {
   /**
    * the `rel` property for external links
    *
-   * @default "noreferrer noopenner"
+   * @default "noreferrer noopener"
    */
   externalRel: undefined | string | StringTransformer
 
