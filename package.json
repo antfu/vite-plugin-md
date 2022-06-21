@@ -56,14 +56,15 @@
     "@vue/runtime-core": "^3.2.37",
     "@vueuse/core": "^8.7.4",
     "@yankeeinlondon/happy-wrapper": "^2.1.0",
-    "fp-ts": "^2.12.1",
     "gray-matter": "^4.0.3",
     "happy-dom": "^5.3.1",
     "markdown-it": "^13.0.1",
     "prismjs": "^1.28.0",
+    "source-map-js": "^1.0.2",
     "ts-morph": "^15.1.0"
   },
   "devDependencies": {
+    "fp-ts": "^2.12.1",
     "@antfu/eslint-config": "^0.25.1",
     "@antfu/ni": "^0.16.2",
     "@antfu/utils": "^0.5.2",

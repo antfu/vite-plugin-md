@@ -1,4 +1,5 @@
-import path from 'path'
+import { dirname, resolve } from 'path'
+import { fileURLToPath } from 'url'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import Inspect from 'vite-plugin-inspect'
@@ -9,10 +10,14 @@ import Unocss from 'unocss/vite'
 import Vue from '@vitejs/plugin-vue'
 import { defineConfig } from 'vite'
 
+const _dirname = typeof __dirname !== 'undefined'
+  ? __dirname
+  : dirname(fileURLToPath(import.meta.url))
+
 const config = defineConfig({
   resolve: {
     alias: {
-      '~/': `${path.resolve(__dirname, 'src')}/`,
+      '~/': `${resolve(_dirname, 'src')}/`,
     },
   },
   plugins: [
@@ -45,12 +50,12 @@ const config = defineConfig({
 
     Markdown({
       headEnabled: true,
+      frontmatterDefaults: {
+        requireAuth: false,
+      },
       builders: [
         meta({
           routeProps: ['layout', 'requireAuth', 'foo', 'route'],
-          defaults: {
-            requireAuth: () => false,
-          },
         }),
         link(),
         code({

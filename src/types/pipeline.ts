@@ -4,8 +4,9 @@ import type * as TE from 'fp-ts/TaskEither'
 import type { UserConfig } from 'vite'
 import type { Either } from 'fp-ts/lib/Either'
 import type { Fragment, IElement } from '@yankeeinlondon/happy-wrapper'
+import type { ExistingRawSourceMap } from 'rollup'
+import type { BuilderApi, BuilderDependencyApi } from '../builders'
 import type { EnumValues, Frontmatter, MetaProperty, ResolvedOptions } from './core'
-import type { BuilderApi, BuilderDependencyApi } from '~/builders'
 
 export enum PipelineStage {
   /**
@@ -257,6 +258,7 @@ export type Blocks<S extends IPipelineStage> = S extends 'sfcBlocksExtracted' | 
 
       /** any other top-level SFC blocks besides the traditional */
       customBlocks: string[]
+
     }
   : {}
 
@@ -264,6 +266,8 @@ export type Completed<S extends IPipelineStage> = S extends 'closeout'
   ? {
       /** the finalized component in string form */
       component: string
+      /** The sourcemap from Markdown to SFC */
+      map?: ExistingRawSourceMap | undefined
     }
   : {}
 

@@ -22,6 +22,7 @@ import {
   loadMarkdownItPlugins,
   parseHtml,
   repairFrontmatterLinks,
+  sourcemap,
   transformsBefore,
   usesBuilder,
   wrapHtml,
@@ -127,6 +128,7 @@ export async function composeSfcBlocks(
     handlers(PipelineStage.sfcBlocksExtracted),
 
     finalize,
+    sourcemap,
     handlers(PipelineStage.closeout),
   )()
 

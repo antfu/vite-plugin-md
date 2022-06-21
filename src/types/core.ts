@@ -2,7 +2,7 @@ import type MarkdownIt from 'markdown-it'
 import type { FilterPattern } from '@rollup/pluginutils'
 import type { Plugin, UserConfig } from 'vite'
 import type { CodeBlockProperties } from '../builders/code/code-types'
-import type { BuilderRegistration } from '~/builders'
+import type { BuilderRegistration } from '../builders'
 
 export type ViteConfig = Parameters<Exclude<Plugin['configResolved'], undefined>>[0]
 
@@ -151,7 +151,7 @@ export type FmValueCallback = (fm: Frontmatter, filename: string) => Frontmatter
 /**
  * Values allowed to be set as frontmatter props
  */
-export type FmAllowedValue = string | number | undefined | any[] | Symbol
+export type FmAllowedValue = string | number | undefined | any[] | Symbol | boolean
 
 /**
  * Options for Graymatter parser [[Docs](https://github.com/jonschlinkert/gray-matter#options)]
