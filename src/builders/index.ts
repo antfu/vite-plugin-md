@@ -1,5 +1,5 @@
 export * from './code'
 export * from './link'
-export * from './meta'
+export * from '@yankeeinlondon/meta-builder'
 export * from './createBuilder'
 export * from './builder-types'
