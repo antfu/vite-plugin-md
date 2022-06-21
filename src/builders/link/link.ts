@@ -153,7 +153,7 @@ export const link = createBuilder('link', 'parser')
       documentClass: 'doc-reference',
       ruleBasedClasses: [],
       externalTarget: '_blank',
-      externalRel: 'noreferrer noopenner',
+      externalRel: 'noreferrer noopener',
       internalTarget: undefined,
       internalRel: undefined,
       useRouterLinks: true,
