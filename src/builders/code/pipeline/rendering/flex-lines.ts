@@ -33,10 +33,7 @@ export const flexLines = (p: Pipeline<PipelineStage.parser>, o: CodeOptions, fen
       '.code-block',
         `Couldn't find the ".code-block" in the file ${p.fileName}`,
     )(wrap(fence.pre, lineNumbersWrapper)),
-    // we'll use DIV's -- a block element -- to give PRE's whitespace
-    // property jurisdiction to create a new line
-    // whereas with Prism's output we're just getting SPANs
-    s => s.updateAll('.code-line')(changeTagName('div')),
+    s => s.updateAll('.code-line')(changeTagName('code')),
     s => s.toContainer(),
   )
 }
