@@ -1,4 +1,3 @@
-import { escapeHtml } from 'markdown-it/lib/common/utils'
 import type { Grammar } from 'prismjs'
 import Prism from 'prismjs'
 import loadLanguages from 'prismjs/components/index'
@@ -7,6 +6,7 @@ import type {
   Highlighter,
   LineClassFn,
 } from '../code-types'
+import { escapeHtml } from '../utils/excapeHtml'
 
 function wrap(line: string, klass: LineClassFn) {
   return `<div class="${klass(line)}">${line}</div>`
