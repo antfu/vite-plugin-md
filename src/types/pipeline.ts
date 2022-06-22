@@ -184,6 +184,12 @@ export interface PipelineUtilityFunctions {
    * Adds a `<style>` reference to the page's header section
    */
   addStyleReference: (style: StyleProperty) => void
+
+  /**
+   * Adds meta-properties to the HEAD section of the page
+   */
+  addMetaProperty: (meta: MetaProperty) => void
+
   /**
    * Adds a VueJS `<script>` block to the HTML (which VueJS will eventually place in HEAD). A style block should be named so that downstream consumers
    * can -- potentially -- override or further modify the style.

@@ -2,7 +2,7 @@ import type { MaybeRef } from '@vueuse/core'
 import type { IElement } from '@yankeeinlondon/happy-wrapper'
 import { createElement, isElement } from '@yankeeinlondon/happy-wrapper'
 import { isRef, ref } from 'vue'
-import type { LinkProperty, Pipeline, PipelineStage, PipelineUtilityFunctions, ScriptProperty, StyleProperty } from '../types'
+import type { LinkProperty, MetaProperty, Pipeline, PipelineStage, PipelineUtilityFunctions, ScriptProperty, StyleProperty } from '../types'
 import { transformer } from '../utils'
 
 const add = (p: MaybeRef<any[]>, v: any) => isRef(p) ? p.value.push(v) : p.push(v)
@@ -35,6 +35,13 @@ const pipelineUtilityFunctions = (
   /** add inline code to a script block on the page */
   addCodeBlock(name, script, forVue2) {
     ctx.vueCodeBlocks[name] = forVue2 ? [script, forVue2] : script
+  },
+
+  addMetaProperty(meta) {
+    if (!ctx.head.link)
+      ctx.head.meta = ref([] as MetaProperty[])
+
+    add(ctx.head.meta, meta)
   },
 
   addStyleBlock(name, style) {

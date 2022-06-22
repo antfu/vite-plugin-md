@@ -17,5 +17,11 @@ export const wrapHtml = transformer('wrapHtml', 'parsed', 'parsed', (payload) =>
   if (wrapperComponent)
     updated = `<${wrapperComponent}${frontmatter ? ' :frontmatter="frontmatter"' : ''}>${updated}</${wrapperComponent}>`
 
+  // if (viteConfig.mode === 'production') {
+  //   // console.log('SSG:', process.env.SSG)
+
+  //   payload.setSsgTitle(frontmatter?.title || ' ')
+  // }
+
   return { ...payload, html: updated }
 })
