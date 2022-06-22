@@ -47,7 +47,7 @@ importers:
       vue: ^3.2.37
       vue-router: ^4.0.16
     dependencies:
-      '@yankeeinlondon/code-builder': 1.0.0-alpha.3_w64hlemryzeydsmsb4k4iblpia
+      '@yankeeinlondon/code-builder': 1.0.0-alpha.3_m6pl6huwqazy2mn7e2mgbbe7mm
       '@yankeeinlondon/link-builder': 1.0.0-alpha.2_cwfiq4kgvx3eovz3ynrdnuqa24
       '@yankeeinlondon/meta-builder': 1.0.0-alpha.2
       gray-matter: 4.0.3
@@ -69,7 +69,7 @@ importers:
       '@vue/runtime-core': 3.2.37
       '@vue/test-utils': 2.0.1_vue@3.2.37
       '@vueuse/core': 8.7.5_vue@3.2.37
-      '@yankeeinlondon/happy-wrapper': 2.1.0
+      '@yankeeinlondon/happy-wrapper': 2.2.0
       bumpp: 8.2.1
       c8: 7.11.3
       callsites: 3.1.0
@@ -1288,7 +1288,7 @@ packages:
       vue-demi: 0.13.1_vue@3.2.37
     dev: true
 
-  /@yankeeinlondon/code-builder/1.0.0-alpha.3_w64hlemryzeydsmsb4k4iblpia:
+  /@yankeeinlondon/code-builder/1.0.0-alpha.3_m6pl6huwqazy2mn7e2mgbbe7mm:
     resolution: {integrity: sha512-98dITNbW2YZ9wCKaphnTiZ2BbKWaWbd2lkjgQkLPesItUC+0F+cDfjo4g0BsxqnGK/6SuT+qmEEXv/JHghJAKA==}
     peerDependencies:
       '@yankeeinlondon/happy-wrapper': ^2.1.0
@@ -1297,7 +1297,7 @@ packages:
       vite: ^2.9.12
       vite-plugin-md: ^0.17.2
     dependencies:
-      '@yankeeinlondon/happy-wrapper': 2.1.0
+      '@yankeeinlondon/happy-wrapper': 2.2.0
       fp-ts: 2.12.1
       markdown-it: 13.0.1
       pathe: 0.3.0
@@ -1309,11 +1309,10 @@ packages:
       - supports-color
     dev: false
 
-  /@yankeeinlondon/happy-wrapper/2.1.0:
-    resolution: {integrity: sha512-Oa5BJheKEG6HCXNj0f0NGmo/YIUa7ynaVNhwTk39XCPAmow6lr0euq0MuXbfne86Sny2E4mCtcdds2YabDrBwg==}
+  /@yankeeinlondon/happy-wrapper/2.2.0:
+    resolution: {integrity: sha512-IwR7UMQNIjfBJP9ZJ02Ic8QmwnrIY9atQnxez/l0KUg6mw0fC5wxCpe1LbUkbpA4iDqfce+FFQBZv7tN4RFHhg==}
     dependencies:
-      callsites: 3.1.0
-      fp-ts: 2.12.1
+      callsites: 4.0.0
       happy-dom: 5.3.1
       native-dash: 1.22.1
     transitivePeerDependencies:
@@ -1526,7 +1525,7 @@ packages:
     hasBin: true
     dependencies:
       caniuse-lite: 1.0.30001358
-      electron-to-chromium: 1.4.165
+      electron-to-chromium: 1.4.166
       node-releases: 2.0.5
       update-browserslist-db: 1.0.3_browserslist@4.21.0
     dev: true
@@ -1604,6 +1603,11 @@ packages:
   /callsites/3.1.0:
     resolution: {integrity: sha512-P8BjAsXvZS+VIDUI11hHCQEv74YT67YUi5JJFNWIqL235sBmjX4+qx9Muvls5ivyNENctx46xQLQ3aTuE7ssaQ==}
     engines: {node: '>=6'}
+    dev: true
+
+  /callsites/4.0.0:
+    resolution: {integrity: sha512-y3jRROutgpKdz5vzEhWM34TidDU8vkJppF8dszITeb1PQmSqV3DTxyV8G/lyO/DNvtE1YTedehmw9MPZsCBHxQ==}
+    engines: {node: '>=12.20'}
 
   /camel-case/3.0.0:
     resolution: {integrity: sha512-+MbKztAYHXPr1jNTSKQF52VpcFjwY5RkR7fxksV8Doo4KAYc5Fl4UJRgthBbTmEx8C54DqahhbLJkDwjI3PI/w==}
@@ -1991,8 +1995,8 @@ packages:
   /duplexer/0.1.2:
     resolution: {integrity: sha512-jtD6YG370ZCIi/9GTaJKQxWTZD045+4R4hTk/x1UyoqadyJ9x9CgSi1RlVDQF8U2sxLLSnFkCaMihqljHIWgMg==}
 
-  /electron-to-chromium/1.4.165:
-    resolution: {integrity: sha512-DKQW1lqUSAYQvn9dnpK7mWaDpWbNOXQLXhfCi7Iwx0BKxdZOxkKcCyKw1l3ihWWW5iWSxKKbhEUoNRoHvl/hbA==}
+  /electron-to-chromium/1.4.166:
+    resolution: {integrity: sha512-ZPLdq3kcATkD6dwne5M4SgJBHw21t90BqTGzf3AceJwj3cE/ICv6jyDwHYyJoF4JNuXM3pzRxlaRmpO7pdwmcg==}
     dev: true
 
   /emoji-regex/8.0.0:
@@ -2464,7 +2468,7 @@ packages:
       doctrine: 2.1.0
       eslint: 8.18.0
       estraverse: 5.3.0
-      jsx-ast-utils: 3.3.0
+      jsx-ast-utils: 3.3.1
       minimatch: 3.1.2
       object.entries: 1.1.5
       object.fromentries: 2.0.5
@@ -3527,8 +3531,8 @@ packages:
       graceful-fs: 4.2.10
     dev: true
 
-  /jsx-ast-utils/3.3.0:
-    resolution: {integrity: sha512-XzO9luP6L0xkxwhIJMTJQpZo/eeN60K08jHdexfD569AGxeNug6UketeHXEhROoM8aR7EcUoOQmIhcJQjcuq8Q==}
+  /jsx-ast-utils/3.3.1:
+    resolution: {integrity: sha512-pxrjmNpeRw5wwVeWyEAk7QJu2GnBO3uzPFmHCKJJFPKK2Cy0cWL23krGtLdnMmbIi6/FjlrQpPyfQI19ByPOhQ==}
     engines: {node: '>=4.0'}
     dependencies:
       array-includes: 3.1.5
