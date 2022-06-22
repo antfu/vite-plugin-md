@@ -23,7 +23,6 @@ importers:
       '@yankeeinlondon/happy-wrapper': ^2.1.0
       '@yankeeinlondon/link-builder': ^1.0.0-alpha.1
       '@yankeeinlondon/meta-builder': ^1.0.0-alpha.1
-      add: ^2.0.6
       bumpp: ^8.2.1
       c8: ^7.11.3
       callsites: ^3.1.0
@@ -42,6 +41,7 @@ importers:
       typescript: ^4.7.4
       unocss: ^0.39.3
       vite: ^2.9.12
+      vite-plugin-md: ''
       vite-plugin-pages: ^0.24.2
       vite-plugin-vue-layouts: ^0.6.0
       vitest: ^0.15.1
@@ -70,7 +70,6 @@ importers:
       '@vue/test-utils': 2.0.1_vue@3.2.37
       '@vueuse/core': 8.7.4_vue@3.2.37
       '@yankeeinlondon/happy-wrapper': 2.1.0
-      add: 2.0.6
       bumpp: 8.2.1
       c8: 7.11.3
       callsites: 3.1.0
@@ -721,6 +720,7 @@ packages:
       minimatch: 5.1.0
       mkdirp: 1.0.4
       path-browserify: 1.0.1
+    dev: false
 
   /@types/chai-subset/1.3.3:
     resolution: {integrity: sha512-frBecisrNGz+F4T6bcc+NLeolfiojh5FxW2klu669+8BARtyQv2C/GkNW6FUodVe4BroGMP/wER/YDGc7rEllw==}
@@ -1272,6 +1272,7 @@ packages:
     transitivePeerDependencies:
       - '@unocss/webpack'
       - supports-color
+    dev: false
 
   /@yankeeinlondon/happy-wrapper/2.1.0:
     resolution: {integrity: sha512-Oa5BJheKEG6HCXNj0f0NGmo/YIUa7ynaVNhwTk39XCPAmow6lr0euq0MuXbfne86Sny2E4mCtcdds2YabDrBwg==}
@@ -1296,6 +1297,7 @@ packages:
       pathe: 0.3.0
       vite: 2.9.12
       vite-plugin-md: 'link:'
+    dev: false
 
   /@yankeeinlondon/meta-builder/1.0.0-alpha.1_vite@2.9.12+vue@3.2.37:
     resolution: {integrity: sha512-MqsBj/XEe633GWzhRk7aE6DjCtX5wGGWC9ZODWNWOEu8cwSij4YiLhk9r/AuBv3ddxbTmcssI+Azqeig2JmPyA==}
@@ -1307,6 +1309,7 @@ packages:
       - encoding
       - vite
       - vue
+    dev: false
 
   /abab/2.0.6:
     resolution: {integrity: sha512-j2afSsaIENvHZN2B8GOpF566vZ5WVk5opAiMTvWgaQT8DkbOqsTfvNAvHoRGU2zzP8cPoqys+xHTRDWW8L+/BA==}
@@ -1342,10 +1345,6 @@ packages:
     resolution: {integrity: sha512-Xx54uLJQZ19lKygFXOWsscKUbsBZW0CPykPhVQdhIeIwrbPmJzqeASDInc8nKBnp/JT6igTs82qPXz069H8I/A==}
     engines: {node: '>=0.4.0'}
     hasBin: true
-    dev: true
-
-  /add/2.0.6:
-    resolution: {integrity: sha512-j5QzrmsokwWWp6kUcJQySpbG+xfOBqqKnup3OIk1pz+kB/80SLorZ9V8zHFLO92Lcd+hbvq8bT+zOGoPkmBV0Q==}
     dev: true
 
   /agent-base/6.0.2:
@@ -1684,6 +1683,7 @@ packages:
     resolution: {integrity: sha512-GEqWvEWWsOvER+g9keO4ohFoD3ymwyCnqY3hoTr7GZipYFwEhMHJw+TtV0rfgRhNImM6QWZGO2XYjlJVyYT62w==}
     dependencies:
       tslib: 2.3.1
+    dev: false
 
   /color-convert/1.9.3:
     resolution: {integrity: sha512-QfAUtd+vFdAtFQcC8CCyYt1fYWxSqAiK2cSD6zDB8N3cpsEBAvRxp9zOGg6G/SHHJYAT88/az/IuDGALsNVbGg==}
@@ -3966,6 +3966,7 @@ packages:
     resolution: {integrity: sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==}
     engines: {node: '>=10'}
     hasBin: true
+    dev: false
 
   /mlly/0.3.19:
     resolution: {integrity: sha512-zMq5n3cOf4fOzA4WoeulxagbAgMChdev3MgP6K51k7M0u2whTXxupfIY4VVzws4vxkiWhwH1rVQcsw7zDGfRhA==}
@@ -4323,6 +4324,7 @@ packages:
 
   /path-browserify/1.0.1:
     resolution: {integrity: sha512-b7uo2UCUOYZcnF/3ID0lulOJi/bafxa1xPe7ZPsammBSpjSWQkjNxlt635YGS2MiR9GjvuXCtz2emr3jbsz98g==}
+    dev: false
 
   /path-exists/3.0.0:
     resolution: {integrity: sha512-bpC7GYwiDYQ4wYLe+FA8lhRjhQCMcQGuSgGGqDkg/QerRWw9CmGRT0iSOVRSZJ29NMLZgIzqaljJ63oaL4NIJQ==}
@@ -5041,6 +5043,7 @@ packages:
     dependencies:
       '@ts-morph/common': 0.16.0
       code-block-writer: 11.0.0
+    dev: false
 
   /tsconfig-paths/3.14.1:
     resolution: {integrity: sha512-fxDhWnFSLt3VuTwtvJt5fpwxBHg5AdKWMsgcPOOIilyjymcYVZoCQF8fvFRezCNfblEXmi+PcM1eYHeOAgXCOQ==}
@@ -5057,6 +5060,7 @@ packages:
 
   /tslib/2.3.1:
     resolution: {integrity: sha512-77EbyPPpMz+FRFRuAFlWMtmgUWGe9UOG2Z25NqCwiIjRhOf5iKGuzSe5P2w1laq+FkRy4p+PCuVkJSGkzTEKVw==}
+    dev: false
 
   /tslib/2.4.0:
     resolution: {integrity: sha512-d6xOpEDfsi2CZVlPQzGeux8XMwLT9hssAsaPYExaQMuYskwb+x1x7J371tWlbBdWHroy99KnVB6qIkUbs5X3UQ==}
@@ -5432,6 +5436,7 @@ packages:
       - '@vue/composition-api'
       - encoding
       - vue
+    dev: false
 
   /vite-plugin-pages/0.24.2_vite@2.9.12:
     resolution: {integrity: sha512-AmrHa6gi6n0mZReKzQTQ1uuf17fd1ziRDjNvSh0NTWNnDgA2si+hC8p63s3KyEmJS5lOE/rEeO4NBaRkY3sY3g==}

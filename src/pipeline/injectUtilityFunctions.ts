@@ -38,7 +38,7 @@ const pipelineUtilityFunctions = (
   },
 
   addMetaProperty(meta) {
-    if (!ctx.head.link)
+    if (!ctx.head.meta)
       ctx.head.meta = ref([] as MetaProperty[])
 
     add(ctx.head.meta, meta)
