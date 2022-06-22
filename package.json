@@ -23,6 +23,9 @@
       "import": "./dist/index.mjs"
     }
   },
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
   "typesVersions": {
     "*": {
       "*": [
@@ -31,9 +34,6 @@
       ]
     }
   },
-  "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
   "files": [
     "dist"
   ],
@@ -54,10 +54,11 @@
     "test:component": "npx cypress open-ct -p 4000"
   },
   "dependencies": {
-    "@yankeeinlondon/code-builder": "^1.0.0-alpha.1",
-    "@yankeeinlondon/link-builder": "^1.0.0-alpha.1",
-    "@yankeeinlondon/meta-builder": "^1.0.0-alpha.1",
+    "@yankeeinlondon/code-builder": "^1.0.0-alpha.3",
+    "@yankeeinlondon/link-builder": "^1.0.0-alpha.2",
+    "@yankeeinlondon/meta-builder": "^1.0.0-alpha.2",
     "gray-matter": "^4.0.3",
+    "markdown-it": "^13.0.1",
     "source-map-js": "^1.0.2"
   },
   "devDependencies": {
@@ -85,7 +86,6 @@
     "esno": "^0.16.3",
     "fp-ts": "^2.12.1",
     "happy-dom": "^5.3.1",
-    "markdown-it": "^13.0.1",
     "npm-run-all": "^4.1.5",
     "pathe": "^0.3.0",
     "rollup": "^2.75.7",
@@ -101,12 +101,11 @@
   },
   "peerDependencies": {
     "@vitejs/plugin-vue": "^2.3.3",
-    "@yankeeinlondon/code-builder": "^1.0.0-alpha.1",
+    "@yankeeinlondon/code-builder": "^1.0.0-alpha.3",
     "@yankeeinlondon/happy-wrapper": "^2.1.0",
-    "@yankeeinlondon/link-builder": "^1.0.0-alpha.1",
-    "@yankeeinlondon/meta-builder": "^1.0.0-alpha.1",
+    "@yankeeinlondon/link-builder": "^1.0.0-alpha.2",
+    "@yankeeinlondon/meta-builder": "^1.0.0-alpha.2",
     "happy-dom": "^5.3.1",
-    "markdown-it": "^13.0.1",
     "vite": "^2.9.9",
     "vue": "^3.2.37"
   },
