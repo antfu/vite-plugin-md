@@ -53,6 +53,9 @@ const config = defineConfig({
       frontmatterDefaults: {
         requireAuth: false,
       },
+      style: {
+        baseStyle: 'github',
+      },
       builders: [
         meta({
           routeProps: ['layout', 'requireAuth', 'foo', 'route'],
@@ -60,7 +63,6 @@ const config = defineConfig({
         link(),
         code({
           theme: 'base',
-          layoutStructure: 'tabular',
         }),
       ],
     }),

@@ -1,6 +1,6 @@
 import type { Grammar } from 'prismjs'
 import Prism from 'prismjs'
-import loadLanguages from 'prismjs/components/index'
+import loadLanguages from 'prismjs/components/index.js'
 import type {
   CodeOptions,
   Highlighter,
@@ -71,14 +71,24 @@ export const getPrismGrammar = (lang: string | undefined, options: CodeOptions):
   }
 
   else {
-    loadLanguages(candidate)
+    // loadLanguages(candidate)
     if (!Prism.languages[candidate]) {
       // couldn't find the language so fall back to defaults
       const fallback = options.defaultLanguageForUnknown || options.defaultLanguage || 'markdown'
-      loadLanguages(fallback)
-      return {
-        langUsed: fallback,
-        grammar: Prism.languages[fallback],
+      if (Prism.languages[fallback]) {
+        loadLanguages(fallback)
+        return {
+          langUsed: fallback,
+          grammar: Prism.languages[fallback],
+        }
+      }
+      else {
+        console.error(`The language passed in [${candidate}] was not found in prismJS but neither was the fallback language of "${fallback}"! Will use "plaintext" for now.`)
+
+        return {
+          langUsed: 'plaintext',
+          grammar: Prism.languages.plaintext,
+        }
       }
     }
     else {
