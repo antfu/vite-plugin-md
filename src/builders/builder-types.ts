@@ -1,4 +1,4 @@
-import type * as TE from 'fp-ts/TaskEither'
+import type * as TE from 'fp-ts/lib/TaskEither.js'
 import type { IPipelineStage, Pipeline, PipelineStage, RulesUse } from '../types'
 
 export interface BuilderRegistration<O extends BuilderOptions, S extends IPipelineStage> {

@@ -21,7 +21,7 @@ export default defineConfig({
     }),
     Layouts(),
     Markdown({
-      builders: [link(), code({ theme: 'base' }), meta()],
+      builders: [link(), code()],
       excerpt: true,
       exposeExcerpt: true,
     }),
