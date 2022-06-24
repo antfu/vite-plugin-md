@@ -1,6 +1,5 @@
 import type MarkdownIt from 'markdown-it'
 import type { ExistingRawSourceMap } from 'rollup'
-import type { RawSourceMap } from 'source-map-js'
 import { SourceMapGenerator } from 'source-map-js'
 import { transformer } from '../utils'
 

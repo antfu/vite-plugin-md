@@ -53,12 +53,14 @@ const config = defineConfig({
       frontmatterDefaults: {
         requireAuth: false,
       },
+      style: {
+        baseStyle: 'github',
+      },
       builders: [
         meta(),
         link(),
         code({
           theme: 'base',
-          layoutStructure: 'tabular',
         }),
       ],
     }),

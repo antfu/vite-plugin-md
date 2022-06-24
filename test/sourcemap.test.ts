@@ -10,7 +10,6 @@ describe('sourcemap support', () => {
 
   it('pipeline with filename produces sourcemap', async () => {
     const { map } = await composeFixture('simple')
-    console.log(map)
 
     expect(map).toBeDefined()
     expect(map?.file).toBe('./test/fixtures/simple.md')

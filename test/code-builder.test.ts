@@ -7,8 +7,6 @@ import {
 } from '@yankeeinlondon/happy-wrapper'
 import { composeSfcBlocks } from '../src/pipeline'
 import { code } from '../src/index'
-import { getPrismGrammar } from '../src/builders/code/mdi/establishHighlighter'
-import type { CodeOptions } from '../src/builders/code/code-types'
 import { composeFixture, getFixture } from './utils'
 
 describe('code() builder using Prism (incl generalized tests)', () => {
