@@ -1,5 +1,5 @@
-import { dirname, resolve } from 'path'
 import { fileURLToPath } from 'url'
+import { dirname, resolve } from 'pathe'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import Inspect from 'vite-plugin-inspect'

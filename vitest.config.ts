@@ -1,9 +1,7 @@
 /// <reference types="vitest" />
 import { defineConfig } from 'vite'
-import Pages from 'vite-plugin-pages'
-import Layouts from 'vite-plugin-vue-layouts'
 import Vue from '@vitejs/plugin-vue'
-import Markdown, { code, link, meta } from './src'
+import Markdown from './src'
 
 // used for testing, library code uses TSUP to build exports
 export default defineConfig({
@@ -16,17 +14,14 @@ export default defineConfig({
     },
   },
   plugins: [
-    Pages({
-      extensions: ['vue', 'md'],
-    }),
-    Layouts(),
+
     Markdown({
-      builders: [link(), code()],
+      // builders: [link(), code()],
       excerpt: true,
       exposeExcerpt: true,
     }),
     Vue({
       include: [/\.vue$/, /\.md$/],
-    }),
+    }) as any,
   ],
 })
