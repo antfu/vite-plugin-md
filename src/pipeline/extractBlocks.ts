@@ -1,6 +1,6 @@
 import { extract, getAttribute, select, toHtml } from '@yankeeinlondon/happy-wrapper'
 import type { IElement } from '@yankeeinlondon/happy-wrapper'
-import { pipe } from 'fp-ts/lib/function'
+import { pipe } from 'fp-ts/lib/function.js'
 import { isVue2, transformer, wrap } from '../utils'
 import type {
   Pipeline,

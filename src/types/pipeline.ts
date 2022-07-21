@@ -1,11 +1,12 @@
 import type MarkdownIt from 'markdown-it'
 import type { MaybeRef } from '@vueuse/core'
-import type * as TE from 'fp-ts/TaskEither'
+import type * as TE from 'fp-ts/lib/TaskEither.js'
 import type { UserConfig } from 'vite'
-import type { Either } from 'fp-ts/lib/Either'
+import type { Either } from 'fp-ts/lib/Either.js'
 import type { Fragment, IElement } from '@yankeeinlondon/happy-wrapper'
+import type { ExistingRawSourceMap } from 'rollup'
+import type { BuilderApi, BuilderDependencyApi } from '../builders'
 import type { EnumValues, Frontmatter, MetaProperty, ResolvedOptions } from './core'
-import type { BuilderApi, BuilderDependencyApi } from '~/builders'
 
 export enum PipelineStage {
   /**
@@ -183,6 +184,12 @@ export interface PipelineUtilityFunctions {
    * Adds a `<style>` reference to the page's header section
    */
   addStyleReference: (style: StyleProperty) => void
+
+  /**
+   * Adds meta-properties to the HEAD section of the page
+   */
+  addMetaProperty: (meta: MetaProperty) => void
+
   /**
    * Adds a VueJS `<script>` block to the HTML (which VueJS will eventually place in HEAD). A style block should be named so that downstream consumers
    * can -- potentially -- override or further modify the style.
@@ -257,6 +264,7 @@ export type Blocks<S extends IPipelineStage> = S extends 'sfcBlocksExtracted' | 
 
       /** any other top-level SFC blocks besides the traditional */
       customBlocks: string[]
+
     }
   : {}
 
@@ -264,6 +272,8 @@ export type Completed<S extends IPipelineStage> = S extends 'closeout'
   ? {
       /** the finalized component in string form */
       component: string
+      /** The sourcemap from Markdown to SFC */
+      map?: ExistingRawSourceMap | undefined
     }
   : {}
 

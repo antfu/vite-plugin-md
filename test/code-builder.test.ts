@@ -7,8 +7,6 @@ import {
 } from '@yankeeinlondon/happy-wrapper'
 import { composeSfcBlocks } from '../src/pipeline'
 import { code } from '../src/index'
-import { getPrismGrammar } from '../src/builders/code/mdi/establishHighlighter'
-import type { CodeOptions } from '../src/builders/code/code-types'
 import { composeFixture, getFixture } from './utils'
 
 describe('code() builder using Prism (incl generalized tests)', () => {
@@ -224,36 +222,6 @@ describe('code() builder using Prism (incl generalized tests)', () => {
 
     const pre = select(html).findFirst('pre', 'pre element not found!')
     expect(getStyle(pre)).toBe('text-color: green')
-  })
-
-  it('loading language parsers on demand works with Prism', () => {
-    const ts = getPrismGrammar('typescript', {} as CodeOptions)
-    expect(ts.langUsed).toBe('typescript')
-    expect(ts.grammar).toBeDefined()
-    expect(typeof ts.grammar).toBe('object')
-    expect(ts.grammar.comment).toBeDefined()
-
-    const rust = getPrismGrammar('rust', {} as CodeOptions)
-    expect(rust.langUsed).toBe('rust')
-    expect(rust.grammar).toBeDefined()
-    expect(typeof rust.grammar).toBe('object')
-    expect(rust.grammar.comment).toBeDefined()
-
-    const md = getPrismGrammar('markdown', {} as CodeOptions)
-    expect(md.langUsed).toBe('markdown')
-    expect(md.grammar).toBeDefined()
-    expect(typeof md.grammar).toBe('object')
-    expect(md.grammar.comment).toBeDefined()
-  })
-
-  it('getting a highlighter for an aliased language works', () => {
-    const ts = getPrismGrammar('ts', {} as CodeOptions)
-    expect(ts.langUsed).toBe('typescript')
-    expect(ts.grammar).toBeDefined()
-
-    const md = getPrismGrammar('md', {} as CodeOptions)
-    expect(md.langUsed).toBe('markdown')
-    expect(md.grammar).toBeDefined()
   })
 
   it('code content loaded from file using <<< syntax', async () => {

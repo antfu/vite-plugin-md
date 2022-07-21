@@ -15,7 +15,13 @@ export const wrapHtml = transformer('wrapHtml', 'parsed', 'parsed', (payload) =>
   // if we wrap with component, make sure frontmatter props
   // are passed down
   if (wrapperComponent)
-    updated = `<${wrapperComponent}${frontmatter ? ' :frontmatter="frontmatter"' : ''}${updated}</${wrapperComponent}>`
+    updated = `<${wrapperComponent}${frontmatter ? ' :frontmatter="frontmatter"' : ''}>${updated}</${wrapperComponent}>`
+
+  // if (viteConfig.mode === 'production') {
+  //   // console.log('SSG:', process.env.SSG)
+
+  //   payload.setSsgTitle(frontmatter?.title || ' ')
+  // }
 
   return { ...payload, html: updated }
 })

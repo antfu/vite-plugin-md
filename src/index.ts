@@ -4,9 +4,9 @@ import type { TransformResult } from 'rollup'
 import { createSfcComponent } from './createSfcComponent'
 import { resolveOptions } from './options'
 import type { Options } from './types'
+export { composeSfcBlocks } from './composeSfcBlocks'
 export * from './builders'
 export * from './types'
-export { mergeColorThemes } from './builders/code/styles/color/mergeColorThemes'
 
 function VitePluginMarkdown(userOptions: Options = {}): Plugin {
   const options = resolveOptions(userOptions)
@@ -27,16 +27,13 @@ function VitePluginMarkdown(userOptions: Options = {}): Plugin {
     configResolved(c) {
       config = { ...c }
     },
-    async transform(raw, id): Promise<TransformResult> {
-      if (!filter(id))
+    async transform(content, file): Promise<TransformResult> {
+      if (!filter(file))
         return
 
       try {
         /** converts Markdown to VueJS SFC string */
-        const sfc = await markdownToVue(config)(id, raw)
-        return {
-          code: sfc,
-        }
+        return await markdownToVue(config)(file, content)
       }
       catch (e: any) {
         this.error(e)
@@ -48,7 +45,7 @@ function VitePluginMarkdown(userOptions: Options = {}): Plugin {
 
       const defaultRead = ctx.read
       ctx.read = async function () {
-        return markdownToVue(config)(ctx.file, await defaultRead())
+        return (await markdownToVue(config)(ctx.file, await defaultRead())).code
       }
     },
   } as Plugin

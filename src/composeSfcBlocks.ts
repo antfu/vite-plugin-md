@@ -1,5 +1,5 @@
-import { flow, pipe } from 'fp-ts/lib/function'
-import { isRight } from 'fp-ts/lib/Either'
+import { flow, pipe } from 'fp-ts/lib/function.js'
+import { isRight } from 'fp-ts/lib/Either.js'
 import { resolveOptions } from './options'
 import { PipelineStage } from './types'
 import type {
@@ -22,6 +22,7 @@ import {
   loadMarkdownItPlugins,
   parseHtml,
   repairFrontmatterLinks,
+  sourcemap,
   transformsBefore,
   usesBuilder,
   wrapHtml,
@@ -127,6 +128,7 @@ export async function composeSfcBlocks(
     handlers(PipelineStage.sfcBlocksExtracted),
 
     finalize,
+    sourcemap,
     handlers(PipelineStage.closeout),
   )()
 

@@ -1,6 +1,6 @@
-import * as E from 'fp-ts/lib/Either'
-import * as TE from 'fp-ts/lib/TaskEither'
-import { pipe } from 'fp-ts/lib/function'
+import * as E from 'fp-ts/lib/Either.js'
+import { flatten, map, tryCatch } from 'fp-ts/lib/TaskEither.js'
+import { pipe } from 'fp-ts/lib/function.js'
 
 import type { IPipelineStage, PipeEither, PipeTask, Pipeline, PipelineStage } from '../types'
 
@@ -22,8 +22,8 @@ export const transformer = <F extends IPipelineStage, T extends IPipelineStage>(
   fn: (p: Pipeline<F>) => Pipeline<T>,
 ) => (payload: PipeTask<F>): PipeTask<T> => pipe(
     payload,
-    TE.map(
-      p => TE.tryCatch(
+    map(
+      p => tryCatch(
         () => {
           const result = Promise.resolve(fn(p))
           return result
@@ -33,7 +33,7 @@ export const transformer = <F extends IPipelineStage, T extends IPipelineStage>(
         },
       ),
     ),
-    TE.flatten,
+    flatten,
   )
 
 export function isPipeTask<S extends IPipelineStage>(payload: PipeTask<S> | PipeEither<S>): payload is PipeTask<S> {

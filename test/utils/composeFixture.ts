@@ -1,4 +1,4 @@
-import { composeSfcBlocks } from '../../src/pipeline'
+import { composeSfcBlocks } from '../../src'
 import type { Options } from '../../src/types'
 import { getFixture } from './getFixture'
 

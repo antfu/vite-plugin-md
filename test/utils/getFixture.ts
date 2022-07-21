@@ -1,5 +1,5 @@
 import { readFile } from 'fs/promises'
-import { join } from 'path'
+import { join } from 'pathe'
 
 export async function getFixture(file: string): Promise<string> {
   const filepath = file.includes('fixtures')
