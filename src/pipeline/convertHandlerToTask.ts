@@ -16,7 +16,7 @@ const getBuilders = <S extends IPipelineStage>(stage: S, options: ResolvedOption
     }
   },
   {} as BuilderConfig,
-)[stage] || [] as Array<BuilderRegistration<any, S>>
+)[stage] || [] as Array<BuilderRegistration<Record<string, any>, S>>
 
 /**
  * Provides back a function which converts the payload for a given lifecycle stage --

@@ -5,7 +5,7 @@ import type { UserConfig } from 'vite'
 import type { Either } from 'fp-ts/lib/Either.js'
 import type { Fragment, IElement } from '@yankeeinlondon/happy-wrapper'
 import type { ExistingRawSourceMap } from 'rollup'
-import type { BuilderApi, BuilderDependencyApi } from '../builders'
+import type { BuilderApi, BuilderDependencyApi, BuilderOptions } from '../builders'
 import type { EnumValues, Frontmatter, MetaProperty, ResolvedOptions } from './core'
 
 export enum PipelineStage {
@@ -160,7 +160,7 @@ export interface HeadProps {
 export type Initialization<S extends IPipelineStage> = S extends 'initialize'
   ? {
       /** allows a Builder API to express a dependency on another Builder API */
-      usesBuilder: <T extends BuilderApi<any, any>>(builder: T) => BuilderDependencyApi<T>
+      usesBuilder: <T extends BuilderApi<BuilderOptions, IPipelineStage>>(builder: T) => BuilderDependencyApi<T>
     }
   : {}
 export interface PipelineUtilityFunctions {

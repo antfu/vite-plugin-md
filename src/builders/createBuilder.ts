@@ -1,9 +1,8 @@
 import type {
   IPipelineStage,
-  PipelineStage,
 } from '../types'
 import { createFnWithProps } from '../utils'
-import type { BuilderApi, BuilderApiMeta, BuilderApiWithoutMeta, BuilderHandler, BuilderOptions, BuilderRegistration } from './builder-types'
+import type { BuilderApi, BuilderApiMeta, BuilderOptions, BuilderRegistration, CreateBuilder } from './builder-types'
 
 function createAboutSection<N extends string>(name: N, description: string): BuilderApiMeta {
   return {
@@ -18,54 +17,43 @@ function createAboutSection<N extends string>(name: N, description: string): Bui
  * - provide the **name** and **lifecycle hook** you'll plug into
  * - provide a generic `<O>` which expresses the options this builder will accept
  */
-export function createBuilder<E extends IPipelineStage>(name: string, lifecycle: E) {
+export const createBuilder: CreateBuilder = <E extends IPipelineStage>(name: string, lifecycle: E) => {
   return {
     /**
-     * A utility function to help you build a type-safe "builder".
-     *
      * Step 2:
      * - provide a generic `<O>` which expresses the options this builder will accept
      */
-    options: <O extends BuilderOptions>() => {
+    options: <O extends BuilderOptions = {}>() => {
       return {
         /**
-             * A utility function to help you build a type-safe "builder".
-             *
              * Step 3:
              * - _if_ your builder needs to initialize state in some way prior
              * to be calling by the event hook, then you should add it here
              * - this is purely optional
              */
-        initializer: (initializer?: BuilderHandler<O, PipelineStage.initialize>) => {
+        initializer: (initializer) => {
           return {
             /**
-             * A utility function to help you build a type-safe "builder".
-             *
              * Step 4:
              * - provide the **handler function** which is called upon reaching the
              * lifecycle event you've subscribed to
              * - your handler should be an async function which will receive the payload
              * along with any options that your builder has configured
              */
-            handler: (handler: BuilderHandler<O, E>) => {
+            handler: (handler) => {
               return {
-                /**
-                 * A utility function to help you build a type-safe "builder".
-                 *
-                 * Step 5:
-                 * - provide additional details describing this builder
-                 */
-                meta: (meta: Omit<BuilderRegistration<any, E>, 'name' | 'lifecycle' | 'handler' | 'options'>) => {
-                  const registration: Omit<BuilderRegistration<O, E>, 'options'> = {
+
+                meta: (meta = {}) => {
+                  const registration = {
                     ...meta,
                     name,
                     lifecycle,
                     handler,
                     initializer,
-                  }
+                  } as unknown as Omit<BuilderRegistration<O, E>, 'options'>
 
                   // return a function so that the consumer can add in their options
-                  const fn: BuilderApiWithoutMeta<O, E> = (options: Partial<O> = {}) =>
+                  const fn = (options: Partial<O> = {} as Partial<O>) =>
                     () => ({ ...registration, options }) as BuilderRegistration<O, E>
 
                   const apiMeta = createAboutSection(name, meta.description || '')

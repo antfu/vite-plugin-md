@@ -1,7 +1,8 @@
 import type MarkdownIt from 'markdown-it'
 import type { FilterPattern } from '@rollup/pluginutils'
 import type { Plugin, UserConfig } from 'vite'
-import type { BuilderRegistration } from '../builders'
+import type { BuilderOptions, BuilderRegistration } from '../builders'
+import type { IPipelineStage, PipelineStage } from './pipeline'
 
 export type ViteConfig = Parameters<Exclude<Plugin['configResolved'], undefined>>[0]
 
@@ -190,7 +191,7 @@ export interface Options {
   }
 
   /** allows adding in Builder's which help to expand functionality of this plugin */
-  builders?: (() => BuilderRegistration<any, any>)[]
+  builders?: (() => BuilderRegistration<{ [key: string]: any }, IPipelineStage>)[]
 
   /**
    * Explicitly set the Vue version.

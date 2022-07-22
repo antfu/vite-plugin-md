@@ -1,22 +1,23 @@
 {
   "name": "vite-plugin-md",
+  "type": "module",
   "version": "0.18.1",
+  "packageManager": "pnpm@7.1.7",
   "description": "Markdown for Vite",
+  "author": "Anthony Fu <anthonyfu117@hotmail.com>",
+  "license": "MIT",
+  "funding": "https://github.com/sponsors/antfu",
+  "homepage": "https://github.com/antfu/vite-plugin-md",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/antfu/vite-plugin-md"
+  },
+  "bugs": "https://github.com/antfu/vite-plugin-md/issues",
   "keywords": [
     "vite",
     "vite-plugin",
     "markdown-it"
   ],
-  "homepage": "https://github.com/antfu/vite-plugin-md",
-  "bugs": "https://github.com/antfu/vite-plugin-md/issues",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/antfu/vite-plugin-md"
-  },
-  "funding": "https://github.com/sponsors/antfu",
-  "license": "MIT",
-  "author": "Anthony Fu <anthonyfu117@hotmail.com>",
-  "type": "module",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -48,6 +49,10 @@
     "test:update": "vitest -u",
     "test:component": "npx cypress open-ct -p 4000"
   },
+  "peerDependencies": {
+    "@rollup/pluginutils": "^4.2.1",
+    "@vitejs/plugin-vue": "^3.0.1"
+  },
   "dependencies": {
     "@yankeeinlondon/code-builder": "1.0.0",
     "@yankeeinlondon/happy-wrapper": "^2.4.0",
@@ -59,15 +64,12 @@
     "pathe": "^0.3.2",
     "source-map-js": "^1.0.2"
   },
-  "peerDependencies": {
-    "@vitejs/plugin-vue": "^3.0.1",
-    "@rollup/pluginutils": "^4.2.1"
-  },
   "devDependencies": {
     "@antfu/eslint-config": "^0.25.2",
     "@antfu/ni": "^0.17.2",
     "@antfu/utils": "^0.5.2",
     "@rollup/pluginutils": "^4.2.1",
+    "@type-challenges/utils": "^0.1.1",
     "@types/markdown-it": "^12.2.3",
     "@types/node": "^18.0.6",
     "@types/prismjs": "^1.26.0",
@@ -93,6 +95,5 @@
     "vitest": "^0.18.1",
     "vue": "^3.2.37",
     "vue-router": "^4.1.2"
-  },
-  "packageManager": "pnpm@7.1.7"
+  }
 }

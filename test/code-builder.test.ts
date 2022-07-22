@@ -6,6 +6,7 @@ import {
   toHtml,
 } from '@yankeeinlondon/happy-wrapper'
 import { composeSfcBlocks } from '../src/pipeline'
+import type { CodeOptions } from '../src/index'
 import { code } from '../src/index'
 import { composeFixture, getFixture } from './utils'
 
@@ -60,7 +61,7 @@ describe('code() builder using Prism (incl generalized tests)', () => {
     const { templateBlock, html } = await composeSfcBlocks(
       'test/fixtures/ts-code-block.md',
       await getFixture('ts-code-block.md'),
-      { builders: [code({ lineNumbers: true })] },
+      { builders: [code({ lineNumbers: true } as Partial<CodeOptions>)] },
     )
 
     const dom = select(html)
