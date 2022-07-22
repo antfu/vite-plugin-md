@@ -7,7 +7,6 @@ import type { Options } from './types'
 export { composeSfcBlocks } from './composeSfcBlocks'
 export * from './builders'
 export * from './types'
-export { mergeColorThemes } from './builders/code/styles/color/mergeColorThemes'
 
 function VitePluginMarkdown(userOptions: Options = {}): Plugin {
   const options = resolveOptions(userOptions)

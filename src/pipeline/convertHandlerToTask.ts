@@ -1,6 +1,7 @@
-import { pipe } from 'fp-ts/lib/function'
-import * as TE from 'fp-ts/TaskEither'
-import type { BuilderConfig, BuilderOptions, BuilderRegistration, IPipelineStage, PipeTask, Pipeline, ResolvedOptions } from '../types'
+import { pipe } from 'fp-ts/lib/function.js'
+import * as TE from 'fp-ts/lib/TaskEither.js'
+import type { BuilderConfig, BuilderOptions, BuilderRegistration } from '../builders/builder-types'
+import type { IPipelineStage, PipeTask, Pipeline, ResolvedOptions } from '../types'
 
 const getBuilders = <S extends IPipelineStage>(stage: S, options: ResolvedOptions): Array<BuilderRegistration<any, S>> => options.builders.reduce(
   (acc, b) => {
@@ -15,7 +16,7 @@ const getBuilders = <S extends IPipelineStage>(stage: S, options: ResolvedOption
     }
   },
   {} as BuilderConfig,
-)[stage] || [] as Array<BuilderRegistration<any, S>>
+)[stage] || [] as Array<BuilderRegistration<Record<string, any>, S>>
 
 /**
  * Provides back a function which converts the payload for a given lifecycle stage --

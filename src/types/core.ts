@@ -1,8 +1,8 @@
 import type MarkdownIt from 'markdown-it'
 import type { FilterPattern } from '@rollup/pluginutils'
 import type { Plugin, UserConfig } from 'vite'
-import type { CodeBlockProperties } from '../builders/code/code-types'
-import type { BuilderRegistration } from '../builders'
+import type { BuilderOptions, BuilderRegistration } from '../builders'
+import type { IPipelineStage, PipelineStage } from './pipeline'
 
 export type ViteConfig = Parameters<Exclude<Plugin['configResolved'], undefined>>[0]
 
@@ -62,29 +62,6 @@ export interface MetaProperty {
   [key: string]: unknown
 }
 
-export interface LinkElement {
-  href?: string | undefined
-  tagName?: string | undefined
-  class?: string | undefined
-  ref?: string | undefined
-  target?: string | undefined
-  to?: string | undefined
-  [key: string]: unknown
-}
-
-export interface CodeBlockSummary {
-  /** the source filename (if stated) */
-  source?: string
-  /** the language as described by the author */
-  requestedLang: string
-  /** the actual language setting used to parse the code block */
-  parsedLang: string
-  linesHighlighted: number[]
-  /** the number of lines in the code block */
-  codeLines: number
-  props: CodeBlockProperties
-}
-
 /**
  * Frontmatter content is represented as key/value dictionary
  */
@@ -99,13 +76,6 @@ export interface Frontmatter {
   layout?: string
   requiresAuth?: boolean
   meta?: MetaProperty[]
-  /**
-   * Brief summary info about code blocks found on page.
-   *
-   * Will be populated when there are at least one code and you are using
-   * the code Builder with `code({injectIntoFrontmatter: true})`.
-   */
-  _codeBlocks?: CodeBlockSummary[]
   [key: string]: unknown
 }
 
@@ -221,7 +191,7 @@ export interface Options {
   }
 
   /** allows adding in Builder's which help to expand functionality of this plugin */
-  builders?: (() => BuilderRegistration<any, any>)[]
+  builders?: (() => BuilderRegistration<{ [key: string]: any }, IPipelineStage>)[]
 
   /**
    * Explicitly set the Vue version.

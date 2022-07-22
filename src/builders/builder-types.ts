@@ -1,4 +1,4 @@
-import type * as TE from 'fp-ts/TaskEither'
+import type * as TE from 'fp-ts/lib/TaskEither.js'
 import type { IPipelineStage, Pipeline, PipelineStage, RulesUse } from '../types'
 
 export interface BuilderRegistration<O extends BuilderOptions, S extends IPipelineStage> {
@@ -41,13 +41,13 @@ export interface BuilderRegistration<O extends BuilderOptions, S extends IPipeli
 /**
  * a dependency on a stated Builder API by another Builder API
  */
-export type BuilderDependency<T extends Partial<{}> = Partial<{}>> = [builder: BuilderApi<any, any>, options: T]
+export type BuilderDependency<T extends Partial<{}> = Partial<{}>> = [builder: BuilderApi<BuilderOptions, IPipelineStage>, options: T]
 
-export type OptionsFor<T extends BuilderApi<any, any>> = T extends BuilderApi<infer O, any>
+export type OptionsFor<T extends BuilderApi<BuilderOptions, IPipelineStage>> = T extends BuilderApi<infer O, any>
   ? O
   : never
 
-export type BuilderDependencyApi<B extends BuilderApi<any, any>, E extends string = never> = Omit<{
+export type BuilderDependencyApi<B extends BuilderApi<BuilderOptions, IPipelineStage>, E extends string = never> = Omit<{
   /**
    * Allows you to state a preferred option configuration for the Builder
    * you are dependant on. This should be seen as a suggestion more than
@@ -98,15 +98,15 @@ export interface BuilderApiMeta {
   }
 }
 
-export type BuilderApiWithoutMeta<O extends {}, S extends IPipelineStage> = (options?: O) => () => BuilderRegistration<O, S>
+export type BuilderOptionsFromUser<O extends {}, S extends IPipelineStage> = (options?: Partial<O>) => () => BuilderRegistration<O, S>
 
 /**
  * Builder options are expected to be a key/value dictionary but must
  * be allowed to be an empty object
  * */
-export type BuilderOptions = Record<string, any> | {}
+export interface BuilderOptions { [key: string]: any }
 
-export type BuilderConfig = Record<IPipelineStage, BuilderRegistration<any, any>[] | []>
+export type BuilderConfig = Record<IPipelineStage, BuilderRegistration<BuilderOptions, IPipelineStage>[] | []>
 
 /**
  * Builder's must provide an export which meets this API constraint. Basic
@@ -117,6 +117,38 @@ export type BuilderConfig = Record<IPipelineStage, BuilderRegistration<any, any>
 export type BuilderApi<
   O extends BuilderOptions,
   S extends IPipelineStage,
-> = BuilderApiWithoutMeta<O, S> & BuilderApiMeta
+> = BuilderOptionsFromUser<O, S> & BuilderApiMeta
 
 export type InlineBuilder = <N extends string, L extends IPipelineStage>(name: N, lifecycle: L) => (payload: Pipeline<L>) => Pipeline<L>
+
+export interface BuilderReadyForMeta<O extends BuilderOptions, E extends IPipelineStage> {
+  /**
+   * Step 5:
+   * - provide additional details describing this builder
+   */
+  meta(m?: Omit<BuilderRegistration<O, E>, 'name' | 'lifecycle' | 'handler' | 'options'>): BuilderApi<O, E>
+}
+
+export interface BuilderReadyForHandler<O extends BuilderOptions, E extends IPipelineStage> {
+  handler(h: BuilderHandler<O, E>): BuilderReadyForMeta<O, E>
+}
+
+export interface BuilderReadyForInitializer<O extends BuilderOptions, E extends IPipelineStage> {
+  /**
+ * Your builder may optionally provide an _initializer_ function who's utility is
+ * establishing context and configuration settings at the top of the build pipeline.
+ */
+  initializer(i?: BuilderHandler<O, PipelineStage.initialize>): BuilderReadyForHandler<O, E>
+}
+
+/**
+ * The **Builder API** now expects to get a _type_ for the options which
+ * the API will accept.
+ */
+export interface BuilderReadyForOptions<E extends IPipelineStage> {
+  options<O extends BuilderOptions = {}>(): BuilderReadyForInitializer<O, E>
+}
+
+export interface CreateBuilder {
+  <E extends IPipelineStage>(name: string, lifecycle: E): BuilderReadyForOptions<E>
+}

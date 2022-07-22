@@ -1,11 +1,11 @@
 import type MarkdownIt from 'markdown-it'
 import type { MaybeRef } from '@vueuse/core'
-import type * as TE from 'fp-ts/TaskEither'
+import type * as TE from 'fp-ts/lib/TaskEither.js'
 import type { UserConfig } from 'vite'
-import type { Either } from 'fp-ts/lib/Either'
+import type { Either } from 'fp-ts/lib/Either.js'
 import type { Fragment, IElement } from '@yankeeinlondon/happy-wrapper'
 import type { ExistingRawSourceMap } from 'rollup'
-import type { BuilderApi, BuilderDependencyApi } from '../builders'
+import type { BuilderApi, BuilderDependencyApi, BuilderOptions } from '../builders'
 import type { EnumValues, Frontmatter, MetaProperty, ResolvedOptions } from './core'
 
 export enum PipelineStage {
@@ -160,7 +160,7 @@ export interface HeadProps {
 export type Initialization<S extends IPipelineStage> = S extends 'initialize'
   ? {
       /** allows a Builder API to express a dependency on another Builder API */
-      usesBuilder: <T extends BuilderApi<any, any>>(builder: T) => BuilderDependencyApi<T>
+      usesBuilder: <T extends BuilderApi<BuilderOptions, IPipelineStage>>(builder: T) => BuilderDependencyApi<T>
     }
   : {}
 export interface PipelineUtilityFunctions {
@@ -184,6 +184,12 @@ export interface PipelineUtilityFunctions {
    * Adds a `<style>` reference to the page's header section
    */
   addStyleReference: (style: StyleProperty) => void
+
+  /**
+   * Adds meta-properties to the HEAD section of the page
+   */
+  addMetaProperty: (meta: MetaProperty) => void
+
   /**
    * Adds a VueJS `<script>` block to the HTML (which VueJS will eventually place in HEAD). A style block should be named so that downstream consumers
    * can -- potentially -- override or further modify the style.
