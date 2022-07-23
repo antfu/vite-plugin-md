@@ -20,11 +20,4 @@ describe('code block', () => {
       expect(toHtml(pre)).toContain('dotenv.config({')
     }
   })
-
-  it('loaded into DOM, works too', async () => {
-    const { wrapper } = await mountFixtureWithRouter('./fixtures/ts-code-block.md')
-
-    const pre = wrapper.find('pre')
-    expect(pre.exists).toBeTruthy()
-  })
 })
