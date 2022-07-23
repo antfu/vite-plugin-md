@@ -55,10 +55,10 @@
     "rollup": "^2.75.6"
   },
   "dependencies": {
-    "@yankeeinlondon/code-builder": "1.0.0",
+    "@yankeeinlondon/code-builder": "*",
     "@yankeeinlondon/happy-wrapper": "^2.4.0",
-    "@yankeeinlondon/link-builder": "^1.0.0",
-    "@yankeeinlondon/meta-builder": "^1.0.0",
+    "@yankeeinlondon/link-builder": "*",
+    "@yankeeinlondon/meta-builder": "*",
     "gray-matter": "github:yankeeinlondon/gray-matter",
     "happy-dom": "^6.0.4",
     "markdown-it": "^13.0.1",

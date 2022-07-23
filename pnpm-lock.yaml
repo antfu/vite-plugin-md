@@ -19,10 +19,10 @@ importers:
       '@vue/runtime-core': ^3.2.37
       '@vue/test-utils': ^2.0.2
       '@vueuse/core': ^8.9.4
-      '@yankeeinlondon/code-builder': 1.0.0
+      '@yankeeinlondon/code-builder': '*'
       '@yankeeinlondon/happy-wrapper': ^2.4.0
-      '@yankeeinlondon/link-builder': ^1.0.0
-      '@yankeeinlondon/meta-builder': ^1.0.0
+      '@yankeeinlondon/link-builder': '*'
+      '@yankeeinlondon/meta-builder': '*'
       bumpp: ^8.2.1
       c8: ^7.12.0
       callsites: ^4.0.0
