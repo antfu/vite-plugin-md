@@ -134,7 +134,7 @@ export const extractBlocks = transformer('extractBlocks', 'dom', 'sfcBlocksExtra
     frontmatter: [
       '/** frontmatter meta-data for MD page **/',
       'export interface Frontmatter {',
-      '  title?: string; description?: string; subject?: string; category?: string; name?: string; excerpt?: string; image?: string; layout?: string; requiredAuth?: boolean; meta?: Record<string, any>[];',
+      '  title?: string\n  description?: string\n  subject?: string\n  category?: string\n  name?: string\n  excerpt?: string\n  image?: string\n  layout?: string\n  requiredAuth?: boolean\n  meta?: Record<string, any>[]',
       '  [key: string]: unknown',
       '}',
       `export const frontmatter: Frontmatter = ${options.exposeFrontmatter ? JSON.stringify(frontmatter) : '{}'}`,
