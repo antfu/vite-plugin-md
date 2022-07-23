@@ -10,7 +10,16 @@ const title = \\"Links Testing\\"
 <script lang=\\"ts\\">
 /** frontmatter meta-data for MD page **/
 export interface Frontmatter {
-  title?: string; description?: string; subject?: string; category?: string; name?: string; excerpt?: string; image?: string; layout?: string; requiredAuth?: boolean; meta?: Record<string, any>[];
+  title?: string
+  description?: string
+  subject?: string
+  category?: string
+  name?: string
+  excerpt?: string
+  image?: string
+  layout?: string
+  requiredAuth?: boolean
+  meta?: Record<string, any>[]
   [key: string]: unknown
 }
 export const frontmatter: Frontmatter = {\\"title\\":\\"Links Testing\\"}
