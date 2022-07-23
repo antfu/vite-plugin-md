@@ -18,7 +18,10 @@ jobs:
           registry-url: https://registry.npmjs.org/
       - run: npm i -g pnpm@7.5.2 @antfu/ni
       - run: nci
-      - run: nr test --if-present
+      - name: Test
+        run: nr test --if-present
+      - name: Build
+        run: nr build
       - run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
