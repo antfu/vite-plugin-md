@@ -2,7 +2,7 @@
   "name": "vite-plugin-md",
   "type": "module",
   "version": "0.19.1",
-  "packageManager": "pnpm@7.1.7",
+  "packageManager": "pnpm@7.6.0",
   "description": "Markdown for Vite",
   "author": "Anthony Fu <anthonyfu117@hotmail.com>",
   "license": "MIT",
