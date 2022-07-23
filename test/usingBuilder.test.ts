@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import { code, meta } from '../src'
+// import { code, meta } from '../src'
 import { composeFixture } from './utils'
 
-describe('usingBuilder() utility on pipeline', () => {
+describe.todo('usingBuilder() utility on pipeline', () => {
   it('testing for absence of builders', async () => {
     const sfc = await composeFixture('simple')
     expect(sfc.options.usingBuilder('code')).toBeFalsy()

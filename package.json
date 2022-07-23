@@ -50,18 +50,15 @@
     "test:component": "npx cypress open-ct -p 4000"
   },
   "peerDependencies": {
-    "@rollup/pluginutils": "^4.2.1",
     "@vitejs/plugin-vue": "^3.0.1",
     "rollup": "^2.75.6"
   },
   "dependencies": {
-    "@yankeeinlondon/code-builder": "*",
     "@yankeeinlondon/happy-wrapper": "^2.4.0",
-    "@yankeeinlondon/link-builder": "*",
-    "@yankeeinlondon/meta-builder": "*",
     "gray-matter": "github:yankeeinlondon/gray-matter",
     "happy-dom": "^6.0.4",
     "markdown-it": "^13.0.1",
+    "@rollup/pluginutils": "^4.2.1",
     "pathe": "^0.3.2",
     "source-map-js": "^1.0.2"
   },
