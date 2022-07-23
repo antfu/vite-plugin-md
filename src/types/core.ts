@@ -1,10 +1,12 @@
-import type MarkdownIt from 'markdown-it'
 import type { FilterPattern } from '@rollup/pluginutils'
+import type MarkdownIt from 'markdown-it'
 import type { Plugin, UserConfig } from 'vite'
-import type { BuilderOptions, BuilderRegistration } from '../builders'
-import type { IPipelineStage, PipelineStage } from './pipeline'
+import type { BuilderRegistration } from '../builders'
+import type { IPipelineStage } from './pipeline'
 
-export type ViteConfig = Parameters<Exclude<Plugin['configResolved'], undefined>>[0]
+export type ViteConfig = Parameters<
+  Exclude<Plugin['configResolved'], undefined>
+>[0]
 
 /**
  * The key/value definition for Route Properties.
