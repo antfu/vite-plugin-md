@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 jobs:
   release:
@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: 16
           registry-url: https://registry.npmjs.org/
-      - run: npm i -g pnpm @antfu/ni
+      - run: npm i -g pnpm@7.5.2 @antfu/ni
       - run: nci
       - run: nr test --if-present
       - run: npm publish --access public

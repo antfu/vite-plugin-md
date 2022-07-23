@@ -30,7 +30,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Setup
-        run: npm i -g pnpm @antfu/ni
+        run: npm i -g pnpm@7.5.2 @antfu/ni
 
       - name: Install
         run: nci
