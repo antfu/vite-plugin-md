@@ -18,7 +18,7 @@ importers:
       '@vue/runtime-core': ^3.2.37
       '@vue/test-utils': ^2.0.2
       '@vueuse/core': ^8.9.4
-      '@yankeeinlondon/builder-api': ^0.3.1
+      '@yankeeinlondon/builder-api': '*'
       '@yankeeinlondon/happy-wrapper': ^2.4.0
       bumpp: ^8.2.1
       c8: ^7.12.0
