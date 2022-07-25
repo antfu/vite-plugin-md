@@ -41,8 +41,6 @@
     "lint:fix": "eslint . --fix",
     "audit:fix": "pnpm audit --fix && pnpm install",
     "release": "bumpp",
-    "prepublishOnly": "pnpm install",
-    "publish": "bumpp",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
