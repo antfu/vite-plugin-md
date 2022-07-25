@@ -40,7 +40,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "audit:fix": "pnpm audit --fix && pnpm install",
-    "release": "bumpp",
+    "release": "pnpm audit:fix && bumpp",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
