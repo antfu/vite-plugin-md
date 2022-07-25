@@ -33,7 +33,7 @@ jobs:
         run: npm i -g pnpm@7.5.2 @antfu/ni
 
       - name: Install
-        run: nci
+        run: pnpm install
 
       - name: Build
         run: nr build
