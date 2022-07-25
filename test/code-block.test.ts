@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { select, toHtml } from '@yankeeinlondon/happy-wrapper'
 import { composeSfcBlocks } from '../src'
-import { getFixture, mountFixtureWithRouter } from './utils'
+import { getFixture } from './utils'
 
 describe('code block', () => {
   it('', async () => {

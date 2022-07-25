@@ -7,6 +7,9 @@
   "dependencies": {
     "@vueuse/core": "^8.9.4",
     "@vueuse/head": "^0.7.6",
+    "@yankeeinlondon/code-builder": "^1.0.3",
+    "@yankeeinlondon/link-builder": "^1.0.2",
+    "@yankeeinlondon/meta-builder": "^1.0.2",
     "vue": "^3.2.37",
     "vue-router": "^4.1.2"
   },

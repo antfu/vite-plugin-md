@@ -1,7 +1,7 @@
 import type { FilterPattern } from '@rollup/pluginutils'
 import type MarkdownIt from 'markdown-it'
 import type { Plugin, UserConfig } from 'vite'
-import type { BuilderRegistration } from '../builders'
+import type { BuilderRegistration } from '@yankeeinlondon/builder-api'
 import type { IPipelineStage } from './pipeline'
 
 export type ViteConfig = Parameters<

@@ -4,7 +4,7 @@ import { composeSfcBlocks } from '../src/pipeline'
 // import { code, link, meta } from '../src/index'
 let md = ''
 
-describe('Builder API registration', () => {
+describe.todo('Builder API registration', () => {
   beforeAll(async () => {
     md = await readFile('test/fixtures/simple.md', 'utf-8')
   })

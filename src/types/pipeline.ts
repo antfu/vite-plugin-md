@@ -5,8 +5,17 @@ import type { UserConfig } from 'vite'
 import type { Either } from 'fp-ts/lib/Either.js'
 import type { Fragment, IElement } from '@yankeeinlondon/happy-wrapper'
 import type { ExistingRawSourceMap } from 'rollup'
-import type { BuilderApi, BuilderDependencyApi, BuilderOptions } from '../builders'
-import type { EnumValues, Frontmatter, MetaProperty, ResolvedOptions } from './core'
+import type {
+  BuilderApi,
+  BuilderDependencyApi,
+  BuilderOptions,
+} from '@yankeeinlondon/builder-api'
+import type {
+  EnumValues,
+  Frontmatter,
+  MetaProperty,
+  ResolvedOptions,
+} from './core'
 
 export enum PipelineStage {
   /**
