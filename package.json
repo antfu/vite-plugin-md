@@ -51,7 +51,7 @@
   },
   "peerDependencies": {
     "@vitejs/plugin-vue": "^3.0.1",
-    "rollup": "^2.75.6"
+    "rollup": "^2.77.0"
   },
   "dependencies": {
     "@rollup/pluginutils": "^4.2.1",
