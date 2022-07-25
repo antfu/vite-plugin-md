@@ -1,5 +1,6 @@
 {
   "private": true,
+  "packageManager": "pnpm@7.5.2",
   "scripts": {
     "build": "cross-env DEBUG=vite-plugin-md:* vite build",
     "dev": "cross-env DEBUG=vite-plugin-md:* vite"
