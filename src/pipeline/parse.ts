@@ -6,6 +6,7 @@ import { transformer } from '../utils'
 export const parseHtml = transformer('parseHtml', 'parser', 'parsed', (payload) => {
   try {
     const html = payload.parser.render(payload.md, {})
+
     return {
       ...payload,
       html,

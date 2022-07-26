@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 // import { code, meta } from '../src'
 import { composeFixture } from './utils'
 
+// TODO: bring this back in if we want to re-export the now external builders
 describe.todo('usingBuilder() utility on pipeline', () => {
   it('testing for absence of builders', async () => {
     const sfc = await composeFixture('simple')
