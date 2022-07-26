@@ -1,5 +1,5 @@
 import type { IElement } from '@yankeeinlondon/happy-wrapper'
-import { clone, inspect, select, toHtml } from '@yankeeinlondon/happy-wrapper'
+import { clone, select } from '@yankeeinlondon/happy-wrapper'
 import { transformer } from '../utils'
 
 const wrappedFrontmatter = /%7B%7B(.*)%7D%7D/

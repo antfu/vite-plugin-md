@@ -10,6 +10,7 @@ const fixtures = [
   'get-the-picture',
   'highlight-multi-block',
   'route-meta-custom',
+  'with-html-comment',
 ]
 
 describe('generate temporary SFCs and ensure they can be imported', () => {
