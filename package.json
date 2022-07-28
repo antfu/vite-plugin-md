@@ -72,7 +72,7 @@
     "@vitest/ui": "^0.19.1",
     "@vue/runtime-core": "^3.2.37",
     "@vue/test-utils": "^2.0.2",
-    "@vueuse/core": "^8.9.4",
+    "@vueuse/core": "^9.0.0",
     "bumpp": "^8.2.1",
     "c8": "^7.12.0",
     "callsites": "^4.0.0",
