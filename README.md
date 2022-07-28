@@ -4,185 +4,185 @@ Markdown for Vite
 
 - Use Markdown as Vue components
 - Use Vue components in Markdown
+- Extend functionality with **Builder API**
 
 [![NPM version](https://img.shields.io/npm/v/vite-plugin-md?color=a1b858)](https://www.npmjs.com/package/vite-plugin-md)
 
 > From v0.13, we introduced a pipeline and builder engine ([#54](https://github.com/antfu/vite-plugin-md/pull/54), [#77](https://github.com/antfu/vite-plugin-md/pull/77)) to provide full customizability. If you still prefer the simple Markdown-to-Vue transformation prior to v0.13, it has been moved to [`vite-plugin-vue-markdown`](https://github.com/antfu/vite-plugin-vue-markdown).
 
-## Install
+## Installing this Plugin
 
-Install
+Installation can be done in a few simple steps. From the root of your repo do the following:
 
-```bash
-npm i vite-plugin-md -D # yarn add vite-plugin-md -D
-```
+1. **NPM Install**
 
-### TypeScript Shim
+   ```bash
+   npm i vite-plugin-md -D # yarn add vite-plugin-md -D
+   ```
 
-_where needed:_
+   > Please note that this plugin _does_ have some peer dependencies; this is by design is intended to provide better control to end users but as NPM has fairly recently changed how they handle peer dependencies these will no longer be automatically be installed for you. You can either add `auto-install-peers=true` to your `.npmrc` file to go back to the old process or install peer deps when told about them.
 
-```ts
-declare module '*.vue' {
-  import type { ComponentOptions } from 'vue'
-  const Component: ComponentOptions
-  export default Component
-}
+2. **Vite Configuration**
 
-declare module '*.md' {
-  import type { ComponentOptions } from 'vue'
-  const Component: ComponentOptions
-  export default Component
-}
-```
+   Add the following to your `vite.config.js` / `vite.config.ts` file:
 
-then add the following to `vite.config.js`
+   ```ts
+   import Vue from '@vitejs/plugin-vue'
+   import Markdown from 'vite-plugin-md'
 
-```ts
-import Vue from '@vitejs/plugin-vue'
-import Markdown from 'vite-plugin-md'
+   export default {
+     plugins: [
+       Vue({
+         include: [/\.vue$/, /\.md$/], // <--
+       }),
+       Markdown(),
+     ],
+   }
+   ```
 
-export default {
-  plugins: [
-    Vue({
-      include: [/\.vue$/, /\.md$/], // <--
-    }),
-    Markdown(),
-  ],
-}
-```
+   > This adds the VueJS along with _this_ repo as "plugins" to Vite. With VueJS you'll also want to make sure to include both `vue` and `md` files.
 
-And import it as a normal Vue component
+3. **Typescript Config** (optional)
 
-## Import Markdown as Vue components
+   If you're using Typescript than you'll want take the additional step of adding a "shim file" to help Typescript to understand how to think of Vue SFC files and Markdown files structurally. For VueJS developers, you've probably already done this for your VueJS files but you can wrap this up with a single file -- `shims.d.ts` -- in the root of your repo:
 
-```html
-<template>
-  <HelloWorld />
-</template>
+      ```ts
+      declare module '*.vue' {
+        import type { ComponentOptions } from 'vue'
+        const Component: ComponentOptions
+        export default Component
+      }
 
-<script>
-import HelloWorld from './README.md'
+      declare module '*.md' {
+        import type { ComponentOptions } from 'vue'
+        const Component: ComponentOptions
+        export default Component
+      }
+      ```
 
-export default {
-  components: {
-    HelloWorld,
-  },
-}
-</script>
-```
+4. **Builder Installs** (optional)
 
-## Use Vue Components inside Markdown
+    Modern versions of this plugin provide a powerful pipeline system for extending the functionality of this plugin. You can use provided/recommended plugins but you can create these yourself. More on this below but for now be aware that the three _builders_ which had been originally included as internal builders are now "external" to both demonstrate how you can do this and to keep this repo more focused on core pipelining.
 
-You can even use Vue components inside your markdown, for example
+    The three "built-in" builders were `code()`, `link()`, and `meta()`. Instead of importing them directly as symbols from this repo you can now just import them directly from their repos:
 
-```html
-<Counter :init='5'/>
-```
+    - **code** - `pnpm add -D @yankeeinlondon/code-builder`
+       > `npm install -D @yankeeinlondon/code-builder`
 
-<Counter :init='5'/>
+       > `yarn add -D @yankeeinlondon/code-builder`
+    - **meta** - `pnpm add --save-dev @yankeeinlondon/meta-builder`
+    - **link** - `pnpm add --save-dev @yankeeinlondon/link-builder`
 
-Note you can either register the components globally, or use the `<script setup>` tag to register them locally.
+    At this point the process is exactly the same as before, you simply add these builders into the configuration for this repo like so:
 
-```ts
-import { createApp } from 'vue'
-import App from './App.vue'
-import Counter from './Counter.vue'
+    ```ts
+    import Markdown from 'vite-plugin-md'
+    import code from '@yankeeinlondon/code-builder'
 
-const app = createApp(App)
+    export default {
+      plugins: [
+        Markdown({
+          builders: [code()]
+        })
+      ]
+    }
+    ```
 
-// register global
-app.component('Counter', Counter) // <--
+    >**Note:** `code`, `meta`, and `link` can all be imported from [**md-powerpack**](https://github.com/yankeeinlondon/md-powerpack) -- `npm install -D md-powerpack` -- which is an aggregation repo for builder API's. Either approach is equally valid.
 
-app.mount()
-```
+## Using this Plugin
 
-```html
-<script setup>
-import { Counter } from './Counter.vue'
-</script>
+Refer to the _example_ app in this repo for a working example but the really short answer is ... just write markdown files in the same places where you might have written VueJS SFC components and they will both be treated as Vue components in every way.
 
-<Counter :init='5'/>
-```
+That means you can:
 
-Or you can use [`vite-plugin-components`](#work-with-vite-plugin-components) for auto components registration.
+1. **Import Markdown** as Vue components
 
-Please pay attention to the name of the component. `kebab-case` is recommended because it meets the standard.
+   ```html
+   <template>
+     <HelloWorld />
+   </template>
 
-## Frontmatter
+   <script>
+   import HelloWorld from './README.md'
 
-Frontmatter will be parsed and inject into Vue's instance data `frontmatter` field.
+   export default {
+     components: {
+       HelloWorld,
+     },
+   }
+   </script>
+   ```
 
-For example:
+2. Use **Vue Components** inside your Markdown
 
-```md
----
-name: My Cool App
----
+   ```markdown
+   # My Page
+   There I was, there I was ... in the jungle. Then I started hearing this ticking sound and I realized it was some sort of _counter_?
 
-# Hello World
+   <Counter :init='5'/>
 
-This is {{frontmatter.name}}
-```
+   I looked a bit closer and realized I could **press** this counter and it would change! What is this magic?
+   ```
 
-Will be rendered as
+   In this example we use a custom Vue component called `Counter` (actually found in the demo app) and intermix it with our Markdown content. In this example we leveraged the ability to automatically import components with the powerful Vite plugin [`unplugin-vue-components`](https://github.com/antfu/unplugin-vue-components) but if you prefer not to you can just manually import some components globally or you can also add the following block to your Markdown:
 
-```html
-<h1>Hello World</h1>
-<p>This is My Cool App</p>
-```
+   ```markdown
+   <script setup>
+   import { Counter } from './Counter.vue'
+   </script>
+   ```
 
-It will also be passed to the wrapper component's props if you have set `wrapperComponent` option.
+   In most cases, however, use of the `unplugin-vue-components` just makes life simpler. :)
 
-## Document head and meta
+3. **Frontmatter**
 
-To manage document head and meta, you would need to install [`@vueuse/head`](https://github.com/vueuse/head) and do some setup.
+   Frontmatter is a meta-data standard used with most of the static content frameworks and allows you to put name/value pairs at the top of your Markdown files and then use this content within the page. For example:
 
-```bash
-npm i @vueuse/head
-```
+   ```md
+   ---
+   name: My Cool App
+   ---
 
-then in your `vite.config.js`:
+   # Hello World
 
-```js
-import Vue from '@vitejs/plugin-vue'
-import Markdown from 'vite-plugin-md'
+   This is {{name}}
+   ```
 
-export default {
-  plugins: [
-    Vue({
-      include: [/\.vue$/, /\.md$/],
-    }),
-    Markdown({
-      headEnabled: true, // <--
-    }),
-  ],
-}
-```
+   Will be rendered as:
 
-`src/main.js`
+   ```html
+   <h1>Hello World</h1>
+   <p>This is My Cool App</p>
+   ```
 
-```js
-import { createApp } from 'vue'
-import { createHead } from '@vueuse/head' // <--
+     **Leveraging Meta Properties**
 
-const app = createApp(App)
+      It is often useful to have certain "meta properties" associated with your pages and you can do this easily in one of two ways:
 
-const head = createHead() // <--
-app.use(head) // <--
-```
+      1. If you use `@vueuse/head` then you can enable the `headEnabled` configuration option
+      2. If you want to go further you can add the [`meta()`](https://github.com/yankeeinlondon/meta-builder) builder mentioned above
 
-Then you can use frontmatter to control the head. For example:
+      With both options you can start to add frontmatter like this:
 
-```yaml
----
-title: My Cool App
-meta:
-  - name: description
-    content: Hello World
----
-```
+      ```yaml
+      meta:
+        - name: My Cool App
+          description: cool things happen to people who use cool apps
+      ```
 
-For more options available, please refer to [`@vueuse/head`'s docs](https://github.com/vueuse/head).
+      This will then intelligently be incorporated into `<meta>` tags in the resulting output. For more information look at the corresponding docs:
+
+      - [Docs for `@vueuse/head`](https://github.com/vueuse/head)
+      - [Docs for `@yankeeinlondon/meta-builder`](<https://github.com/yankeeinlondon/meta-builder>)
+
+4. Import Frontmatter from Markdown
+
+    Not only can you import Markdown files as VueJS components (using the _default_ import) but you can also import a Markdown file's frontmatter via a named export:
+
+    ```ts
+    import { frontmatter } from 'my-app.md'
+    ```
 
 ## Configuration / Options
 
@@ -223,29 +223,37 @@ For more options available, please refer to [`@vueuse/head`'s docs](https://gith
 
 3. [`Builder APIs`](./docs/BuilderApi.md)
 
-      Builder API's are mini-configurators for a particular feature area. The idea behind them is to allow extending functionality quickly with _sensible defaults_ but also providing their own configurations to allow users to grow into and configure that feature area. The builder APIs available are:
+      Builder API's are mini-configurators for a particular feature area. The idea behind them is to allow extending functionality quickly with _sensible defaults_ but also providing their own configurations to allow users to grow into and configure that feature area. The Builder API and Builder pipeline are the _preferred_ way of extending the functionality of this plugin where possible but due to the vast array of MarkdownIt plugins you may still need to rely on that ecosystem in some cases.
 
-     - [Link Builder](./docs/LinkBuilder.md)
-     - [Meta Builder](./docs/MetaBuilder.md)
+      To empower developers the docs and a `createBuilder` utility can be found here:
 
-      If you wanted to use both of these builders in their default configuration, you would simply add the following to your options config for this plugin:
+      - [Builder API](https://github.com/yankeeinlondon/builder-api)
+
+      and examples of builders can be found here:
+
+     - [Meta Builder](https://github.com/yankeeinlondon/meta-builder)
+     - [Link Builder](https://github.com/yankeeinlondon/link-builder)
+     - [Code Builder](https://github.com/yankeeinlondon/code-builder)
+
+      If you wanted to use any of these builders in their default configuration, you would simply add the following to your options config for this plugin:
 
       ```ts
-      import Markdown, { link, meta } from 'vite-plugin-md'
+      import Markdown from 'vite-plugin-md'
+      // note: all of these plugins are available as part of an aggregation
+      // repo for Builder APIs (but you can import directly if you prefer)
+      import { code, link, meta } from 'md-powerpack'
       export default {
         plugins: [
           Markdown({
-            builders: [link(), meta()],
+            builders: [link(), meta(), code()],
           }),
         ],
       }
       ```
 
-      If you're interested in building your own you can refer to the [Builder API](./docs/BuilderApi.md) docs.
+## Example Usage
 
-## Example
-
-See the [/example](./example).
+See the [/example](./example) app in this repo.
 
 Or the pre-configured starter template [Vitesse](https://github.com/antfu/vitesse).
 
@@ -260,4 +268,4 @@ This plugin has good integrations with several other plugins, including:
 
 ## License
 
-MIT License © 2020-PRESENT [Anthony Fu](https://github.com/antfu)
+MIT License © 2020-PRESENT [Anthony Fu](https://github.com/antfu) and [Ken Snyder](https://github.com/yankeeinlondon)
