@@ -38,19 +38,21 @@ Let's now go through each stage in the pipeline and talk about what is available
 So now that we've reviewed the pipeline which is exposed to a "builder", let's talk about how you can build one. The good news is this is pretty simple and primarily involves using the provided `createBuilder` utility:
 
 ```ts
+
+interface Options {
+  foo:  'foo' | 'bar' | 'baz'
+}
+
 const superFantastic = createBuilder(
   'superFantastic', // name your plugin
   PipelineStage.dom, // attach to a stage in the pipeline
 )
+  .options<Options>()
   .initializer((payload, options) => {
     // your initializer code goes here
   })
   .handler((payload, options) => {
     // your handler code goes here
-  })
-  .options({
-    // your options hash for the builder
-    foo: 'foo' | 'bar' | 'baz'
   })
   .meta({
     description: 'you are NOT going to believe what you can with this builder!'
