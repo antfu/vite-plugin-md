@@ -1,9 +1,9 @@
 import type { Plugin } from 'vite'
-import { createFilter } from '@rollup/pluginutils'
 import type { TransformResult } from 'rollup'
 import { createSfcComponent } from './createSfcComponent'
 import { resolveOptions } from './options'
 import type { Options } from './types'
+import { createFilter } from './utils/createFilter'
 export { composeSfcBlocks } from './composeSfcBlocks'
 export * from './types'
 
@@ -14,7 +14,7 @@ function VitePluginMarkdown(userOptions: Options = {}): Plugin {
   /** filter out files which aren't Markdown files */
   const filter = createFilter(
     userOptions.include || /\.md$/,
-    userOptions.exclude,
+    userOptions.exclude || null,
   )
 
   let config: Parameters<Exclude<Plugin['configResolved'], undefined>>[0]

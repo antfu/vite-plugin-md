@@ -47,10 +47,7 @@
     "test:update": "vitest -u",
     "test:component": "npx cypress open-ct -p 4000"
   },
-  "peerDependencies": {
-    "@rollup/pluginutils": "^4.2.1",
-    "rollup": "^2.77.0"
-  },
+  "peerDependencies": {},
   "dependencies": {
     "@yankeeinlondon/builder-api": "*",
     "@yankeeinlondon/happy-wrapper": "^2.6.0",

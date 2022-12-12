@@ -155,7 +155,7 @@ export const extractBlocks = transformer('extractBlocks', 'dom', 'sfcBlocksExtra
 
   /** all userland non-import lines in `<setup script>` blocks */
   const nonImportDirectives = scriptSetupBlocks.map((line) => {
-    if (/^import/.test(line)) {
+    if (line.startsWith('import')) {
       importDirectives.push(line)
       return ''
     }

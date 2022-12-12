@@ -1,5 +1,5 @@
 export class MdError extends Error {
-  public kind: 'MdError' = 'MdError'
+  public kind = 'MdError' as const
   public name = 'MdError'
   public message: string
 

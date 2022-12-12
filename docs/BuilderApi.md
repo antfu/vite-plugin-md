@@ -38,9 +38,8 @@ Let's now go through each stage in the pipeline and talk about what is available
 So now that we've reviewed the pipeline which is exposed to a "builder", let's talk about how you can build one. The good news is this is pretty simple and primarily involves using the provided `createBuilder` utility:
 
 ```ts
-
 interface Options {
-  foo:  'foo' | 'bar' | 'baz'
+  foo: 'foo' | 'bar' | 'baz'
 }
 
 const superFantastic = createBuilder(
