@@ -263,7 +263,7 @@ This plugin has good integrations with several other plugins, including:
 
 - [`vite-plugin-pages`](https://github.com/hannoeru/vite-plugin-pages)
 - [`vite-plugin-components`](https://github.com/antfu/vite-plugin-components)
-- [`vite-plugin-vue-layouts`](https://github.dev/JohnCampionJr/vite-plugin-vue-layouts)
+- [`vite-plugin-vue-layouts`](https://github.com/JohnCampionJr/vite-plugin-vue-layouts)
 - for details, refer to the [Integration Page](./docs/Integrations.md)
 
 ## License

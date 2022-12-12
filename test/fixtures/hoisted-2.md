@@ -105,6 +105,6 @@ This plug is intended to work very well with the following packages:
 
 - [`vite-plugin-pages`](https://github.com/hannoeru/vite-plugin-pages)
 - [`vite-plugin-components`](https://github.com/antfu/vite-plugin-components)
-- [`vite-plugin-vue-layouts`](https://github.dev/JohnCampionJr/vite-plugin-vue-layouts)
+- [`vite-plugin-vue-layouts`](https://github.com/JohnCampionJr/vite-plugin-vue-layouts)
 
 For details, refer to the [Integration Page]()
