@@ -88,10 +88,10 @@ importers:
       '@vitejs/plugin-vue': ^3.2.0
       '@vueuse/core': ^9.6.0
       '@vueuse/head': ^1.0.22
-      '@yankeeinlondon/code-builder': ^1.1.4
+      '@yankeeinlondon/code-builder': ^1.1.5
       '@yankeeinlondon/happy-wrapper': ^2.10.1
-      '@yankeeinlondon/link-builder': ^1.1.4
-      '@yankeeinlondon/meta-builder': ^1.1.4
+      '@yankeeinlondon/link-builder': ^1.1.6
+      '@yankeeinlondon/meta-builder': ^1.1.5
       cross-env: ^7.0.3
       typescript: ^4.9.4
       unocss: ^0.47.6
@@ -109,9 +109,9 @@ importers:
     dependencies:
       '@vueuse/core': 9.6.0_vue@3.2.45
       '@vueuse/head': 1.0.22_vue@3.2.45
-      '@yankeeinlondon/code-builder': 1.1.4_utfvde2x7dchmghn7q5ggekmjq
-      '@yankeeinlondon/link-builder': 1.1.4_fm6657jtvgefyjwsqe5m2766xm
-      '@yankeeinlondon/meta-builder': 1.1.4_fm6657jtvgefyjwsqe5m2766xm
+      '@yankeeinlondon/code-builder': 1.1.5_utfvde2x7dchmghn7q5ggekmjq
+      '@yankeeinlondon/link-builder': 1.1.6_fm6657jtvgefyjwsqe5m2766xm
+      '@yankeeinlondon/meta-builder': 1.1.5_fm6657jtvgefyjwsqe5m2766xm
       vue: 3.2.45
       vue-router: 4.1.6_vue@3.2.45
     devDependencies:
@@ -1282,8 +1282,8 @@ packages:
       - terser
     dev: false
 
-  /@yankeeinlondon/builder-api/0.5.5_fm6657jtvgefyjwsqe5m2766xm:
-    resolution: {integrity: sha512-Zhsmer/tzD0hndppH+hq3vDyn+rUouWjAwpxQM+1Dhir4DELZrMWFNADwcgwPiFhTvPZSCkPb6V4Sw2E4XcfKQ==}
+  /@yankeeinlondon/builder-api/0.5.6_fm6657jtvgefyjwsqe5m2766xm:
+    resolution: {integrity: sha512-5P8Zycw2tTHLMJBTlEPWlfUgMNG4llfXdXwXPdIjVL17RLCmprJ2KSNNcpDQAt+sOlaMOfozmgdttrkAPZCwOw==}
     peerDependencies:
       '@types/markdown-it': ^12.2.3
       markdown-it: ^13.0.1
@@ -1311,12 +1311,12 @@ packages:
       - terser
     dev: false
 
-  /@yankeeinlondon/code-builder/1.1.4_utfvde2x7dchmghn7q5ggekmjq:
-    resolution: {integrity: sha512-2EEGmpnyfGazplvYYhWUXhijn+TfI9m/Y/Zy5prvlXXaKKXNcHJg1vppSrkdtLfgoQrHqGMAPN58JrXj8E8big==}
+  /@yankeeinlondon/code-builder/1.1.5_utfvde2x7dchmghn7q5ggekmjq:
+    resolution: {integrity: sha512-HLtFKPy8lPx7H94io0lU7JImV5r+MJHe9b+TVLN69iigBu2tvSuTkRaReTtG/EtvLQS5iVkU4/fJvz3uV7soUQ==}
     dependencies:
       '@types/markdown-it': 12.2.3
       '@unocss/vite': 0.44.7_vite@3.2.5
-      '@yankeeinlondon/builder-api': 0.5.5_fm6657jtvgefyjwsqe5m2766xm
+      '@yankeeinlondon/builder-api': 0.5.6_fm6657jtvgefyjwsqe5m2766xm
       '@yankeeinlondon/happy-wrapper': 2.10.1
       inferred-types: 0.37.6
       markdown-it: 13.0.1
@@ -1381,10 +1381,10 @@ packages:
       - terser
     dev: false
 
-  /@yankeeinlondon/link-builder/1.1.4_fm6657jtvgefyjwsqe5m2766xm:
-    resolution: {integrity: sha512-SGph2/12tbepP8MlmcFiBZOVGMfBfAqDu0aIJHIguhPRBS0S2GosQT3XyibCqUJ2/p5uB8nZIAGOU0Ik4PPo9w==}
+  /@yankeeinlondon/link-builder/1.1.6_fm6657jtvgefyjwsqe5m2766xm:
+    resolution: {integrity: sha512-F06/Yn5h9994h22nlbBFjiTB1V0E9l3kuZGXVWunT2mfIlO8UVDLNHOxeLLQO2zC9pQsg7DW40Jtg9LaCL6f1Q==}
     dependencies:
-      '@yankeeinlondon/builder-api': 0.5.5_fm6657jtvgefyjwsqe5m2766xm
+      '@yankeeinlondon/builder-api': 0.5.6_fm6657jtvgefyjwsqe5m2766xm
       '@yankeeinlondon/happy-wrapper': 2.10.1
     transitivePeerDependencies:
       - '@edge-runtime/vm'
@@ -1404,10 +1404,10 @@ packages:
       - terser
     dev: false
 
-  /@yankeeinlondon/meta-builder/1.1.4_fm6657jtvgefyjwsqe5m2766xm:
-    resolution: {integrity: sha512-G1qHqXih3NvhE4NjP8zBZ0vLcC1CVcnvsl/Al4AjDmKfsvcxAAH/l7PHfDoYd8IzE+wXa9/s4F3C/D/RzzCpGA==}
+  /@yankeeinlondon/meta-builder/1.1.5_fm6657jtvgefyjwsqe5m2766xm:
+    resolution: {integrity: sha512-GP1kLAWMcutnlIvOp0gXXW/uQTLnY/AXBdjBC1fXobJ/98vY/+Dkv78wBlEpeu19KhF9q/Qv11wkN1RYk7birg==}
     dependencies:
-      '@yankeeinlondon/builder-api': 0.5.5_fm6657jtvgefyjwsqe5m2766xm
+      '@yankeeinlondon/builder-api': 0.5.6_fm6657jtvgefyjwsqe5m2766xm
       inferred-types: 0.37.6
     transitivePeerDependencies:
       - '@edge-runtime/vm'
@@ -6026,7 +6026,7 @@ packages:
       rollup: ^2.77.0
     dependencies:
       '@rollup/pluginutils': 4.2.1
-      '@yankeeinlondon/builder-api': 0.5.5_fm6657jtvgefyjwsqe5m2766xm
+      '@yankeeinlondon/builder-api': 0.5.6_fm6657jtvgefyjwsqe5m2766xm
       '@yankeeinlondon/happy-wrapper': 2.10.1
       gray-matter: 4.0.3
       markdown-it: 13.0.1
