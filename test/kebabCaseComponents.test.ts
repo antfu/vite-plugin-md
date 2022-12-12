@@ -19,4 +19,3 @@ describe('PascalCase to kebab-case components', () => {
     expect(kebab.tagName.toLowerCase()).toBe('foo-bar')
   })
 })
-

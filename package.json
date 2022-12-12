@@ -43,11 +43,12 @@
     "release": "pnpm audit:fix && bumpp",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage",
+    "test:coverage": "vitest run --coverage",
     "test:update": "vitest -u",
     "test:component": "npx cypress open-ct -p 4000"
   },
   "dependencies": {
+    "@vitest/coverage-c8": "^0.25.7",
     "@yankeeinlondon/builder-api": "^1.2.0",
     "@yankeeinlondon/happy-wrapper": "^2.10.1",
     "gray-matter": "^4.0.3",
@@ -55,7 +56,7 @@
     "source-map-js": "^1.0.2"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^0.26.3",
+    "@antfu/eslint-config": "^0.34.0",
     "@antfu/ni": "^0.18.8",
     "@antfu/utils": "^0.7.2",
     "@type-challenges/utils": "^0.1.1",

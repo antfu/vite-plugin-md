@@ -7,4 +7,3 @@ const name = 'Example App'
     <router-view />
   </div>
 </template>
-

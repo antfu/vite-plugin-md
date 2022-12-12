@@ -68,4 +68,3 @@ describe('exposeFrontmatter snapshots', () => {
     expect(component).toMatchSnapshot()
   })
 })
-
