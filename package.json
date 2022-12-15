@@ -2,6 +2,8 @@
   "name": "vite-plugin-md",
   "version": "0.21.1",
   "description": "Markdown for Vite",
+  "type": "module",
+  "packageManager": "pnpm@7.5.2",
   "keywords": [
     "vite",
     "vite-plugin",
@@ -16,7 +18,9 @@
   "funding": "https://github.com/sponsors/antfu",
   "license": "MIT",
   "author": "Anthony Fu <anthonyfu117@hotmail.com>",
-  "type": "module",
+  "contributors": [
+    "Ken Snyder <ken@ken.net>"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -36,8 +40,11 @@
     "dev": "npm run build -- --watch",
     "example:build": "cp README.md example/README.md && npm -C example run build",
     "example:dev": "cp README.md example/README.md && npm -C example run dev",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "lint": "run-p lint:*",
+    "lint:src": "eslint src/**/*.ts --fix",
+    "lint:test": "eslint test/**/*.ts --fix",
+    "lint:tsc": "tsc --noEmit",
+    "lint:node": "tsup src/index.ts --format=esm && node dist/index.js",
     "audit:fix": "pnpm audit --fix && pnpm install",
     "release": "pnpm audit:fix && bumpp",
     "test": "vitest",
@@ -46,10 +53,9 @@
     "test:update": "vitest -u",
     "test:component": "npx cypress open-ct -p 4000"
   },
-  "packageManager": "pnpm@7.5.2",
   "dependencies": {
-    "@yankeeinlondon/builder-api": "^1.2.1",
-    "@yankeeinlondon/gray-matter": "^6.1.0",
+    "@yankeeinlondon/builder-api": "^1.2.2",
+    "@yankeeinlondon/gray-matter": "^6.1.1",
     "@yankeeinlondon/happy-wrapper": "^2.10.1",
     "markdown-it": "^13.0.1",
     "source-map-js": "^1.0.2"
@@ -71,9 +77,9 @@
     "@vitest/ui": "^0.25.8",
     "@vue/test-utils": "^2.2.6",
     "@vueuse/core": "^9.6.0",
-    "@yankeeinlondon/code-builder": "^1.2.0",
-    "@yankeeinlondon/link-builder": "^1.2.0",
-    "@yankeeinlondon/meta-builder": "^1.2.0",
+    "@yankeeinlondon/code-builder": "^1.2.1",
+    "@yankeeinlondon/link-builder": "^1.2.1",
+    "@yankeeinlondon/meta-builder": "^1.2.1",
     "bumpp": "^8.2.1",
     "c8": "^7.12.0",
     "callsites": "^4.0.0",
