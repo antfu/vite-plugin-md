@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-md",
-  "version": "0.21.1",
+  "version": "0.22.0",
   "description": "Markdown for Vite",
   "type": "module",
   "packageManager": "pnpm@7.5.2",
@@ -46,7 +46,8 @@
     "lint:tsc": "tsc --noEmit",
     "lint:node": "tsup src/index.ts --format=esm && node dist/index.js",
     "audit:fix": "pnpm audit --fix && pnpm install",
-    "release": "pnpm audit:fix && lint && bumpp",
+    "release": "run-s audit:fix lint release:bumpp",
+    "release:bumpp": "bumpp",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
