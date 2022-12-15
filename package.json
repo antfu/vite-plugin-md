@@ -46,7 +46,7 @@
     "lint:tsc": "tsc --noEmit",
     "lint:node": "tsup src/index.ts --format=esm && node dist/index.js",
     "audit:fix": "pnpm audit --fix && pnpm install",
-    "release": "pnpm audit:fix && bumpp",
+    "release": "pnpm audit:fix && lint && bumpp",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
