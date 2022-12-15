@@ -1,8 +1,8 @@
 import { readFile } from 'fs/promises'
 import { beforeAll, describe, expect, it } from 'vitest'
+import type { ExcerptFunction } from '../src/types'
 import { composeSfcBlocks } from '../src/pipeline'
 import { composeFixture } from './utils'
-import type { ExcerptFunction } from '~/types'
 
 let content = ''
 

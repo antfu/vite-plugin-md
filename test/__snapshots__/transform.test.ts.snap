@@ -41,4 +41,27 @@ exports[`transform snapshots > html remains the same 1`] = `
 
 exports[`transform snapshots > meta props remains the same 1`] = `[]`;
 
-exports[`transform snapshots > script blocks remain the same 1`] = `undefined`;
+exports[`transform snapshots > script blocks remain the same 1`] = `
+[
+  "
+<script lang=\\"ts\\">
+/** frontmatter meta-data for MD page **/
+export interface Frontmatter {
+  title?: string
+  description?: string
+  subject?: string
+  category?: string
+  name?: string
+  excerpt?: string
+  image?: string
+  layout?: string
+  requiredAuth?: boolean
+  meta?: Record<string, any>[]
+  [key: string]: unknown
+}
+export const frontmatter: Frontmatter = {\\"title\\":\\"transform tests\\",\\"description\\":\\"hello world\\",\\"hello\\":\\"how friendly\\"}
+export const excerpt: string | undefined = \\"\\"
+
+</script>",
+]
+`;

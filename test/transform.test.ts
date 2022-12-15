@@ -26,7 +26,7 @@ describe('transform snapshots', () => {
     expect(sfc.customBlocks).toMatchSnapshot()
   })
   it('script blocks remain the same', async () => {
-    expect(sfc.scriptBlock).toMatchSnapshot()
+    expect(sfc.scriptBlocks).toMatchSnapshot()
   })
 })
 

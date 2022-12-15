@@ -1,4 +1,4 @@
-import type { BuilderDependency } from '../types'
+import type { BuilderDependency } from '@yankeeinlondon/builder-api'
 import { transformer } from '../utils'
 
 /**

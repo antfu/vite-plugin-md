@@ -1,3 +1,7 @@
 {
-  "extends": "@antfu"
+  "extends": "@antfu",
+  "rules": {
+    "jsonc/sort-keys": "off",
+    "eol-last": "off"
+  }
 }

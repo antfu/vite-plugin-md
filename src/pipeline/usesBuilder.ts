@@ -1,5 +1,5 @@
+import type { BuilderApi, BuilderDependency, BuilderDependencyApi, OptionsFor } from '@yankeeinlondon/builder-api'
 import type { Pipeline, PipelineStage } from '../types'
-import type { BuilderApi, BuilderDependency, BuilderDependencyApi, OptionsFor } from '../builders/builder-types'
 
 export const usesBuilder = (payload: Pipeline<PipelineStage.initialize>, deps: BuilderDependency[]) => <
   T extends BuilderApi<any, any>,

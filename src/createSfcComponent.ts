@@ -1,5 +1,6 @@
-import type { Options, ViteConfig } from './types'
+import type { Options } from './types'
 import { composeSfcBlocks } from './pipeline/index'
+import type { ViteConfig } from '.'
 
 /**
  * Produces a _string_ which represents the parsed Markdown as a SFC component.

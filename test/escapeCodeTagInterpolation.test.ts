@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { getAttribute, select } from '@yankeeinlondon/happy-wrapper'
-// import { code } from '../src'
+// import code from '@yankeeinlondon/code-builder'
 import { composeFixture } from './utils'
 
 describe('escapeCodeTagInterpolation()', () => {
@@ -47,8 +47,9 @@ describe('escapeCodeTagInterpolation()', () => {
     expect(getVPre(pre[1])).toBeFalsy()
   })
 
-  it.todo('tag interpolation works the same when using code() builder', async () => {
-    const sfc = await composeFixture('escape-on.md', { builders: [code()] })
+  it.skip('tag interpolation works the same when using code() builder', async () => {
+    const sfc = await composeFixture('escape-on.md', { builders: [] })
+    // const sfc = await composeFixture('escape-on.md', { builders: [code()] })
     const sel = select(sfc.html)
     const pre = sel.findAll('pre')
     const getVPre = getAttribute('v-pre')

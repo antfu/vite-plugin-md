@@ -1,4 +1,4 @@
-import matter from 'gray-matter'
+import { matter } from '@yankeeinlondon/gray-matter'
 import type {
   ExcerptFunction,
   Frontmatter,

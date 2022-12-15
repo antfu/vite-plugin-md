@@ -1,23 +1,22 @@
 {
   "name": "vite-plugin-md",
-  "type": "module",
   "version": "0.21.0",
-  "packageManager": "pnpm@7.5.2",
   "description": "Markdown for Vite",
-  "author": "Anthony Fu <anthonyfu117@hotmail.com>",
-  "license": "MIT",
-  "funding": "https://github.com/sponsors/antfu",
-  "homepage": "https://github.com/antfu/vite-plugin-md",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/antfu/vite-plugin-md"
-  },
-  "bugs": "https://github.com/antfu/vite-plugin-md/issues",
   "keywords": [
     "vite",
     "vite-plugin",
     "markdown-it"
   ],
+  "homepage": "https://github.com/antfu/vite-plugin-md",
+  "bugs": "https://github.com/antfu/vite-plugin-md/issues",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/antfu/vite-plugin-md"
+  },
+  "funding": "https://github.com/sponsors/antfu",
+  "license": "MIT",
+  "author": "Anthony Fu <anthonyfu117@hotmail.com>",
+  "type": "module",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -47,13 +46,16 @@
     "test:update": "vitest -u",
     "test:component": "npx cypress open-ct -p 4000"
   },
+  "packageManager": "pnpm@7.5.2",
   "dependencies": {
-    "@vitest/coverage-c8": "^0.25.7",
-    "@yankeeinlondon/builder-api": "^1.2.0",
+    "@yankeeinlondon/builder-api": "^1.2.1",
+    "@yankeeinlondon/gray-matter": "^6.1.0",
     "@yankeeinlondon/happy-wrapper": "^2.10.1",
-    "gray-matter": "^4.0.3",
     "markdown-it": "^13.0.1",
     "source-map-js": "^1.0.2"
+  },
+  "peerDependencies": {
+    "vite": "^4.0.0"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^0.34.0",
@@ -61,13 +63,17 @@
     "@antfu/utils": "^0.7.2",
     "@type-challenges/utils": "^0.1.1",
     "@types/markdown-it": "^12.2.3",
-    "@types/node": "^16.18.8",
+    "@types/node": "^16.18.9",
     "@typescript-eslint/eslint-plugin": "^5.46.1",
     "@typescript-eslint/parser": "^5.46.1",
     "@vitejs/plugin-vue": "^4.0.0",
-    "@vitest/ui": "^0.25.7",
+    "@vitest/coverage-c8": "^0.25.8",
+    "@vitest/ui": "^0.25.8",
     "@vue/test-utils": "^2.2.6",
     "@vueuse/core": "^9.6.0",
+    "@yankeeinlondon/code-builder": "^1.2.0",
+    "@yankeeinlondon/link-builder": "^1.2.0",
+    "@yankeeinlondon/meta-builder": "^1.2.0",
     "bumpp": "^8.2.1",
     "c8": "^7.12.0",
     "callsites": "^4.0.0",
@@ -77,11 +83,11 @@
     "happy-dom": "^8.1.0",
     "npm-run-all": "^4.1.5",
     "pathe": "^1.0.0",
-    "rollup": "^3.7.3",
+    "rollup": "^3.7.4",
     "tsup": "^6.5.0",
     "typescript": "^4.9.4",
     "vite": "^4.0.1",
-    "vitest": "^0.25.7",
+    "vitest": "^0.25.8",
     "vue": "^3.2.45",
     "vue-router": "^4.1.6"
   }

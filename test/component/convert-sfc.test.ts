@@ -1,20 +1,20 @@
-import { describe, expect, it } from 'vitest'
-import type { DefineComponent } from 'vue'
+import { describe, it } from 'vitest'
+// import type { DefineComponent } from 'vue'
 // import { ssrRenderStyle } from 'vue/server-renderer'
-import type { Frontmatter } from '../../src/types'
+// import type { Frontmatter } from '../../src/types'
 
 describe.skip('converting SFC\'s to Components', () => {
-  it.skip('get component via an async import', async () => {
-    const sfc = await import('../fixtures/with-slots.md') as {
-      default: DefineComponent
-      frontmatter: Frontmatter
-    }
+  // it.skip('get component via an async import', async () => {
+  //   const sfc = await import('../fixtures/with-slots.md') as {
+  //     default: DefineComponent
+  //     frontmatter: Frontmatter
+  //   }
 
-    expect(sfc.frontmatter.title).toBe('Testing Slots')
-    expect(sfc.default.__name).toBe('with-slots')
-    expect(sfc.default.props.name).toBeDefined()
-    expect(sfc.default.props.name.type).toBeDefined()
-  })
+  //   expect(sfc.frontmatter.title).toBe('Testing Slots')
+  //   expect(sfc.default.__name).toBe('with-slots')
+  //   expect(sfc.default.props.name).toBeDefined()
+  //   expect(sfc.default.props.name.type).toBeDefined()
+  // })
 
   it('use vue\'s server render', async () => {
     // const sfc = await composeFixture('links', {

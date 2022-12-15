@@ -1,6 +1,6 @@
 import { pipe } from 'fp-ts/lib/function.js'
 import * as TE from 'fp-ts/lib/TaskEither.js'
-import type { BuilderConfig, BuilderOptions, BuilderRegistration } from '../builders/builder-types'
+import type { BuilderConfig, BuilderOptions, BuilderRegistration } from '@yankeeinlondon/builder-api'
 import type { IPipelineStage, PipeTask, Pipeline, ResolvedOptions } from '../types'
 
 const getBuilders = <S extends IPipelineStage>(stage: S, options: ResolvedOptions): Array<BuilderRegistration<any, S>> => options.builders.reduce(
