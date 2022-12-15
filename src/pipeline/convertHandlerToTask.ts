@@ -1,22 +1,28 @@
+import type { BuilderOptions, BuilderRegistration } from '@yankeeinlondon/builder-api'
 import { pipe } from 'fp-ts/lib/function.js'
 import * as TE from 'fp-ts/lib/TaskEither.js'
-import type { BuilderConfig, BuilderOptions, BuilderRegistration } from '@yankeeinlondon/builder-api'
+
 import type { IPipelineStage, PipeTask, Pipeline, ResolvedOptions } from '../types'
 
-const getBuilders = <S extends IPipelineStage>(stage: S, options: ResolvedOptions): Array<BuilderRegistration<any, S>> => options.builders.reduce(
-  (acc, b) => {
-    const defn = b() as BuilderRegistration<BuilderOptions, IPipelineStage>
+/**
+ * Gets all builders associated with a particular pipeline stage
+ */
+const getBuilders = <
+  S extends IPipelineStage,
+>(
+    stage: S,
+    options: ResolvedOptions,
+  ) => {
+  const builders = options.builders.reduce(
+    (acc, b) => {
+      const defn = b()
 
-    const current = acc[defn.lifecycle]
-    return {
-      ...acc,
-      [defn.lifecycle]: current
-        ? [...current, { handler: defn.handler, options: defn.options }]
-        : [{ handler: defn.handler, options: defn.options }],
-    }
-  },
-  {} as BuilderConfig,
-)[stage] || [] as Array<BuilderRegistration<Record<string, any>, S>>
+      return defn.lifecycle === stage ? [...acc, defn as BuilderRegistration<BuilderOptions, S>] : acc
+    },
+    [] as readonly BuilderRegistration<BuilderOptions, S>[],
+  )
+  return builders
+}
 
 /**
  * Provides back a function which converts the payload for a given lifecycle stage --
@@ -42,7 +48,7 @@ export const getBuilderTask = <S extends IPipelineStage>(
     const asyncApi = async (payload: Pipeline<S>) => {
       for (const b of builders) {
         try {
-          payload = await b.handler(payload, b.options)
+          payload = await b.handler(payload as any, b.options) as Pipeline<S>
         }
         catch (e) {
           throw new Error(`During the "${stage}" stage, the builder API "${b.name}" was unable to transform the payload. It received the following error message: ${e instanceof Error ? e.message : String(e)}`)

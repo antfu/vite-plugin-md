@@ -1,6 +1,6 @@
 import type MarkdownIt from 'markdown-it'
 import type { UserConfig } from 'vite'
-import type { BuilderRegistration } from '@yankeeinlondon/builder-api'
+import type { BuilderOptions, BuilderRegistration } from '@yankeeinlondon/builder-api'
 import type { FilterPattern } from '../utils/createFilter'
 import type { IPipelineStage } from './pipeline'
 
@@ -189,7 +189,7 @@ export interface Options {
   }
 
   /** allows adding in Builder's which help to expand functionality of this plugin */
-  builders?: (() => BuilderRegistration<{ [key: string]: any }, IPipelineStage>)[]
+  builders?: (<S extends IPipelineStage, O extends BuilderOptions>() => BuilderRegistration<O, S>)[]
 
   /**
    * Explicitly set the Vue version.
