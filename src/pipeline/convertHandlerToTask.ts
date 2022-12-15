@@ -15,9 +15,7 @@ const getBuilders = <
   ) => {
   const builders = options.builders.reduce(
     (acc, b) => {
-      const defn = b()
-
-      return defn.lifecycle === stage ? [...acc, defn as BuilderRegistration<BuilderOptions, S>] : acc
+      return b.lifecycle === stage ? [...acc, b as BuilderRegistration<BuilderOptions, S>] : acc
     },
     [] as readonly BuilderRegistration<BuilderOptions, S>[],
   )

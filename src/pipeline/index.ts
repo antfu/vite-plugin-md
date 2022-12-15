@@ -1,4 +1,3 @@
-export * from './addBuilderDependencies'
 export * from './applyMarkdownItOptions'
 export * from './baseStyling'
 export * from '../composeSfcBlocks'

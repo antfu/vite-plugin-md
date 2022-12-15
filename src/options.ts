@@ -48,7 +48,7 @@ export function resolveOptions(userOptions: Omit<Options, 'usingBuilder'> = {}):
           ...userOptions.style,
         },
         usingBuilder: (name: string) => {
-          return !options.builders.every(b => b().name !== name)
+          return !options.builders.every(b => b.name !== name)
         },
         frontmatterPreprocess: (frontmatter: Frontmatter, options: ResolvedOptions) => {
           if (!options.usingBuilder('link')) {

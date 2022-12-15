@@ -189,7 +189,7 @@ export interface Options {
   }
 
   /** allows adding in Builder's which help to expand functionality of this plugin */
-  builders?: (<S extends IPipelineStage, O extends BuilderOptions>() => BuilderRegistration<O, S>)[]
+  builders?: readonly BuilderRegistration<BuilderOptions, IPipelineStage>[]
 
   /**
    * Explicitly set the Vue version.
@@ -400,7 +400,9 @@ export interface ResolvedOptions extends Required<Options> {
   wrapperClasses: string
   frontmatterDefaults: FmValueCallback | Record<string, FmAllowedValue>
   frontmatterOverrides: FmValueCallback | Record<string, FmAllowedValue>
-  /** a utility which tests whether a given builder is being used */
+  /**
+   * a utility which tests whether a given builder is being used
+   */
   usingBuilder: (name: string) => boolean
 }
 
