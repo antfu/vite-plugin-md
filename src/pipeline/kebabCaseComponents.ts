@@ -1,3 +1,4 @@
+import type { GenericBuilder } from '../types/core'
 import { dasherize, transformer } from '../utils'
 
 /**
@@ -8,25 +9,27 @@ import { dasherize, transformer } from '../utils'
  *
  * While doing this we must avoid doing the same transformation when inside a code block.
  */
-export const kebabCaseComponents = transformer('kebabCaseComponents', 'parsed', 'parsed', (p) => {
-  const possiblePascalCase = /\<[A-Z]/s
-  // we only need to scan and replace if there is suspicious character sequence
-  if (possiblePascalCase.test(p.html)) {
-    const pascalBlocks = /<([A-Z]\w*)/gs
-    const blocks = p.html.matchAll(pascalBlocks)
-    /** the set of PascalCase tag names in the HTML */
-    const tagNames = new Set<string>()
-    for (const b of blocks) {
-      const [, tag] = b
-      tagNames.add(tag)
+export const kebabCaseComponents = <B extends readonly GenericBuilder[]>() => transformer<B>()(
+  'parsed',
+  (p) => {
+    const possiblePascalCase = /\<[A-Z]/s
+    // we only need to scan and replace if there is suspicious character sequence
+    if (possiblePascalCase.test(p.html)) {
+      const pascalBlocks = /<([A-Z]\w*)/gs
+      const blocks = p.html.matchAll(pascalBlocks)
+      /** the set of PascalCase tag names in the HTML */
+      const tagNames = new Set<string>()
+      for (const b of blocks) {
+        const [, tag] = b
+        tagNames.add(tag)
+      }
+
+      Array.from(tagNames).forEach((tag) => {
+        const open = new RegExp(`<${tag}`, 'gs')
+        const close = new RegExp(`<\/${tag}>`, 'gs')
+        p.html = p.html.replace(open, `<${dasherize(tag)}`).replace(close, `</${dasherize(tag)}>`)
+      })
     }
 
-    Array.from(tagNames).forEach((tag) => {
-      const open = new RegExp(`<${tag}`, 'gs')
-      const close = new RegExp(`<\/${tag}>`, 'gs')
-      p.html = p.html.replace(open, `<${dasherize(tag)}`).replace(close, `</${dasherize(tag)}>`)
-    })
-  }
-
-  return { ...p }
-})
+    return { ...p }
+  })

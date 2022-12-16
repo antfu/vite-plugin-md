@@ -1,4 +1,4 @@
-import type { ResolvedOptions } from '../types'
+import type { GenericBuilder, ResolvedOptions } from '../types'
 
 export function getVueVersion(defaultVersion = '3.2.0') {
   try {
@@ -33,7 +33,7 @@ export function keys<T extends {}, W extends readonly string[]>(obj: T, ...witho
   return v as unknown as Length<W> extends 0 ? Array<keyof T> : Array<Exclude<keyof T, Keys<W>>>
 }
 
-export function isVue2(options: ResolvedOptions) {
+export function isVue2<B extends readonly GenericBuilder[]>(options: ResolvedOptions<B>) {
   return options.vueVersion.startsWith('2')
 }
 

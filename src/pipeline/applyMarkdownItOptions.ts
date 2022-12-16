@@ -1,3 +1,4 @@
+import type { GenericBuilder } from '../types/core'
 import { transformer } from '../utils'
 
 /**
@@ -5,7 +6,7 @@ import { transformer } from '../utils'
  * the parser will be passed into this callback function so that the
  * parser may be configured.
  */
-export const applyMarkdownItOptions = transformer('applyMarkdownItOptions', 'parser', 'parser', (payload) => {
+export const applyMarkdownItOptions = <B extends readonly GenericBuilder[]>() => transformer<B>()('parser', (payload) => {
   payload.options.markdownItSetup(payload.parser)
   return payload
 })

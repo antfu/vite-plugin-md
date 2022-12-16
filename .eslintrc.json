@@ -2,6 +2,15 @@
   "extends": "@antfu",
   "rules": {
     "jsonc/sort-keys": "off",
-    "eol-last": "off"
+    "eol-last": "off",
+    // "cases" allows for graceful use of that variable
+    // in type testing
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        "varsIgnorePattern": "cases|^_",
+        "argsIgnorePattern": "^_"
+      }
+    ]
   }
 }

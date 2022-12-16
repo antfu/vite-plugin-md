@@ -6,66 +6,43 @@ import type { Either } from 'fp-ts/lib/Either.js'
 import type { Fragment, IElement } from '@yankeeinlondon/happy-wrapper'
 import type { ExistingRawSourceMap } from 'rollup'
 import type {
-  BuilderApi,
-  BuilderDependencyApi,
   BuilderOptions,
+  ConfiguredBuilder,
 } from '@yankeeinlondon/builder-api'
 import type {
-  EnumValues,
   Frontmatter,
+  GenericBuilder,
   MetaProperty,
   ResolvedOptions,
 } from './core'
 
-export enum PipelineStage {
-  /**
-   * Initialized with incoming filename, config, options,
-   * available events (core and provided by builders).
-   */
-  initialize = 'initialize',
-
-  /**
-   * All frontmatter has been extracted from default values and page values
-   * but no mapping has been done yet.
-   *
-   * Note: this is the event hook which the included `meta` builder connects
-   * to and it in turn _provides_ a `metaMapped` hook.
-   */
-  metaExtracted = 'metaExtracted',
-
-  /**
-   * The **MarkdownIt** parser is initialized, all builders
-   * connecting at this point will receive a valid `md` parser
-   * object so that they can participate in MD-to-HTML parsing.
-   */
-  parser = 'parser',
-  /**
-   * The **MarkdownIt** parser is initialized and all builders
-   * have been able to apply their customizations to it.
-   */
-  parsed = 'parsed',
-
-  /**
-   * The HTML has been converted to a HappyDom tree to allow
-   * interested parties to manipulate contents using DOM based
-   * queries.
-   */
-  dom = 'dom',
-
-  /**
-   * SFC blocks (template, script, and an array of customBlocks) are ready for
-   * builders to inspect/mutate/etc.
-   */
-  sfcBlocksExtracted = 'sfcBlocksExtracted',
-
-  /**
-   * All mutations of page are complete; builders can hook into this stage but
-   * will _not_ be able to mutate at this stage.
-   */
-  closeout = 'closeout',
-}
-
-export type IPipelineStage = EnumValues<PipelineStage>
+/**
+ * **PipelineStage**
+ * 
+ * The _stage_ in the transformation pipeline:
+ * 
+ * - `initialize` - meant for configuration settings
+ * - `metaExtracted` - all frontmatter has been separated from the text content
+ * giving you a clear but raw markdown content and frontmatter key/value
+ * - `parser` - a **markdown-it** parser is initialized; providing the `md` prop
+ * on the payload. This is where builders who want to act as a markdown-it-plugin
+ * will want to engage.
+ * - `parsed` - The **MarkdownIt** parser is initialized and all builders
+ * have been able to apply their customizations to it.
+ * - `dom` - The HTML has been converted to a HappyDom tree to allow interested builders
+ * to manipulate contents using DOM based queries 
+ * - `sfcBlocksExtracted` - SFC blocks (template, script, and an array of customBlocks) 
+ * are ready for builders to inspect/mutate/etc.
+ * - `closeout` - All mutations of page are complete; builders can hook into this stage
+ * but will _not_ be able to mutate at this stage
+ */
+export type PipelineStage = 'initialize' 
+  | 'metaExtracted' 
+  | 'parser' 
+  | 'parsed' 
+  | 'dom' 
+  | 'sfcBlocksExtracted'
+  | 'closeout'
 
 export interface RulesUse {
   ruleName: string
@@ -73,9 +50,7 @@ export interface RulesUse {
   description?: string
 }
 
-export type PipelineInitializer = (i?: Pipeline<PipelineStage.initialize>) => Pipeline<PipelineStage.initialize>
-
-export type Parser<S extends IPipelineStage> = S extends 'parser' | 'parsed' | 'dom' | 'sfcBlocksExtracted' | 'closeout'
+export type Parser<S extends PipelineStage> = S extends 'parser' | 'parsed' | 'dom' | 'sfcBlocksExtracted' | 'closeout'
   ? {
       /** the **MarkdownIT** parser instance */
       parser: MarkdownIt
@@ -166,11 +141,8 @@ export interface HeadProps {
 }
 
 /** types available _only_ during initialization */
-export type Initialization<S extends IPipelineStage> = S extends 'initialize'
-  ? {
-      /** allows a Builder API to express a dependency on another Builder API */
-      usesBuilder: <T extends BuilderApi<BuilderOptions, IPipelineStage>>(builder: T) => BuilderDependencyApi<T>
-    }
+export type Initialization<S extends PipelineStage> = S extends 'initialize'
+  ? {}
   : {}
 export interface PipelineUtilityFunctions {
   /**
@@ -206,7 +178,7 @@ export interface PipelineUtilityFunctions {
   addStyleBlock: (name: string, style: IElement | string) => void
 }
 
-export type MetaExtracted<S extends IPipelineStage> = S extends 'initialize'
+export type MetaExtracted<S extends PipelineStage> = S extends 'initialize'
   ? {}
   : {
       /** the frontmatter metadata */
@@ -228,7 +200,7 @@ export type MetaExtracted<S extends IPipelineStage> = S extends 'initialize'
 
     } & PipelineUtilityFunctions
 
-export type HtmlContent<S extends IPipelineStage> = S extends 'parsed' | 'sfcBlocksExtracted' | 'closeout'
+export type HtmlContent<S extends PipelineStage> = S extends 'parsed' | 'sfcBlocksExtracted' | 'closeout'
   ? {
       /**
        * the HTML produced from MD content (and using parser rules passed in)
@@ -250,7 +222,7 @@ export type HtmlContent<S extends IPipelineStage> = S extends 'parsed' | 'sfcBlo
       }
     : {}
 
-export type Blocks<S extends IPipelineStage> = S extends 'sfcBlocksExtracted' | 'closeout'
+export type Blocks<S extends PipelineStage> = S extends 'sfcBlocksExtracted' | 'closeout'
   ? {
 
       /** the SFC's template block (aka, html content) */
@@ -277,7 +249,7 @@ export type Blocks<S extends IPipelineStage> = S extends 'sfcBlocksExtracted' | 
     }
   : {}
 
-export type Completed<S extends IPipelineStage> = S extends 'closeout'
+export type Completed<S extends PipelineStage> = S extends 'closeout'
   ? {
       /** the finalized component in string form */
       component: string
@@ -286,13 +258,16 @@ export type Completed<S extends IPipelineStage> = S extends 'closeout'
     }
   : {}
 
-export type Pipeline<S extends IPipelineStage> = {
+export type Pipeline<
+  S extends PipelineStage, B extends readonly ConfiguredBuilder<string, BuilderOptions, PipelineStage, string>[] = readonly ConfiguredBuilder<string, BuilderOptions, PipelineStage, string>[],
+> = {
+  stage: S
   /** the underlying filename of the source */
   fileName: string
   /** the raw content in the file being processed */
   content: string
   /** the `vite-plugin-md` options */
-  options: ResolvedOptions
+  options: ResolvedOptions<B>
   /** the Vite config */
   viteConfig: UserConfig
 
@@ -341,19 +316,28 @@ export type Pipeline<S extends IPipelineStage> = {
  * - a _string_ error condition
  * - a `Pipeline<S>` value
  */
-export type PipeEither<S extends IPipelineStage> = Either<string, Pipeline<S>>
+export type PipeEither<
+  S extends PipelineStage,
+  B extends readonly GenericBuilder[],
+> = Either<string, Pipeline<S, B>>
 
 /**
  * Carries an `TaskEither<T>` condition which is either:
  * - a _string_ error condition
  * - a `() => Promise<Pipeline<S>>` task
  */
-export type PipeTask<S extends IPipelineStage> = TE.TaskEither<string, Pipeline<S>>
+export type PipeTask<
+  S extends PipelineStage,
+  B extends readonly ConfiguredBuilder<string, {}, PipelineStage, string>[],
+> = TE.TaskEither<string, Pipeline<S, B>>
 
 /**
  * A pipeline payload or either an async `PipeTask<S>` or a synchronous `PipeEither<S>`
  */
-export type PipelinePayload<S extends IPipelineStage> = PipeTask<S> | PipeEither<S>
+export type PipelinePayload<
+  S extends PipelineStage,
+  B extends readonly GenericBuilder[],
+> = PipeTask<S, B> | PipeEither<S, B>
 
 /**
  * A _synchronous_ transformer function which:
@@ -362,9 +346,10 @@ export type PipelinePayload<S extends IPipelineStage> = PipeTask<S> | PipeEither
  * - converts it to a type of `PipeEither<T>`
  */
 export type SyncPipelineTransformer<
-  F extends IPipelineStage,
-  T extends IPipelineStage,
-> = (payload: PipeTask<F>) => PipeTask<T>
+  F extends PipelineStage,
+  T extends PipelineStage,
+  B extends readonly GenericBuilder[],
+> = (payload: PipeTask<F, B>) => PipeTask<T, B>
 
 /**
 * An _asynchronous_ transformer function which:
@@ -373,6 +358,7 @@ export type SyncPipelineTransformer<
 * - converts it to a type of `PipeTask<T>`
 */
 export type AsyncPipelineTransformer<
-  F extends IPipelineStage,
-  T extends IPipelineStage,
-> = (payload: PipeTask<F>) => PipeTask<T>
+  F extends PipelineStage,
+  T extends PipelineStage,
+  B extends readonly GenericBuilder[],
+> = (payload: PipeTask<F, B>) => PipeTask<T, B>

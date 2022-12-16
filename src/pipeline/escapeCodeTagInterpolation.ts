@@ -1,4 +1,5 @@
 import { getClassList, select, setAttribute } from '@yankeeinlondon/happy-wrapper'
+import type { GenericBuilder } from '../types/core'
 import { transformer } from '../utils'
 
 /**
@@ -10,9 +11,8 @@ import { transformer } from '../utils'
  * the payload being passed through as this could be valuable for _search_
  * or other meta features.
  */
-export const escapeCodeTagInterpolation = transformer(
-  'escapeCodeTagInterpolation',
-  'dom', 'dom',
+export const escapeCodeTagInterpolation = <B extends readonly GenericBuilder[]>() => transformer<B>()(
+  'dom',
   (payload) => {
     const { options: { escapeCodeTagInterpolation, usingBuilder }, html: dom } = payload
     const addVPre = setAttribute('v-pre')('true')

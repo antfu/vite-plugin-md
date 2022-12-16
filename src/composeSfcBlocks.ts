@@ -1,8 +1,9 @@
 import { flow, pipe } from 'fp-ts/lib/function.js'
 import { isRight } from 'fp-ts/lib/Either.js'
+
 import { resolveOptions } from './options'
-import { PipelineStage } from './types'
 import type {
+  GenericBuilder,
   Options,
   Pipeline,
   ViteConfigPassthrough,
@@ -18,13 +19,11 @@ import {
   finalize,
   frontmatterPreprocess,
   gatherBuilderEvents,
-  injectUtilityFunctions,
   loadMarkdownItPlugins,
   parseHtml,
   repairFrontmatterLinks,
   sourcemap,
   transformsBefore,
-  usesBuilder,
   wrapHtml,
 } from './pipeline'
 import { lift } from './utils'
@@ -35,14 +34,21 @@ import { kebabCaseComponents } from './pipeline/kebabCaseComponents'
  * Composes the `template` and `script` blocks, along with any other `customBlocks` from
  * the raw markdown content along with user options.
  */
-export async function composeSfcBlocks(
+export async function composeSfcBlocks<
+  B extends readonly GenericBuilder[] = [],
+>(
   id: string,
   raw: string,
-  opts: Omit<Options, 'usingBuilder'> = {},
+  opts: Options<B> = {} as Options<B>,
   config: Partial<ViteConfigPassthrough> = {},
 ) {
   const options = resolveOptions(opts)
-  const p0 = {
+
+  /**
+   * The initial pipeline state
+   */
+  const payload: Pipeline<'initialize', B> = {
+    stage: 'initialize',
     fileName: id,
     content: raw.trimStart(),
     head: {},
@@ -58,50 +64,40 @@ export async function composeSfcBlocks(
     options,
   }
 
-  /**
-   * The initial pipeline state
-   */
-  const payload: Pipeline<PipelineStage.initialize> = {
-    ...p0,
-    usesBuilder: usesBuilder(p0 as unknown as Pipeline<PipelineStage.initialize>, []),
-  }
-
   const handlers = gatherBuilderEvents(options)
 
   /** initialize the configuration */
   const initialize = flow(
-    lift('initialize'),
-    transformsBefore,
-    handlers(PipelineStage.initialize),
-    // addBuilderDependencies([]),
+    // lifted,
+    transformsBefore<B>(),
+    handlers('initialize'),
   )
 
   /** extract the meta-data from the MD content */
   const metaExtracted = flow(
-    injectUtilityFunctions,
-    extractFrontmatter,
-    baseStyling,
-    frontmatterPreprocess,
-    handlers(PipelineStage.metaExtracted),
+    extractFrontmatter<B>(),
+    baseStyling<B>(),
+    frontmatterPreprocess<B>(),
+    handlers('metaExtracted'),
   )
 
   /** establish the MarkdownIt parser */
   const parser = flow(
-    createParser,
-    loadMarkdownItPlugins,
-    applyMarkdownItOptions,
-    handlers(PipelineStage.parser),
+    createParser<B>(),
+    loadMarkdownItPlugins<B>(),
+    applyMarkdownItOptions<B>(),
+    handlers('parser'),
   )
 
   /**
    * use MarkdownIt to produce HTML
    */
   const parsed = flow(
-    parseHtml,
-    kebabCaseComponents,
-    repairFrontmatterLinks,
-    wrapHtml,
-    handlers(PipelineStage.parsed),
+    parseHtml<B>(),
+    kebabCaseComponents<B>(),
+    repairFrontmatterLinks<B>(),
+    wrapHtml<B>(),
+    handlers('parsed'),
   )
 
   /**
@@ -109,14 +105,14 @@ export async function composeSfcBlocks(
    * easier to perform.
    */
   const dom = flow(
-    convertToDom,
-    escapeCodeTagInterpolation,
-    handlers(PipelineStage.dom),
+    convertToDom<B>(),
+    escapeCodeTagInterpolation<B>(),
+    handlers('dom'),
   )
 
   // construct the async pipeline
   const result = await pipe(
-    payload,
+    lift(payload),
 
     initialize,
     metaExtracted,
@@ -124,12 +120,12 @@ export async function composeSfcBlocks(
     parsed,
 
     dom,
-    extractBlocks,
-    handlers(PipelineStage.sfcBlocksExtracted),
+    extractBlocks<B>(),
+    handlers('sfcBlocksExtracted'),
 
-    finalize,
-    sourcemap,
-    handlers(PipelineStage.closeout),
+    finalize<B>(),
+    sourcemap<B>(),
+    handlers('closeout'),
   )()
 
   if (isRight(result))

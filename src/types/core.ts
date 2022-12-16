@@ -1,8 +1,10 @@
 import type MarkdownIt from 'markdown-it'
 import type { UserConfig } from 'vite'
-import type { BuilderOptions, BuilderRegistration } from '@yankeeinlondon/builder-api'
+import type { BuilderOptions, ConfiguredBuilder } from '@yankeeinlondon/builder-api'
 import type { FilterPattern } from '../utils/createFilter'
-import type { IPipelineStage } from './pipeline'
+import type { PipelineStage } from './pipeline'
+
+export type GenericBuilder = ConfiguredBuilder<string, BuilderOptions, PipelineStage, string>
 
 /**
  * The key/value definition for Route Properties.
@@ -183,13 +185,15 @@ export interface ProcessedFrontmatter {
   routeMeta: RouteProperties
 }
 
-export interface Options {
+export interface Options<
+  B extends readonly ConfiguredBuilder<string, BuilderOptions, PipelineStage, string>[],
+> {
   style?: {
     baseStyle?: 'none' | 'github'
   }
 
   /** allows adding in Builder's which help to expand functionality of this plugin */
-  builders?: readonly BuilderRegistration<BuilderOptions, IPipelineStage>[]
+  builders?: B
 
   /**
    * Explicitly set the Vue version.
@@ -298,7 +302,7 @@ export interface Options {
    */
   frontmatterPreprocess?: (
     frontmatter: Frontmatter,
-    options: ResolvedOptions
+    options: ResolvedOptions<B>
   ) => ProcessedFrontmatter
 
   /**
@@ -396,7 +400,9 @@ export interface Options {
   exclude?: FilterPattern
 }
 
-export interface ResolvedOptions extends Required<Options> {
+export interface ResolvedOptions<
+  B extends readonly ConfiguredBuilder<string, BuilderOptions, PipelineStage, string>[] = [],
+> extends Required<Options<B>> {
   wrapperClasses: string
   frontmatterDefaults: FmValueCallback | Record<string, FmAllowedValue>
   frontmatterOverrides: FmValueCallback | Record<string, FmAllowedValue>
@@ -412,6 +418,6 @@ export interface ViteConfigPassthrough {
   [key: string]: unknown
 }
 
-export type WithConfig<T extends ResolvedOptions> = ViteConfigPassthrough & T
+export type WithConfig<T extends ResolvedOptions<any>> = ViteConfigPassthrough & T
 
 export type ReturnValues = string | string[] | number | boolean | Object

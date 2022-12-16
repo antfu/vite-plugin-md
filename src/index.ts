@@ -14,7 +14,7 @@ export type ViteConfig = Readonly<Omit<UserConfig, 'plugins' | 'assetsInclude' |
   experimental: any
 }>
 
-function VitePluginMarkdown(userOptions: Options = {}) {
+function VitePluginMarkdown<O extends Options<any>>(userOptions: O = {} as O) {
   const options = resolveOptions(userOptions)
   const markdownToVue = createSfcComponent(options)
   let config: ViteConfig

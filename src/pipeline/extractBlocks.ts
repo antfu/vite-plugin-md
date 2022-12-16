@@ -3,8 +3,8 @@ import type { IElement } from '@yankeeinlondon/happy-wrapper'
 import { pipe } from 'fp-ts/lib/function.js'
 import { isVue2, transformer, wrap } from '../utils'
 import type {
+  GenericBuilder,
   Pipeline,
-  PipelineStage,
   ResolvedOptions,
 } from '../types'
 
@@ -46,7 +46,9 @@ const createVue2ScriptBlock = (codeBlocks: Record<string, string | [base: string
  * from the html. The pipeline's HTML is updated and the two varieties of scripts
  * are returned.
  */
-function extractScriptBlocks(p: Pipeline<PipelineStage.dom>) {
+function extractScriptBlocks<
+  P extends Pipeline<'dom', any>,
+>(p: P) {
   const scripts: IElement[] = []
   const extractor = extract(scripts)
   const html = select(p.html)
@@ -73,7 +75,10 @@ function extractScriptBlocks(p: Pipeline<PipelineStage.dom>) {
  * for this plugin. This call also mutates the `html` property to extract these custom
  * blocks.
  */
-function extractCustomBlocks(p: Pipeline<PipelineStage.dom>, options: ResolvedOptions) {
+function extractCustomBlocks<
+  B extends readonly GenericBuilder[],
+  P extends Pipeline<'dom', B>,
+>(p: P, options: ResolvedOptions<B>) {
   const styleBlocks = [
     ...select(p.html).findAll('style'),
     ...elementHashToArray(p.vueStyleBlocks),
@@ -94,7 +99,9 @@ function extractCustomBlocks(p: Pipeline<PipelineStage.dom>, options: ResolvedOp
 }
 
 /** produces the defineExpose() call based on config */
-function expose(p: Pipeline<'dom'>) {
+function expose<
+  P extends Pipeline<'dom', any>,
+>(p: P) {
   const fm = p.frontmatter
   delete fm.excerpt
 
@@ -112,104 +119,107 @@ function expose(p: Pipeline<'dom'>) {
 /**
  * Separates the various "blocks" in an SFC component
  */
-export const extractBlocks = transformer('extractBlocks', 'dom', 'sfcBlocksExtracted', (payload) => {
+export const extractBlocks = <B extends readonly GenericBuilder[]>() => transformer<B>()(
+  'dom',
+  (payload) => {
   // eslint-disable-next-line prefer-const
-  let { options, frontmatter, head } = payload
+    let { options, frontmatter, head } = payload
 
-  const { scriptSetups, traditionalScripts } = extractScriptBlocks(payload)
-  const { styleBlocks, customBlocks } = extractCustomBlocks(payload, options)
+    const { scriptSetups, traditionalScripts } = extractScriptBlocks(payload)
+    const { styleBlocks, customBlocks } = extractCustomBlocks(payload, options)
 
-  /** template blocks that will be applied below */
-  const template = {
+    /** template blocks that will be applied below */
+    const template = {
     /** adds the lines needed to include useHead() */
-    useHead: head && options.headEnabled
-      ? `import { useHead } from "@vueuse/head"\n  const head = ${JSON.stringify(head)}\n  useHead(head)`
-      : '',
-    importDefineExpose: options.frontmatter ? 'import { defineExpose } from \'vue\'' : '',
-    /** exports the excerpt in a `<script>` block */
-    excerptExport: `export const excerpt: string | undefined = ${JSON.stringify(payload.excerpt || '')}\n`,
-    /**
+      useHead: head && options.headEnabled
+        ? `import { useHead } from "@vueuse/head"\n  const head = ${JSON.stringify(head)}\n  useHead(head)`
+        : '',
+      importDefineExpose: options.frontmatter ? 'import { defineExpose } from \'vue\'' : '',
+      /** exports the excerpt in a `<script>` block */
+      excerptExport: `export const excerpt: string | undefined = ${JSON.stringify(payload.excerpt || '')}\n`,
+      /**
      * export of frontmatter variable; intended for `<script>` block
      */
-    frontmatter: [
-      '/** frontmatter meta-data for MD page **/',
-      'export interface Frontmatter {',
-      '  title?: string\n  description?: string\n  subject?: string\n  category?: string\n  name?: string\n  excerpt?: string\n  image?: string\n  layout?: string\n  requiredAuth?: boolean\n  meta?: Record<string, any>[]',
-      '  [key: string]: unknown',
-      '}',
+      frontmatter: [
+        '/** frontmatter meta-data for MD page **/',
+        'export interface Frontmatter {',
+        '  title?: string\n  description?: string\n  subject?: string\n  category?: string\n  name?: string\n  excerpt?: string\n  image?: string\n  layout?: string\n  requiredAuth?: boolean\n  meta?: Record<string, any>[]',
+        '  [key: string]: unknown',
+        '}',
       `export const frontmatter: Frontmatter = ${options.exposeFrontmatter ? JSON.stringify(frontmatter) : '{}'}`,
-    ].join('\n'),
-    /** returning the 'frontmatter' property for external actors using Vue3 */
-    vue3CompositionReturn: options.frontmatter ? 'return { frontmatter }' : '',
-    /** return 'frontmatter' on the data property for Vue2 users */
-    vue2DataExport: 'export default { data() { return { frontmatter, excerpt } } }',
-    /** variables usable in page template */
-    localVariables: Object.entries(frontmatter).reduce(
-      (acc, [key, value]) => `${acc}\n${isVue2(options) ? 'export' : ''} const ${key} = ${JSON.stringify(value)}`,
-      '',
-    ).trimStart(),
-  }
-
-  const importDirectives: string[] = []
-  const scriptSetupBlocks = scriptSetups.map(el => el.innerHTML)
-
-  /** all userland non-import lines in `<setup script>` blocks */
-  const nonImportDirectives = scriptSetupBlocks.map((line) => {
-    if (line.startsWith('import')) {
-      importDirectives.push(line)
-      return ''
+      ].join('\n'),
+      /** returning the 'frontmatter' property for external actors using Vue3 */
+      vue3CompositionReturn: options.frontmatter ? 'return { frontmatter }' : '',
+      /** return 'frontmatter' on the data property for Vue2 users */
+      vue2DataExport: 'export default { data() { return { frontmatter, excerpt } } }',
+      /** variables usable in page template */
+      localVariables: Object.entries(frontmatter).reduce(
+        (acc, [key, value]) => `${acc}\n${isVue2(options) ? 'export' : ''} const ${key} = ${JSON.stringify(value)}`,
+        '',
+      ).trimStart(),
     }
-    else { return line }
-  }).filter(i => i).join('\n')
 
-  const scriptSetup = isVue2(options)
+    const importDirectives: string[] = []
+    const scriptSetupBlocks = scriptSetups.map(el => el.innerHTML)
+
+    /** all userland non-import lines in `<setup script>` blocks */
+    const nonImportDirectives = scriptSetupBlocks.map((line) => {
+      if (line.startsWith('import')) {
+        importDirectives.push(line)
+        return ''
+      }
+      else { return line }
+    }).filter(i => i).join('\n')
+
+    const scriptSetup = isVue2(options)
     // Vue 2
-    ? ''
+      ? ''
     // Vue 3
-    : wrap('script setup lang="ts"', [
-      ...importDirectives,
-      template.useHead,
-      template.localVariables,
-      expose(payload),
-      nonImportDirectives,
-      ...codeBlocksToArray(payload.vueCodeBlocks),
-    ].filter(i => i).join('\n  '))
+      : wrap('script setup lang="ts"', [
+        ...importDirectives,
+        template.useHead,
+        template.localVariables,
+        expose(payload),
+        nonImportDirectives,
+        ...codeBlocksToArray(payload.vueCodeBlocks),
+      ].filter(i => i).join('\n  '))
 
-  const scriptBlocks = isVue2(options)
+    const scriptBlocks = isVue2(options)
     // Vue 2
-    ? [
-        wrap('script lang="ts"', [
-          template.localVariables,
-          template.frontmatter,
-          template.vue2DataExport,
-        ].join('\n')),
-        [
-          ...traditionalScripts.map(el => el.outerHTML),
-          ...(Object.keys(payload.vueCodeBlocks).length > 0
-            ? createVue2ScriptBlock(payload.vueCodeBlocks)
-            : []
-          ),
-        ].join('\n'),
-      ].filter(i => i)
+      ? [
+          wrap('script lang="ts"', [
+            template.localVariables,
+            template.frontmatter,
+            template.vue2DataExport,
+          ].join('\n')),
+          [
+            ...traditionalScripts.map(el => el.outerHTML),
+            ...(Object.keys(payload.vueCodeBlocks).length > 0
+              ? createVue2ScriptBlock(payload.vueCodeBlocks)
+              : []
+            ),
+          ].join('\n'),
+        ].filter(i => i)
     // Vue3
-    : [
-        wrap('script lang="ts"', [
-          template.frontmatter,
-          template.excerptExport,
-        ].join('\n')),
-        // userland script blocks
-        traditionalScripts.map(s => s.outerHTML).join('\n'),
-      ].filter(i => i)
+      : [
+          wrap('script lang="ts"', [
+            template.frontmatter,
+            template.excerptExport,
+          ].join('\n')),
+          // userland script blocks
+          traditionalScripts.map(s => s.outerHTML).join('\n'),
+        ].filter(i => i)
 
-  const html = toHtml(payload.html)
+    const html = toHtml(payload.html)
 
-  return {
-    ...payload,
-    html,
-    templateBlock: html,
-    scriptSetup,
-    scriptBlocks,
-    styleBlocks: styleBlocks.map(s => s.outerHTML),
-    customBlocks: customBlocks.map(s => s.outerHTML),
-  } as Pipeline<PipelineStage.sfcBlocksExtracted>
-})
+    return {
+      ...payload,
+      stage: 'sfcBlocksExtracted',
+      html,
+      templateBlock: html,
+      scriptSetup,
+      scriptBlocks,
+      styleBlocks: styleBlocks.map(s => s.outerHTML),
+      customBlocks: customBlocks.map(s => s.outerHTML),
+    }
+  })

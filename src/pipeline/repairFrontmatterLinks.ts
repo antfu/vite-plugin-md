@@ -1,5 +1,6 @@
 import type { IElement } from '@yankeeinlondon/happy-wrapper'
 import { clone, select } from '@yankeeinlondon/happy-wrapper'
+import type { GenericBuilder } from '../types/core'
 import { transformer } from '../utils'
 
 const wrappedFrontmatter = /%7B%7B(.*)%7D%7D/
@@ -12,26 +13,28 @@ const restoreBrackets = (bare: string) => `{{${bare}}}`
  * in a way that the curly brackets is no longer going to be interpreted by
  * VueJS. This function will re-establish the intent of the author.
  */
-export const repairFrontmatterLinks = transformer('repairFrontmatterLinks', 'parsed', 'parsed', (payload) => {
-  const update = (attr: string) => (el: IElement) => {
-    const prop = el.getAttribute(attr)
-    if (wrappedFrontmatter.test(prop)) {
-      el.setAttribute(attr,
-        restoreBrackets(prop.replace(wrappedFrontmatter, '$1')),
-      )
+export const repairFrontmatterLinks = <B extends readonly GenericBuilder[]>() => transformer<B>()(
+  'parsed',
+  (payload) => {
+    const update = (attr: string) => (el: IElement) => {
+      const prop = el.getAttribute(attr)
+      if (wrappedFrontmatter.test(prop)) {
+        el.setAttribute(attr,
+          restoreBrackets(prop.replace(wrappedFrontmatter, '$1')),
+        )
+      }
+
+      return clone(el)
     }
 
-    return clone(el)
-  }
+    payload.html = select(payload.html)
+      .updateAll('img')(update('src'))
+      .updateAll('iframe')(update('src'))
+      .updateAll('srcset')(update('src'))
+      .updateAll('a')(update('href'))
+      .updateAll('link')(update('href'))
+      .updateAll('prefetch')(update('href'))
+      .toContainer()
 
-  payload.html = select(payload.html)
-    .updateAll('img')(update('src'))
-    .updateAll('iframe')(update('src'))
-    .updateAll('srcset')(update('src'))
-    .updateAll('a')(update('href'))
-    .updateAll('link')(update('href'))
-    .updateAll('prefetch')(update('href'))
-    .toContainer()
-
-  return payload
-})
+    return payload
+  })

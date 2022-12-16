@@ -1,9 +1,12 @@
 import { toArray } from '@antfu/utils'
+import type { BuilderOptions, ConfiguredBuilder } from '@yankeeinlondon/builder-api'
 import { preprocessHead } from './head'
-import type { Frontmatter, Options, ResolvedOptions } from './types'
+import type { Frontmatter, PipelineStage, Options, ResolvedOptions } from './types'
 import { getVueVersion } from './utils'
 
-export function resolveOptions(userOptions: Omit<Options, 'usingBuilder'> = {}): ResolvedOptions {
+export function resolveOptions<
+  B extends readonly ConfiguredBuilder<string, BuilderOptions, PipelineStage, string>[],
+>(userOptions: Partial<Options<B>> = {} as Partial<Options<B>>): ResolvedOptions<B> {
   const defaultOptions: Omit<ResolvedOptions, 'frontmatterPreprocess' | 'usingBuilder'> = {
     style: {
       baseStyle: 'none',
@@ -48,7 +51,7 @@ export function resolveOptions(userOptions: Omit<Options, 'usingBuilder'> = {}):
           ...userOptions.style,
         },
         usingBuilder: (name: string) => {
-          return !options.builders.every(b => b.name !== name)
+          return !options.builders.every(b => b.about.name !== name)
         },
         frontmatterPreprocess: (frontmatter: Frontmatter, options: ResolvedOptions) => {
           if (!options.usingBuilder('link')) {
@@ -64,5 +67,5 @@ export function resolveOptions(userOptions: Omit<Options, 'usingBuilder'> = {}):
     .filter((i?: string) => i)
     .join(' ')
 
-  return options as ResolvedOptions
+  return options as ResolvedOptions<B>
 }

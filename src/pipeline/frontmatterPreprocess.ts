@@ -1,4 +1,4 @@
-import type { MetaProperty } from '../types'
+import type { GenericBuilder, MetaProperty } from '../types'
 import { transformer } from '../utils'
 
 /**
@@ -6,7 +6,7 @@ import { transformer } from '../utils'
  *
  * Note: the links() builder will turn this off (setting to undefined)
  */
-export const frontmatterPreprocess = transformer('frontmatterPreprocess', 'metaExtracted', 'metaExtracted', (payload) => {
+export const frontmatterPreprocess = <B extends readonly GenericBuilder[]>() => transformer<B>()('metaExtracted', (payload) => {
   const { frontmatter, options: { frontmatterPreprocess } } = payload
   let { head, meta, routeMeta } = payload
 

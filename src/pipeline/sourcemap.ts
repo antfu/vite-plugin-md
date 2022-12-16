@@ -1,6 +1,7 @@
 import type MarkdownIt from 'markdown-it'
 import type { ExistingRawSourceMap } from 'rollup'
 import { SourceMapGenerator } from 'source-map-js'
+import type { GenericBuilder } from '../types/core'
 import { transformer } from '../utils'
 
 const splitRE = /\r?\n/g
@@ -92,19 +93,21 @@ function generateSourceMap(
   return JSON.parse(map.toString()) as ExistingRawSourceMap
 }
 
-export const sourcemap = transformer('finalize', 'closeout', 'closeout', (payload) => {
-  const { fileName, parser, content, component } = payload
-  // add a sourcemap assuming the fileName is stated (which
-  // should always be the case for real files but not all tests)
-  return fileName && fileName.trim().length > 0
-    ? {
-        ...payload,
-        map: generateSourceMap(
-          fileName,
-          content,
-          component,
-          parser,
-        ),
-      }
-    : payload
-})
+export const sourcemap = <B extends readonly GenericBuilder[]>() => transformer<B>()(
+  'closeout',
+  (payload) => {
+    const { fileName, parser, content, component } = payload
+    // add a sourcemap assuming the fileName is stated (which
+    // should always be the case for real files but not all tests)
+    return fileName && fileName.trim().length > 0
+      ? {
+          ...payload,
+          map: generateSourceMap(
+            fileName,
+            content,
+            component,
+            parser,
+          ),
+        }
+      : payload
+  })
