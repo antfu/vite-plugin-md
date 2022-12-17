@@ -441,21 +441,6 @@ export interface Options<
   wrapperComponent?: string | undefined | null
 
   /**
-   * Custom transformations to apply _before_ and/or _after_ the markdown transformation
-   *
-   * Note: these transforms provide _raw_ inputs which means that "code" represents
-   * markdown content along with possibly frontmatter (in the before state) and all of
-   * of the SFC blocks (e.g., template, script, custom) in string format.
-   *
-   * @deprecated these transforms are available using the Builder API -- as well as many more --
-   * and this is the preferred means of mutating the transformation pipeline.
-   */
-  transforms?: {
-    before?: (code: string, id: string) => string
-    after?: (code: string, id: string) => string
-  }
-
-  /**
    * **getFinalizedReport**
    *
    * Hooks into the finalized output of each file. No opportunity to mutate the
