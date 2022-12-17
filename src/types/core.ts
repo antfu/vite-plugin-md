@@ -2,7 +2,7 @@ import type MarkdownIt from 'markdown-it'
 import type { UserConfig } from 'vite'
 import type { BuilderOptions, ConfiguredBuilder } from '@yankeeinlondon/builder-api'
 import type { FilterPattern } from '../utils/createFilter'
-import type { PipelineStage } from './pipeline'
+import type { HeadProps, PipelineStage } from './pipeline'
 
 export type GenericBuilder = ConfiguredBuilder<string, BuilderOptions, PipelineStage, string>
 
@@ -19,13 +19,33 @@ export interface RouteProperties {
   [key: string]: unknown
 }
 
+/**
+ * **SfcBlocks**
+ *
+ * The VueJS SFC _blocks_ which will make up the `.vue` file.
+ */
 export interface SfcBlocks {
   /** the HTML template block of the SFC */
   html: string
 
-  meta: ProcessedFrontmatter
+  /**
+   * All properties destined for the HEAD section of the
+   * page. This includes the title, meta tags, links,
+   * script blocks, etc.
+   *
+   * It also includes `htmlAttrs` and `bodyAttrs` which are the block
+   * attributes associated to the `<html>` and `<body>` sections
+   * respectively.
+   */
+  head: HeadProps
 
-  /** the _script_ blocks  */
+  /**
+   * All the script blocks found on the page.
+   *
+   * Note: all `<script setup>` blocks will be combined into one
+   * where the traditional `<script>` blocks will be left as
+   * separates
+   */
   script: string
   /**
    * Any custom blocks which may exist on the page beyond
@@ -38,7 +58,12 @@ export interface SfcBlocks {
   component: string
 }
 
-/** a `<meta />` property in HTML is defined with the following name/values */
+/**
+ * **MetaProperty**
+ *
+ * a `<meta />` property destined for the HEAD section of an HTML
+ * page with the following key/value pairs.
+ */
 export interface MetaProperty {
   key?: string
   /**
@@ -218,44 +243,63 @@ export interface Options<
   vueVersion?: `2.${string}` | `3.${string}`
 
   /**
+   * **headEnabled**
+   *
    * Enable head support.
    *
-   * You will need to install @vueuse/head and register to App in `main.js`/`main.ts`.
+   * You will need to install @vueuse/head and register to your App in `main.js`/`main.ts`
+   * but doing so will enable the VueJS files you are creating to gain access to the
+   * HEAD section of the page. To get the full power of this plugin it _is_ recommended
+   * that you _do_ turn this on but the default remains as `false`.
    *
    * @default false
    */
   headEnabled?: boolean
 
   /**
-   * The head field in frontmatter used to be used for `@vueuse/head`
+   * @deprecated no function currently
    *
-   * When an empty string is passed, it will use the root properties of the frontmatter
-   *
-   * @default ''
+   * Now that the **meta-builder** is included by default and is responsible
+   * for handling props which go into the HEAD section of the page. You can use
+   * props such as `titleProp`, `descProp`, `routeProp` and `layoutProp`, along
+   * with the
    */
   headField?: string
 
   /**
-   * Parse for frontmatter
+   * **frontmatter**
+   *
+   * Switch which determines whether we will parse for frontmatter in your markdown.
+   *
+   * Note: unless you want to reduce functionality considerably you should leave
+   * this to the default value of `true`.
    *
    * @default true
    */
   frontmatter?: boolean
 
   /**
-   * Default values for a frontmatter properties. Property defaults can be static
-   * values or be provided at build time by a callback function. In cases where
-   * the callback is used, it must conform to the `FrontmatterDefaultValue`
-   * type.
+   * **frontmatterDefaults**
    *
-   * All values at the page level will override these property values.
+   * Default values for a frontmatter properties. Property defaults can be static
+   * dictionary value or a callback function can be run which receives current frontmatter
+   * and the filename as inputs.
+   *
+   * All values at the page level will override these property values; use `frontmatterOverrides`
+   * if you want to _override_ page level props.
    *
    * @default {}
    */
   frontmatterDefaults?: FmValueCallback | Record<string, FmAllowedValue>
 
   /**
-   * Can _override_ page-level author's frontmatter properties
+   * Allows this plugin to override certain frontmatter values on the page. This
+   * can be a static dictionary of key/values but it can also interact with the
+   * page by defining a callback which receives both the filename and the frontmatter
+   * props at this stage in the process and your callback simply returns a dictionary
+   * which can _add_ props or _override_ current ones.
+   *
+   * @default {}
    */
   frontmatterOverrides?: FmValueCallback | Record<string, FmAllowedValue>
 
@@ -287,6 +331,8 @@ export interface Options<
   excerptExtract?: boolean
 
   /**
+   * **exposeExcerpt**
+   *
    * Expose excerpt via expose API.
    *
    * This is on by default and the feature is primarily used to allow excerpts "on page"
@@ -298,6 +344,8 @@ export interface Options<
   exposeExcerpt?: boolean
 
   /**
+   * **customSfcBlocks**
+   *
    * Remove custom SFC block
    *
    * @default ['i18n']
@@ -305,13 +353,20 @@ export interface Options<
   customSfcBlocks?: string[]
 
   /**
+   * **exposeFrontmatter**
+   *
    * Expose frontmatter via expose API
+   * ```ts
+   * const fm = import("page.md").frontmatter;
+   * ```
    *
    * @default true
    */
   exposeFrontmatter?: boolean
 
   /**
+   * **escapeCodeTagInterpolation**
+   *
    * Add `v-pre` to `<code>` tag to escape curly brackets interpolation
    *
    * @see https://github.com/antfu/vite-plugin-md/issues/14
@@ -320,13 +375,17 @@ export interface Options<
   escapeCodeTagInterpolation?: boolean
 
   /**
-   * Options passed to Markdown It
+   * **markdownItOptions**
+   *
+   * Options passed to Markdown It parser
    *
    * @default { html: true, linkify: true, typographer: true }
    */
   markdownItOptions?: MarkdownIt.Options
 
   /**
+   * **markdownItUses**
+   *
    * Plugins for Markdown It
    *
    * **Note:** there is no problem using MarkdownIt plugins whatsoever but in many
@@ -337,15 +396,6 @@ export interface Options<
     | [MarkdownIt.PluginSimple | MarkdownIt.PluginWithOptions<any>, any]
     | any
   )[]
-
-  /**
-   * A function providing the Markdown It instance gets the ability to apply custom
-   * settings/plugins
-   *
-   * @deprecated prefer use of Builder API which provides an easy mechanism to wrap
-   *
-   */
-  markdownItSetup?: (MarkdownIt: MarkdownIt) => void
 
   /**
    * Options which can be passed to [gray-matter](https://github.com/jonschlinkert/gray-matter)
@@ -399,6 +449,12 @@ export interface Options<
   exclude?: FilterPattern
 }
 
+/**
+ * **ResolvedOptions**
+ *
+ * Options which have merged in default values with the user's inputs
+ * to form the finalized _options_ for `vite-plugin-md` runtime.
+ */
 export interface ResolvedOptions<
   B extends readonly any[] | 'none' = 'none',
 > extends Required<Options<B>> {
