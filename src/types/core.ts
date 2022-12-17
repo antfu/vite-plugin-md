@@ -185,15 +185,30 @@ export interface ProcessedFrontmatter {
   routeMeta: RouteProperties
 }
 
+/**
+ * Type utility which converts items in the _builders_ array into ConfiguredBuilders
+ */
+export type ToBuilder<T extends (readonly any[]) | 'none' | undefined> = T extends readonly any[]
+  ? Readonly< {
+    [K in keyof T]: T[K] extends 'none'
+      ? []
+      : T[K] extends ConfiguredBuilder<string, {}, PipelineStage, string>
+        ? T[K] extends ConfiguredBuilder<infer Name, infer Options, infer Stage, infer Desc>
+          ? ConfiguredBuilder<Name, Options, Stage, Desc>
+          : never
+        : T[K]
+  }>
+  : readonly []
+
 export interface Options<
-  B extends readonly ConfiguredBuilder<string, BuilderOptions, PipelineStage, string>[],
+  B extends readonly any[] | 'none' = 'none',
 > {
   style?: {
     baseStyle?: 'none' | 'github'
   }
 
   /** allows adding in Builder's which help to expand functionality of this plugin */
-  builders?: B
+  builders?: ToBuilder<B>
 
   /**
    * Explicitly set the Vue version.
@@ -288,22 +303,6 @@ export interface Options<
    * @default ['i18n']
    */
   customSfcBlocks?: string[]
-
-  /**
-   * Custom function to provide defaults to the frontmatter and
-   * move certain attributes into the "meta" category.
-   *
-   * Note: _overriding this will remove built-in functionality setting
-   * "meta" properties and the built-in "head" support. Do this only
-   * if you know what you're doing._
-   *
-   * @deprecated all use-cases where overriding this have been removed
-   * with the introduction of the Builder API
-   */
-  frontmatterPreprocess?: (
-    frontmatter: Frontmatter,
-    options: ResolvedOptions<B>
-  ) => ProcessedFrontmatter
 
   /**
    * Expose frontmatter via expose API
@@ -401,7 +400,7 @@ export interface Options<
 }
 
 export interface ResolvedOptions<
-  B extends readonly ConfiguredBuilder<string, BuilderOptions, PipelineStage, string>[] = [],
+  B extends readonly any[] | 'none' = 'none',
 > extends Required<Options<B>> {
   wrapperClasses: string
   frontmatterDefaults: FmValueCallback | Record<string, FmAllowedValue>
@@ -410,6 +409,7 @@ export interface ResolvedOptions<
    * a utility which tests whether a given builder is being used
    */
   usingBuilder: (name: string) => boolean
+
 }
 
 export interface ViteConfigPassthrough {
