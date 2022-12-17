@@ -2,7 +2,7 @@ import type MarkdownIt from 'markdown-it'
 import type { UserConfig } from 'vite'
 import type { BuilderOptions, ConfiguredBuilder } from '@yankeeinlondon/builder-api'
 import type { FilterPattern } from '../utils/createFilter'
-import type { HeadProps, PipelineStage } from './pipeline'
+import type { HeadProps, Pipeline, PipelineStage } from './pipeline'
 
 export type GenericBuilder = ConfiguredBuilder<string, BuilderOptions, PipelineStage, string>
 
@@ -269,12 +269,13 @@ export interface Options<
   /**
    * **frontmatter**
    *
-   * Switch which determines whether we will parse for frontmatter in your markdown.
+   * A boolean switch which determines whether we will parse for frontmatter in your markdown.
    *
    * Note: unless you want to reduce functionality considerably you should leave
    * this to the default value of `true`.
    *
    * @default true
+   * @deprecated
    */
   frontmatter?: boolean
 
@@ -293,6 +294,8 @@ export interface Options<
   frontmatterDefaults?: FmValueCallback | Record<string, FmAllowedValue>
 
   /**
+   * **frontmatterOverrides**
+   *
    * Allows this plugin to override certain frontmatter values on the page. This
    * can be a static dictionary of key/values but it can also interact with the
    * page by defining a callback which receives both the filename and the frontmatter
@@ -304,6 +307,8 @@ export interface Options<
   frontmatterOverrides?: FmValueCallback | Record<string, FmAllowedValue>
 
   /**
+   * **excerpt**
+   *
    * This property determines how to process "excerpts" within your Markdown files.
    *
    * - a **boolean** true/false simply turns the feature of looking for an excerpt in the body
@@ -344,15 +349,6 @@ export interface Options<
   exposeExcerpt?: boolean
 
   /**
-   * **customSfcBlocks**
-   *
-   * Remove custom SFC block
-   *
-   * @default ['i18n']
-   */
-  customSfcBlocks?: string[]
-
-  /**
    * **exposeFrontmatter**
    *
    * Expose frontmatter via expose API
@@ -363,6 +359,25 @@ export interface Options<
    * @default true
    */
   exposeFrontmatter?: boolean
+
+  /**
+   * **customSfcBlocks**
+   *
+   * Remove custom SFC block
+   *
+   * @default ['i18n']
+   * @deprecated use `removeSfcBlocks` instead ... same functionality better name
+   */
+  customSfcBlocks?: string[]
+
+  /**
+   * **removeSfcBlocks**
+   *
+   * Allows the removal of certain SFC blocks found in the page
+   *
+   * @default ['i18n']s
+   */
+  removeSfcBlocks?: string[]
 
   /**
    * **escapeCodeTagInterpolation**
@@ -407,6 +422,8 @@ export interface Options<
   grayMatterOptions?: Omit<GraymatterOptions, 'excerpt'>
 
   /**
+   * **wrapperClasses**
+   *
    * Class name for the page's wrapper <div>
    *
    * @default 'markdown-body'
@@ -414,6 +431,8 @@ export interface Options<
   wrapperClasses?: string | string[]
 
   /**
+   * **wrapperComponent**
+   *
    * A component name which the page will be wrapped with (aka,
    * the page becomes HTML and is made a _slot_ for this component)
    *
@@ -437,14 +456,41 @@ export interface Options<
   }
 
   /**
-   * Optionally allows user to explicitly whitelist files which will be transformed
-   * from markdown to VueJS components. By default all files with `.md` extension
-   * are included.
+   * **getFinalizedReport**
+   *
+   * Hooks into the finalized output of each file. No opportunity to mutate the
+   * pipeline but does provide a means to track progress.
+   */
+  getFinalizedReport: <B extends readonly GenericBuilder[]>(cb: Pipeline<'closeout', B>) => void
+
+  /**
+   * **mutateParsed**
+   *
+   * Allows someone to quickly mutate the pipeline at the 'parsed' stage. This will
+   * be run after all builder-api's at that stage have run.
+   */
+  mutateParsed: <B extends readonly GenericBuilder[]>(cb: Pipeline<'parsed', B>) => Pipeline<'parsed', B>
+
+  /**
+   * **mutateSfcBlocks**
+   *
+   * Allows someone to quickly mutate the pipeline at the 'sfcBlocksExtracted' stage. This will
+   * be run after all builder-api's at that stage have run.
+   */
+  mutateSfcBlocks: <B extends readonly GenericBuilder[]>(cb: Pipeline<'sfcBlocksExtracted', B>) => Pipeline<'sfcBlocksExtracted', B>
+
+  /**
+   * **include**
+   *
+   * Whitelists files which should be processed by this plugin. By default all files
+   * with `.md` extension are included.
    */
   include?: FilterPattern
   /**
-   * Allows user to add a blacklist filter to exclude transforming some of the markdown
-   * files to VueJS components.
+   * **exclude**
+   *
+   * Allows certain files to be blacklisted from the "include" list. By default this
+   * is not set.
    */
   exclude?: FilterPattern
 }
