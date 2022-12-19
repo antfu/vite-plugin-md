@@ -27,7 +27,7 @@
     "unplugin-vue-components": "^0.22.12",
     "vite": "^4.0.2",
     "vite-plugin-inspect": "^0.7.11",
-    "vite-plugin-md": "workspace:^0.22.5",
+    "vite-plugin-md": "workspace:^0.23.0",
     "vite-plugin-pages": "^0.28.0",
     "vite-plugin-vue-layouts": "^0.7.0",
     "vite-ssg": "^0.22.1",
