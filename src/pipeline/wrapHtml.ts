@@ -1,10 +1,9 @@
-import type { GenericBuilder } from '../types/core'
 import { transformer } from '../utils'
 
 /**
  * Wraps the HTML with DIV and/or a VueJS component
  */
-export const wrapHtml = <B extends readonly GenericBuilder[]>() => transformer<B>()(
+export const wrapHtml = <B extends readonly any[]>() => transformer<B>()(
   'parsed',
   (payload) => {
     const { options: { wrapperClasses, wrapperComponent }, html, frontmatter } = payload

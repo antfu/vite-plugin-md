@@ -58,6 +58,6 @@ export const liftToAsync = <
  */
 export const lift = <
   S extends PipelineStage,
-  B extends readonly GenericBuilder[],
+  B extends readonly any[],
 >(payload: Pipeline<S, B>): PipeTask<S, B> =>
     () => Promise.resolve(E.right(payload))

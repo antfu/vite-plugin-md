@@ -119,7 +119,7 @@ function expose<
 /**
  * Separates the various "blocks" in an SFC component
  */
-export const extractBlocks = <B extends readonly GenericBuilder[]>() => transformer<B>()(
+export const extractBlocks = <B extends readonly any[]>() => transformer<B>()(
   'dom',
   (payload) => {
   // eslint-disable-next-line prefer-const

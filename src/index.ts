@@ -1,7 +1,6 @@
 import type { InlineConfig, Plugin, UserConfig } from 'vite'
 import type { TransformResult } from 'rollup'
 import { createSfcComponent } from './createSfcComponent'
-import { resolveOptions } from './options'
 import type { Options } from './types'
 import { createFilter } from './utils/createFilter'
 export { composeSfcBlocks } from './composeSfcBlocks'
@@ -14,15 +13,16 @@ export type ViteConfig = Readonly<Omit<UserConfig, 'plugins' | 'assetsInclude' |
   experimental: any
 }>
 
-function VitePluginMarkdown<O extends Options<any>>(userOptions: O = {} as O) {
-  const options = resolveOptions(userOptions)
-  const markdownToVue = createSfcComponent(options)
+function VitePluginMarkdown<
+  O extends Options<readonly any[] | readonly[]> = Options<readonly[]>,
+>(userOptions?: O) {
+  const markdownToVue = createSfcComponent(userOptions)
   let config: ViteConfig
 
   /** filter out files which aren't Markdown files */
   const filter = createFilter(
-    userOptions.include || /\.md$/,
-    userOptions.exclude || null,
+    userOptions?.include || /\.md$/,
+    userOptions?.exclude || null,
   )
 
   return {

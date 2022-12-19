@@ -5,10 +5,7 @@ import type { UserConfig } from 'vite'
 import type { Either } from 'fp-ts/lib/Either.js'
 import type { Fragment, IElement } from '@yankeeinlondon/happy-wrapper'
 import type { ExistingRawSourceMap } from 'rollup'
-import type {
-  BuilderOptions,
-  ConfiguredBuilder,
-} from '@yankeeinlondon/builder-api'
+import type { AfterFirst, First, Narrowable, Suggest } from 'inferred-types'
 import type {
   Frontmatter,
   GenericBuilder,
@@ -18,9 +15,9 @@ import type {
 
 /**
  * **PipelineStage**
- * 
+ *
  * The _stage_ in the transformation pipeline:
- * 
+ *
  * - `initialize` - meant for configuration settings
  * - `metaExtracted` - all frontmatter has been separated from the text content
  * giving you a clear but raw markdown content and frontmatter key/value
@@ -30,19 +27,19 @@ import type {
  * - `parsed` - The **MarkdownIt** parser is initialized and all builders
  * have been able to apply their customizations to it.
  * - `dom` - The HTML has been converted to a HappyDom tree to allow interested builders
- * to manipulate contents using DOM based queries 
- * - `sfcBlocksExtracted` - SFC blocks (template, script, and an array of customBlocks) 
+ * to manipulate contents using DOM based queries
+ * - `sfcBlocksExtracted` - SFC blocks (template, script, and an array of customBlocks)
  * are ready for builders to inspect/mutate/etc.
  * - `closeout` - All mutations of page are complete; builders can hook into this stage
  * but will _not_ be able to mutate at this stage
  */
-export type PipelineStage = 'initialize' 
-  | 'metaExtracted' 
-  | 'parser' 
-  | 'parsed' 
-  | 'dom' 
-  | 'sfcBlocksExtracted'
-  | 'closeout'
+export type PipelineStage = 'initialize'
+| 'metaExtracted'
+| 'parser'
+| 'parsed'
+| 'dom'
+| 'sfcBlocksExtracted'
+| 'closeout'
 
 export interface RulesUse {
   ruleName: string
@@ -81,7 +78,7 @@ export interface LinkProperty {
 }
 
 export interface StyleProperty {
-  type?: string
+  type?: Suggest<'css' | 'scss'>
   [key: string]: unknown
 }
 
@@ -137,6 +134,8 @@ export interface HeadProps {
   script?: MaybeRef<ScriptProperty[]>
   htmlAttrs?: MaybeRef<Record<string, unknown>[]>
   bodyAttrs?: MaybeRef<Record<string, unknown>[]>
+  /** the charset meta property */
+  charset?: MaybeRef<`<meta charset="${string}">` | ''>
   [key: string]: unknown
 }
 
@@ -146,9 +145,20 @@ export type Initialization<S extends PipelineStage> = S extends 'initialize'
   : {}
 export interface PipelineUtilityFunctions {
   /**
+   * Set the title attribute in the head of the page
+   */
+  setTitle(title: string): void
+
+  /**
+   * sets the `charset` as a meta tag
+   */
+  setCharset(type: Suggest<'utf-8'>): void
+
+  /**
    * Adds a `<link>` to the page's header section
    */
-  addLink: (link: LinkProperty) => void
+  addLink(link: LinkProperty): void
+
   /**
    * Adds a `<script>` reference to the page's header section
    */
@@ -170,6 +180,24 @@ export interface PipelineUtilityFunctions {
    * Adds meta-properties to the HEAD section of the page
    */
   addMetaProperty: (meta: MetaProperty) => void
+
+  /**
+   * Sets the meta properties for the pipeline. Be careful as this method is
+   * destructive and can cause unintentional loss if you're not careful.
+   */
+  setMetaProperties(meta: MetaProperty[]): void
+
+  /**
+   * Gets the current set of meta properties being processed
+   * in the pipeline.
+   */
+  getMetaProperties(): MetaProperty[]
+
+  /**
+   * Receives the name of a possible property and returns that meta property
+   * if it exists.
+   */
+  findMetaProperty(name: string): MetaProperty | undefined
 
   /**
    * Adds a VueJS `<script>` block to the HTML (which VueJS will eventually place in HEAD). A style block should be named so that downstream consumers
@@ -259,7 +287,7 @@ export type Completed<S extends PipelineStage> = S extends 'closeout'
   : {}
 
 export type Pipeline<
-  S extends PipelineStage, B extends readonly ConfiguredBuilder<string, BuilderOptions, PipelineStage, string>[] = readonly ConfiguredBuilder<string, BuilderOptions, PipelineStage, string>[],
+  S extends PipelineStage, B extends readonly any[],
 > = {
   stage: S
   /** the underlying filename of the source */
@@ -275,6 +303,7 @@ export type Pipeline<
    * All properties which are destined for the HEAD section of the HTML
    */
   head: HeadProps
+
   /**
    * Meta properties associated with a page's route; used
    * and managed with the "meta" builder.
@@ -328,7 +357,7 @@ export type PipeEither<
  */
 export type PipeTask<
   S extends PipelineStage,
-  B extends readonly ConfiguredBuilder<string, {}, PipelineStage, string>[],
+  B extends readonly any[],
 > = TE.TaskEither<string, Pipeline<S, B>>
 
 /**
@@ -362,3 +391,9 @@ export type AsyncPipelineTransformer<
   T extends PipelineStage,
   B extends readonly GenericBuilder[],
 > = (payload: PipeTask<F, B>) => PipeTask<T, B>
+
+export type Contains<T extends Narrowable, A extends readonly any[]> = First<A> extends T
+  ? true
+  : [] extends AfterFirst<A>
+      ? false
+      : Contains<T, AfterFirst<A>>

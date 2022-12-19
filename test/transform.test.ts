@@ -3,7 +3,7 @@ import { getAttribute, select } from '@yankeeinlondon/happy-wrapper'
 import type { Pipeline } from '../src/types'
 import { composeFixture } from './utils'
 
-let sfc: Pipeline<'closeout'>
+let sfc: Pipeline<'closeout', any>
 
 describe('transform snapshots', () => {
   beforeAll(async () => {

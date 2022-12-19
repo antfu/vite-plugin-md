@@ -5,6 +5,8 @@ import { isRef, ref } from 'vue'
 import type { GenericBuilder, LinkProperty, MetaProperty, Pipeline, PipelineStage, PipelineUtilityFunctions, ScriptProperty, StyleProperty } from '../types'
 
 const add = (p: MaybeRef<any[]>, v: any) => isRef(p) ? p.value.push(v) : p.push(v)
+const set = (p: MaybeRef<any>, v: any) => isRef(p) ? p.value = v : p = v
+const get = (p: MaybeRef<any>) => isRef(p) ? p.value : p
 
 const convertToDictionary = (link: IElement): Record<string, any> => {
   const attrs = Object.keys(link.attributes)
@@ -19,6 +21,20 @@ export const pipelineUtilityFunctions = <
 >(
     ctx: P,
   ): PipelineUtilityFunctions => ({
+    setTitle(title) {
+      if (!ctx.head.title)
+        ctx.head.title = ref('')
+
+      set(ctx.head.title, title)
+    },
+
+    setCharset(type) {
+      if (!ctx.head.charset)
+        ctx.head.charset = ref('')
+
+      set(ctx.head.charset, `<meta charset="${type}">`)
+    },
+
     addLink(link) {
       if (!ctx.head.link)
         ctx.head.link = ref([] as LinkProperty[])
@@ -45,11 +61,24 @@ export const pipelineUtilityFunctions = <
       add(ctx.head.meta, meta)
     },
 
+    getMetaProperties() {
+      return (get(ctx.head.meta) || []) as MetaProperty[]
+    },
+
+    setMetaProperties(meta: MetaProperty[]) {
+      set(ctx.head.meta, meta)
+    },
+
+    findMetaProperty(name: string) {
+      return pipelineUtilityFunctions(ctx).getMetaProperties().find(i => i.name === name)
+    },
+
     addStyleBlock(name, style) {
       ctx.vueStyleBlocks[name] = typeof style === 'string'
         ? createElement(style)
         : style
     },
+
     addStyleReference(style) {
       if (!ctx.head.style)
         ctx.head.style = ref([] as StyleProperty[])

@@ -10,6 +10,7 @@ describe('Async import of components and exposed variables', () => {
 
   it('both frontmatter and excerpt available', async () => {
     const t = await mountFixture('../fixtures/excerpt-default.md')
+
     const sfc = await composeFixture('excerpt-default', {
       exposeExcerpt: true,
       excerpt: true,

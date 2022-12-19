@@ -28,7 +28,7 @@ const frontmatterPreprocess: ResolvedOptions['frontmatterPreprocess'] = (fm) => 
 
 let md = ''
 
-describe('frontmatter pre-processor', () => {
+describe.skip('frontmatter pre-processor', () => {
   beforeAll(async () => {
     md = await readFile('test/fixtures/simple.md', 'utf-8')
   })

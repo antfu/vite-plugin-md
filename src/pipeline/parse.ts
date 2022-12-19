@@ -1,10 +1,9 @@
-import type { GenericBuilder } from '../types/core'
 import { transformer } from '../utils'
 
 /**
  * Using the MarkdownIt parser we are able to extract raw HTML content
  */
-export const parseHtml = <B extends readonly GenericBuilder[]>() => transformer<B>()('parser', (payload) => {
+export const parseHtml = <B extends readonly any[]>() => transformer<B>()('parser', (payload) => {
   try {
     const html = payload.parser.render(payload.md, {})
 

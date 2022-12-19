@@ -1,6 +1,5 @@
 import type { IElement } from '@yankeeinlondon/happy-wrapper'
 import { clone, select } from '@yankeeinlondon/happy-wrapper'
-import type { GenericBuilder } from '../types/core'
 import { transformer } from '../utils'
 
 const wrappedFrontmatter = /%7B%7B(.*)%7D%7D/
@@ -13,7 +12,7 @@ const restoreBrackets = (bare: string) => `{{${bare}}}`
  * in a way that the curly brackets is no longer going to be interpreted by
  * VueJS. This function will re-establish the intent of the author.
  */
-export const repairFrontmatterLinks = <B extends readonly GenericBuilder[]>() => transformer<B>()(
+export const repairFrontmatterLinks = <B extends readonly any[]>() => transformer<B>()(
   'parsed',
   (payload) => {
     const update = (attr: string) => (el: IElement) => {

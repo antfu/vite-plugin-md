@@ -1,4 +1,3 @@
-import type { GenericBuilder } from '../types/core'
 import { dasherize, transformer } from '../utils'
 
 /**
@@ -9,7 +8,7 @@ import { dasherize, transformer } from '../utils'
  *
  * While doing this we must avoid doing the same transformation when inside a code block.
  */
-export const kebabCaseComponents = <B extends readonly GenericBuilder[]>() => transformer<B>()(
+export const kebabCaseComponents = <B extends readonly any[]>() => transformer<B>()(
   'parsed',
   (p) => {
     const possiblePascalCase = /\<[A-Z]/s

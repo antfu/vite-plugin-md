@@ -2,11 +2,8 @@ import type MarkdownIt from 'markdown-it'
 import type { UserConfig } from 'vite'
 import type { BuilderOptions, ConfiguredBuilder } from '@yankeeinlondon/builder-api'
 import type { MetaOptions } from '@yankeeinlondon/meta-builder'
-import type { NarrowlyContains } from 'inferred-types'
-import type meta from '@yankeeinlondon/meta-builder'
 import type { FilterPattern } from '../utils/createFilter'
 import type { HeadProps, Pipeline, PipelineStage } from './pipeline'
-import type { GetEach } from './type-utils'
 
 export type GenericBuilder = ConfiguredBuilder<string, BuilderOptions, PipelineStage, string>
 
@@ -233,16 +230,15 @@ export type ToBuilder<T extends (readonly any[]) | undefined> = T extends readon
   : readonly []
 
 /**
- * Pulls out the builder type from an `Option` or a `ResolvedOption`
+ * Pulls out the builder type from an `Options`, `Partial<Options>` or a `ResolvedOptions`
  */
 export type BuilderFrom<
   T extends Options<readonly any[] | readonly []>
   | Partial<Options<readonly any[] | readonly []>>
-  | ResolvedOptions<any>,
+  | ResolvedOptions<readonly any[]>,
 > = //
   T extends ResolvedOptions<readonly any[] | readonly[]>
     ? T['builders']
-
     : T extends Options<readonly any[] | readonly[]>
       ? T['builders']
       : T extends Partial<Options<readonly any[] | readonly[]>>
@@ -533,7 +529,7 @@ export interface Options<
  * Also adds a few props such as `usingBuilder()`, etc.
  */
 export interface ResolvedOptions<
-  B extends readonly ConfiguredBuilder<string, {}, PipelineStage, string>[] | readonly [],
+  B extends readonly any[] | readonly [],
 > extends Options<readonly any[] | readonly []> {
   [x: string]: any
   wrapperClasses: string

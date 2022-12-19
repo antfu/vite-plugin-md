@@ -2,10 +2,13 @@ import type { Equal, Expect } from '@type-challenges/utils'
 import { describe, expect, it } from 'vitest'
 import type { ConfiguredBuilder } from '@yankeeinlondon/builder-api'
 import { createBuilder } from '@yankeeinlondon/builder-api'
+// import meta from '@yankeeinlondon/meta-builder'
+import type { Narrowable, NarrowlyContains } from 'inferred-types'
 import meta from '@yankeeinlondon/meta-builder'
-import type { BuilderFrom, GenericBuilder, Options, PipeTask, Pipeline, PipelineStage, ResolvedOptions, ToBuilder } from '../src'
+import type { BuilderFrom, Options, PipeTask, Pipeline, PipelineStage, ResolvedOptions, ToBuilder } from '../src'
 import { resolveOptions } from '../src/pipeline/resolveOptions'
 import { lift } from '../src/utils'
+import type { AddBuilder, FilterNamedConfig, FilterTuple, GetEach, NamedBuilders } from '../src/types/type-utils'
 
 // Note: while type tests clearly fail visible inspection, they pass from Vitest
 // standpoint so always be sure to run `tsc --noEmit` over your test files to
@@ -25,21 +28,10 @@ const createPartialOption = <
     : Partial<Options<ToBuilder<O['builders']>>>
 }
 
-const createOption = <
-  O extends Options<readonly any[] | readonly []>,
->(o: O) => {
-  return (
-    o
-      ? o.builders
-        ? o.builders
-        : []
-      : o
-  ) as O['builders'] extends undefined
-    ? Partial<Options<readonly []>>
-    : Partial<Options<ToBuilder<O['builders']>>>
-}
-
-const createPayload = <S extends PipelineStage, B extends readonly GenericBuilder[]>(p: Pipeline<S, B>) => p
+const createPayload = <
+  TStage extends PipelineStage,
+  B extends readonly any[],
+>(p: Pipeline<TStage, B>) => p
 
 const testBuilder = createBuilder('test', 'parsed')
   .options<{ name: string }>()
@@ -53,7 +45,31 @@ const t2 = createBuilder('t2', 'metaExtracted')
   .handler(async p => p)
   .meta()
 
+const fakeMeta = createBuilder('meta', 'dom')
+  .options<{}>()
+  .initializer()
+  .handler(async p => p)
+  .meta({ description: 'this is kinda fake' })
+
 describe('option resolution', () => {
+  it('GetEach', () => {
+    const o1 = createPartialOption({ builders: [t2()] })
+    const o2 = createPartialOption({ builders: [t2(), fakeMeta()] })
+
+    type O1 = BuilderFrom<typeof o1>
+    type O2 = BuilderFrom<typeof o2>
+
+    type T1 = NarrowlyContains<'t2', GetEach<O1, 'about.name'>> // true
+    type T2 = NarrowlyContains<'t3', GetEach<O1, 'about.name'>> // false
+    type T3 = NamedBuilders<O2>
+
+  type cases = [
+    Expect<Equal<T1, true>>, //
+    Expect<Equal<T2, false>>,
+    Expect<Equal<T3, readonly ['t2', 'meta']>>,
+  ]
+  })
+
   it('ToBuilder and BuilderFrom type utils', () => {
     // partial options
     const po1 = createPartialOption()
@@ -66,17 +82,6 @@ describe('option resolution', () => {
     type PO2 = BuilderFrom<typeof po2>
     const po3 = createPartialOption({ builders: [testBuilder(), t2()] })
     type PO3 = BuilderFrom<typeof po3>
-    // options
-    // const o1 = createOption()
-    // const o1b = createOption({})
-    // const o1c = createOption({ builders: [] })
-    // type O1 = BuilderFrom<typeof po1>
-    // type O1b = BuilderFrom<typeof po1b>
-    // type O1c = BuilderFrom<typeof po1c>
-    // const o2 = createOption({ builders: [testBuilder()] })
-    // type O2 = BuilderFrom<typeof po2>
-    // const o3 = createOption({ builders: [testBuilder(), t2()] })
-    // type O3 = BuilderFrom<typeof po3>
 
     type TestBuilder = ReturnType<typeof testBuilder>
     type T2 = ReturnType<typeof t2>
@@ -143,10 +148,19 @@ describe('option resolution', () => {
     const withBuilders = resolveOptions(createPartialOption({ builders: [testBuilder()] }))
     const withBuildersConfigured = resolveOptions(createPartialOption({ builders: [testBuilder({ name: 'Bob' })] }))
     const withMultipleBuilders = resolveOptions(createPartialOption({ builders: [testBuilder(), t2()] }))
+    const withFakeMeta = resolveOptions(createPartialOption({
+      builders: [testBuilder(), fakeMeta()],
+    }))
+    const realMeta = meta()
 
     type Empty = BuilderFrom<typeof empty>
     type WithBuilders = BuilderFrom<typeof withBuilders>
     type MultiBuilders = BuilderFrom<typeof withMultipleBuilders>
+    type FakeMeta = BuilderFrom<typeof withFakeMeta>
+    type Removed = FilterNamedConfig<'meta', FakeMeta>
+    // type RemovedNothing = FilterNamedConfig<'meta', WithBuilders>
+    type Added = AddBuilder<typeof realMeta, Removed>
+    type Named = NamedBuilders<Added>
 
     type cases = [
       Expect<Equal<typeof empty, ResolvedOptions<Empty>>>,
@@ -154,6 +168,8 @@ describe('option resolution', () => {
       Expect<Equal<typeof withBuilders, ResolvedOptions<WithBuilders>>>,
       Expect<Equal<typeof withBuildersConfigured, ResolvedOptions<WithBuilders>>>,
       Expect<Equal<typeof withMultipleBuilders, ResolvedOptions<MultiBuilders>>>,
+      Expect<Equal<typeof withFakeMeta, ResolvedOptions<FakeMeta>>>,
+      Expect<Equal<Named, readonly ['test', 'meta']>>,
     ]
   })
 
@@ -177,7 +193,7 @@ describe('option resolution', () => {
     })
     const lifted = lift(payload)
 
-    type B = typeof payload['options']['builders']
+    type B = BuilderFrom<typeof empty>
 
     type cases = [
       Expect<Equal<typeof payload, Pipeline<'initialize', B>>>,

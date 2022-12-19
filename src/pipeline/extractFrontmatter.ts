@@ -2,7 +2,6 @@ import { matter } from '@yankeeinlondon/gray-matter'
 import type {
   ExcerptFunction,
   Frontmatter,
-  GenericBuilder,
   GraymatterOptions,
   Pipeline,
 } from '../types'
@@ -64,7 +63,7 @@ function resolveFrontmatter<
  * A vast majority of this functionality is provided by leveraging the
  * [GrayMatter](https://github.com/jonschlinkert/gray-matter) library.
  */
-export const extractFrontmatter = <B extends readonly GenericBuilder[]>() => transformer<B>()(
+export const extractFrontmatter = <B extends readonly any[]>() => transformer<B>()(
   'initialize',
   (p) => {
     if (!p.options.frontmatter) {
@@ -73,7 +72,6 @@ export const extractFrontmatter = <B extends readonly GenericBuilder[]>() => tra
         stage: 'metaExtracted',
         frontmatter: {},
         md: p.content,
-        meta: [],
         head: {},
         routeMeta: {},
         ...pipelineUtilityFunctions(p as any),

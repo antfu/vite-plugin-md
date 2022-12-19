@@ -1,11 +1,11 @@
 import { createInlineStyle } from '@yankeeinlondon/happy-wrapper'
-import type { GenericBuilder } from '../types/core'
+
 import { transformer } from '../utils'
 
 /**
- * Call's the transformer function provided in `options.before`
+ * Applies a base styling if the user has opted for this
  */
-export const baseStyling = <B extends readonly GenericBuilder[]>() => transformer<B>()('metaExtracted', (p) => {
+export const baseStyling = <B extends readonly any[]>() => transformer<B>()('metaExtracted', (p) => {
   if (p.options.style.baseStyle === 'github') {
     const style = createInlineStyle()
       .addCssVariable('md-text-color', '#111827')
