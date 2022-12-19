@@ -2,16 +2,17 @@ import type { Equal, Expect } from '@type-challenges/utils'
 import { describe, expect, it } from 'vitest'
 import type { ConfiguredBuilder } from '@yankeeinlondon/builder-api'
 import { createBuilder } from '@yankeeinlondon/builder-api'
-import type { GenericBuilder, Options, PipeTask, Pipeline, PipelineStage, ResolvedOptions, ToBuilder } from '../src'
-import { resolveOptions } from '../src/options'
+import meta from '@yankeeinlondon/meta-builder'
+import type { BuilderFrom, GenericBuilder, Options, PipeTask, Pipeline, PipelineStage, ResolvedOptions, ToBuilder } from '../src'
+import { resolveOptions } from '../src/pipeline/resolveOptions'
 import { lift } from '../src/utils'
 
 // Note: while type tests clearly fail visible inspection, they pass from Vitest
 // standpoint so always be sure to run `tsc --noEmit` over your test files to
 // gain validation that no new type vulnerabilities have cropped up.
 
-const createOption = <
-  O extends Options<(readonly any[]) | 'none'> = Options<'none'>,
+const createPartialOption = <
+  O extends Partial<Options<readonly any[] | readonly []>> = Partial<Options<readonly []>>,
 >(o?: O) => {
   return (
     o
@@ -19,7 +20,23 @@ const createOption = <
         ? o.builders
         : []
       : o
-  ) as Options<ToBuilder<O['builders']>>
+  ) as O['builders'] extends undefined
+    ? Partial<Options<readonly []>>
+    : Partial<Options<ToBuilder<O['builders']>>>
+}
+
+const createOption = <
+  O extends Options<readonly any[] | readonly []>,
+>(o: O) => {
+  return (
+    o
+      ? o.builders
+        ? o.builders
+        : []
+      : o
+  ) as O['builders'] extends undefined
+    ? Partial<Options<readonly []>>
+    : Partial<Options<ToBuilder<O['builders']>>>
 }
 
 const createPayload = <S extends PipelineStage, B extends readonly GenericBuilder[]>(p: Pipeline<S, B>) => p
@@ -37,13 +54,49 @@ const t2 = createBuilder('t2', 'metaExtracted')
   .meta()
 
 describe('option resolution', () => {
+  it('ToBuilder and BuilderFrom type utils', () => {
+    // partial options
+    const po1 = createPartialOption()
+    const po1b = createPartialOption({})
+    const po1c = createPartialOption({ builders: [] })
+    type PO1 = BuilderFrom<typeof po1>
+    type PO1b = BuilderFrom<typeof po1b>
+    type PO1c = BuilderFrom<typeof po1c>
+    const po2 = createPartialOption({ builders: [testBuilder()] })
+    type PO2 = BuilderFrom<typeof po2>
+    const po3 = createPartialOption({ builders: [testBuilder(), t2()] })
+    type PO3 = BuilderFrom<typeof po3>
+    // options
+    // const o1 = createOption()
+    // const o1b = createOption({})
+    // const o1c = createOption({ builders: [] })
+    // type O1 = BuilderFrom<typeof po1>
+    // type O1b = BuilderFrom<typeof po1b>
+    // type O1c = BuilderFrom<typeof po1c>
+    // const o2 = createOption({ builders: [testBuilder()] })
+    // type O2 = BuilderFrom<typeof po2>
+    // const o3 = createOption({ builders: [testBuilder(), t2()] })
+    // type O3 = BuilderFrom<typeof po3>
+
+    type TestBuilder = ReturnType<typeof testBuilder>
+    type T2 = ReturnType<typeof t2>
+
+    type cases = [
+      Expect<Equal<PO1, readonly [] >>, //
+      Expect<Equal<PO1b, readonly []>>, //
+      Expect<Equal<PO1c, readonly []>>, //
+      Expect<Equal<PO2, readonly [TestBuilder]>>,
+      Expect<Equal<PO3, readonly [TestBuilder, T2] >>,
+    ]
+  })
+
   it('BuilderApi converts to ConfiguredBuilder', () => {
     const b = testBuilder()
     const b2 = testBuilder({ name: 'Bob' })
 
     type B0 = ToBuilder<readonly [typeof b]>
     type B1 = ToBuilder<[]>
-    type B2 = ToBuilder<'none'>
+    type B2 = ToBuilder<undefined>
 
     // kind
     expect(testBuilder.kind).toBe('builder')
@@ -64,11 +117,11 @@ describe('option resolution', () => {
   })
 
   it('Options resolve builders generic', () => {
-    const empty = createOption()
-    const noBuilders = createOption({ builders: [] })
-    const withBuilders = createOption({ builders: [testBuilder()] })
-    const withMultipleBuilders = createOption({ builders: [testBuilder(), t2()] })
-    const withBuildersConfigured = createOption({ builders: [testBuilder({ name: 'Bob' })] })
+    const empty = createPartialOption()
+    const noBuilders = createPartialOption({ builders: [] })
+    const withBuilders = createPartialOption({ builders: [testBuilder()] })
+    const withMultipleBuilders = createPartialOption({ builders: [testBuilder(), t2()] })
+    const withBuildersConfigured = createPartialOption({ builders: [testBuilder({ name: 'Bob' })] })
 
     type TestBuilder = ReturnType<typeof testBuilder>
     type TestBuilder2 = ConfiguredBuilder<'test', { name: string }, 'parsed', 'this is a test'>
@@ -76,35 +129,36 @@ describe('option resolution', () => {
 
     type cases = [
       Expect<Equal<TestBuilder, TestBuilder2>>,
-      Expect<Equal<typeof empty, Options<readonly []>>>,
-      Expect<Equal<typeof noBuilders, Options<readonly []>>>,
-      Expect<Equal<typeof withBuilders, Options<readonly [TestBuilder2]>>>,
-      Expect<Equal<typeof withMultipleBuilders, Options<readonly [TestBuilder, T2]>>>,
-      Expect<Equal<typeof withBuildersConfigured, Options<readonly [TestBuilder2]>>>,
+      Expect<Equal<typeof empty, Partial<Options<readonly []>>>>,
+      Expect<Equal<typeof noBuilders, Partial<Options<readonly []>>>>,
+      Expect<Equal<typeof withBuilders, Partial<Options<readonly [TestBuilder2]>>>>,
+      Expect<Equal<typeof withMultipleBuilders, Partial<Options<readonly [TestBuilder, T2]>>>>,
+      Expect<Equal<typeof withBuildersConfigured, Partial<Options<readonly [TestBuilder2]>>>>,
     ]
   })
 
   it('ResolvedOptions', () => {
-    const empty = resolveOptions(createOption())
-    const noBuilders = resolveOptions(createOption({ builders: [] }))
-    const withBuilders = resolveOptions(createOption({ builders: [testBuilder()] }))
-    const withBuildersConfigured = resolveOptions(createOption({ builders: [testBuilder({ name: 'Bob' })] }))
-    const withMultipleBuilders = resolveOptions(createOption({ builders: [testBuilder(), t2()] }))
+    const empty = resolveOptions(createPartialOption())
+    const noBuilders = resolveOptions(createPartialOption({ builders: [] }))
+    const withBuilders = resolveOptions(createPartialOption({ builders: [testBuilder()] }))
+    const withBuildersConfigured = resolveOptions(createPartialOption({ builders: [testBuilder({ name: 'Bob' })] }))
+    const withMultipleBuilders = resolveOptions(createPartialOption({ builders: [testBuilder(), t2()] }))
 
-    type TestBuilder = ReturnType<typeof testBuilder>
-    type T2 = ReturnType<typeof t2>
+    type Empty = BuilderFrom<typeof empty>
+    type WithBuilders = BuilderFrom<typeof withBuilders>
+    type MultiBuilders = BuilderFrom<typeof withMultipleBuilders>
 
     type cases = [
-      Expect<Equal<typeof empty, ResolvedOptions<readonly []>>>,
-      Expect<Equal<typeof noBuilders, ResolvedOptions<readonly []>>>,
-      Expect<Equal<typeof withBuilders, ResolvedOptions<readonly [TestBuilder]>>>,
-      Expect<Equal<typeof withBuildersConfigured, ResolvedOptions<readonly [TestBuilder]>>>,
-      Expect<Equal<typeof withMultipleBuilders, ResolvedOptions<readonly [TestBuilder, T2]>>>,
+      Expect<Equal<typeof empty, ResolvedOptions<Empty>>>,
+      Expect<Equal<typeof noBuilders, ResolvedOptions<Empty>>>,
+      Expect<Equal<typeof withBuilders, ResolvedOptions<WithBuilders>>>,
+      Expect<Equal<typeof withBuildersConfigured, ResolvedOptions<WithBuilders>>>,
+      Expect<Equal<typeof withMultipleBuilders, ResolvedOptions<MultiBuilders>>>,
     ]
   })
 
   it('lift() utility converts a pipeline to a PipeTask', () => {
-    const empty = resolveOptions(createOption({}))
+    const empty = resolveOptions(createPartialOption({}))
     const payload = createPayload({
       stage: 'initialize',
       fileName: 'foobar.md',

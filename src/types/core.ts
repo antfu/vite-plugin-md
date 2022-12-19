@@ -1,8 +1,12 @@
 import type MarkdownIt from 'markdown-it'
 import type { UserConfig } from 'vite'
 import type { BuilderOptions, ConfiguredBuilder } from '@yankeeinlondon/builder-api'
+import type { MetaOptions } from '@yankeeinlondon/meta-builder'
+import type { NarrowlyContains } from 'inferred-types'
+import type meta from '@yankeeinlondon/meta-builder'
 import type { FilterPattern } from '../utils/createFilter'
 import type { HeadProps, Pipeline, PipelineStage } from './pipeline'
+import type { GetEach } from './type-utils'
 
 export type GenericBuilder = ConfiguredBuilder<string, BuilderOptions, PipelineStage, string>
 
@@ -100,6 +104,9 @@ export interface Frontmatter {
   image?: string
   layout?: string
   requiresAuth?: boolean
+  /**
+   * an array of _meta_ tags which are intended to make their way into the HEAD section of the page to provide useful meta-data for users
+   */
   meta?: MetaProperty[]
   [key: string]: unknown
 }
@@ -213,7 +220,7 @@ export interface ProcessedFrontmatter {
 /**
  * Type utility which converts items in the _builders_ array into ConfiguredBuilders
  */
-export type ToBuilder<T extends (readonly any[]) | 'none' | undefined> = T extends readonly any[]
+export type ToBuilder<T extends (readonly any[]) | undefined> = T extends readonly any[]
   ? Readonly< {
     [K in keyof T]: T[K] extends 'none'
       ? []
@@ -225,22 +232,58 @@ export type ToBuilder<T extends (readonly any[]) | 'none' | undefined> = T exten
   }>
   : readonly []
 
+/**
+ * Pulls out the builder type from an `Option` or a `ResolvedOption`
+ */
+export type BuilderFrom<
+  T extends Options<readonly any[] | readonly []>
+  | Partial<Options<readonly any[] | readonly []>>
+  | ResolvedOptions<any>,
+> = //
+  T extends ResolvedOptions<readonly any[] | readonly[]>
+    ? T['builders']
+
+    : T extends Options<readonly any[] | readonly[]>
+      ? T['builders']
+      : T extends Partial<Options<readonly any[] | readonly[]>>
+        ? Exclude<T['builders'], undefined>
+        : never
+
+export type EnsureBuilder<
+  E,
+  R extends readonly GenericBuilder[] | [],
+> = E extends ConfiguredBuilder<any, any, any, any>
+  ? E extends ConfiguredBuilder<infer Name, infer Options, infer Stage, infer Desc>
+    ? readonly [...R, ConfiguredBuilder<Name, Options, Stage, Desc>]
+    : never
+  : readonly [...R, E]
+
 export interface Options<
-  B extends readonly any[] | 'none' = 'none',
+  B extends readonly any[] | readonly [] = readonly [],
 > {
-  style?: {
+  /**
+   * Manage the details of how to deal with meta data such as
+   * `title` tag, the `<meta>` tags, your icon and more.
+   *
+   * **Note:** this is the same properties which the `meta-builder` API
+   * provides and that is because we are now including this Builder API
+   * as part of core.
+   */
+  meta: MetaOptions
+
+  style: {
     baseStyle?: 'none' | 'github'
   }
 
   /** allows adding in Builder's which help to expand functionality of this plugin */
-  builders?: ToBuilder<B>
+  builders: ToBuilder<B>
 
   /**
    * Explicitly set the Vue version.
    *
    * @default auto detected
    */
-  vueVersion?: `2.${string}` | `3.${string}`
+  vueVersion: `2.${string}` | `3.${string}`
 
   /**
    * **headEnabled**
@@ -254,7 +297,7 @@ export interface Options<
    *
    * @default false
    */
-  headEnabled?: boolean
+  headEnabled: boolean
 
   /**
    * @deprecated no function currently
@@ -262,9 +305,10 @@ export interface Options<
    * Now that the **meta-builder** is included by default and is responsible
    * for handling props which go into the HEAD section of the page. You can use
    * props such as `titleProp`, `descProp`, `routeProp` and `layoutProp`, along
-   * with the
+   * with other properties originally associated with the **meta-builder**
+   * underneath the "meta" property
    */
-  headField?: string
+  headField: string
 
   /**
    * **frontmatter**
@@ -277,7 +321,7 @@ export interface Options<
    * @default true
    * @deprecated
    */
-  frontmatter?: boolean
+  frontmatter: boolean
 
   /**
    * **frontmatterDefaults**
@@ -291,7 +335,7 @@ export interface Options<
    *
    * @default {}
    */
-  frontmatterDefaults?: FmValueCallback | Record<string, FmAllowedValue>
+  frontmatterDefaults: FmValueCallback | Record<string, FmAllowedValue>
 
   /**
    * **frontmatterOverrides**
@@ -304,7 +348,7 @@ export interface Options<
    *
    * @default {}
    */
-  frontmatterOverrides?: FmValueCallback | Record<string, FmAllowedValue>
+  frontmatterOverrides: FmValueCallback | Record<string, FmAllowedValue>
 
   /**
    * **excerpt**
@@ -325,7 +369,7 @@ export interface Options<
    *
    * @default false
    */
-  excerpt?: boolean | ExcerptFunction | string
+  excerpt: boolean | ExcerptFunction | string
 
   /**
    * When using the `excerpt` functionality, this flag determines whether the excerpt text
@@ -333,7 +377,7 @@ export interface Options<
    *
    * @default false
    */
-  excerptExtract?: boolean
+  excerptExtract: boolean
 
   /**
    * **exposeExcerpt**
@@ -346,7 +390,7 @@ export interface Options<
    *
    * @default true
    */
-  exposeExcerpt?: boolean
+  exposeExcerpt: boolean
 
   /**
    * **exposeFrontmatter**
@@ -358,7 +402,7 @@ export interface Options<
    *
    * @default true
    */
-  exposeFrontmatter?: boolean
+  exposeFrontmatter: boolean
 
   /**
    * **customSfcBlocks**
@@ -368,7 +412,7 @@ export interface Options<
    * @default ['i18n']
    * @deprecated use `removeSfcBlocks` instead ... same functionality better name
    */
-  customSfcBlocks?: string[]
+  customSfcBlocks: string[]
 
   /**
    * **removeSfcBlocks**
@@ -377,7 +421,7 @@ export interface Options<
    *
    * @default ['i18n']s
    */
-  removeSfcBlocks?: string[]
+  removeSfcBlocks: string[]
 
   /**
    * **escapeCodeTagInterpolation**
@@ -387,7 +431,7 @@ export interface Options<
    * @see https://github.com/antfu/vite-plugin-md/issues/14
    * @default true
    */
-  escapeCodeTagInterpolation?: boolean
+  escapeCodeTagInterpolation: boolean
 
   /**
    * **markdownItOptions**
@@ -396,7 +440,7 @@ export interface Options<
    *
    * @default { html: true, linkify: true, typographer: true }
    */
-  markdownItOptions?: MarkdownIt.Options
+  markdownItOptions: MarkdownIt.Options
 
   /**
    * **markdownItUses**
@@ -406,7 +450,7 @@ export interface Options<
    * **Note:** there is no problem using MarkdownIt plugins whatsoever but in many
    * cases you may find that Builder APIs are available that provider greater functionality.
    */
-  markdownItUses?: (
+  markdownItUses: (
     | MarkdownIt.PluginSimple
     | [MarkdownIt.PluginSimple | MarkdownIt.PluginWithOptions<any>, any]
     | any
@@ -419,7 +463,7 @@ export interface Options<
    * All core functionality -- some of which the graymatter package provides -- is provided directly
    * the root of this options hash (e.g., `excerpt`, `frontmatter`, etc.)
    */
-  grayMatterOptions?: Omit<GraymatterOptions, 'excerpt'>
+  grayMatterOptions: Omit<GraymatterOptions, 'excerpt'>
 
   /**
    * **wrapperClasses**
@@ -428,7 +472,7 @@ export interface Options<
    *
    * @default 'markdown-body'
    */
-  wrapperClasses?: string | string[]
+  wrapperClasses: string | string[]
 
   /**
    * **wrapperComponent**
@@ -438,7 +482,7 @@ export interface Options<
    *
    * @default undefined
    */
-  wrapperComponent?: string | undefined | null
+  wrapperComponent: string | undefined | null
 
   /**
    * **getFinalizedReport**
@@ -446,7 +490,7 @@ export interface Options<
    * Hooks into the finalized output of each file. No opportunity to mutate the
    * pipeline but does provide a means to track progress.
    */
-  getFinalizedReport: <B extends readonly GenericBuilder[]>(cb: Pipeline<'closeout', B>) => void
+  getFinalizedReport: (<B extends readonly GenericBuilder[]>(cb: Pipeline<'closeout', B>) => void) | null
 
   /**
    * **mutateParsed**
@@ -454,7 +498,7 @@ export interface Options<
    * Allows someone to quickly mutate the pipeline at the 'parsed' stage. This will
    * be run after all builder-api's at that stage have run.
    */
-  mutateParsed: <B extends readonly GenericBuilder[]>(cb: Pipeline<'parsed', B>) => Pipeline<'parsed', B>
+  mutateParsed: (<B extends readonly GenericBuilder[]>(cb: Pipeline<'parsed', B>) => Pipeline<'parsed', B>) | null
 
   /**
    * **mutateSfcBlocks**
@@ -462,7 +506,7 @@ export interface Options<
    * Allows someone to quickly mutate the pipeline at the 'sfcBlocksExtracted' stage. This will
    * be run after all builder-api's at that stage have run.
    */
-  mutateSfcBlocks: <B extends readonly GenericBuilder[]>(cb: Pipeline<'sfcBlocksExtracted', B>) => Pipeline<'sfcBlocksExtracted', B>
+  mutateSfcBlocks: (<B extends readonly GenericBuilder[]>(cb: Pipeline<'sfcBlocksExtracted', B>) => Pipeline<'sfcBlocksExtracted', B>) | null
 
   /**
    * **include**
@@ -470,14 +514,14 @@ export interface Options<
    * Whitelists files which should be processed by this plugin. By default all files
    * with `.md` extension are included.
    */
-  include?: FilterPattern
+  include: FilterPattern | null
   /**
    * **exclude**
    *
    * Allows certain files to be blacklisted from the "include" list. By default this
    * is not set.
    */
-  exclude?: FilterPattern
+  exclude: FilterPattern | null
 }
 
 /**
@@ -485,10 +529,13 @@ export interface Options<
  *
  * Options which have merged in default values with the user's inputs
  * to form the finalized _options_ for `vite-plugin-md` runtime.
+ *
+ * Also adds a few props such as `usingBuilder()`, etc.
  */
 export interface ResolvedOptions<
-  B extends readonly any[] | 'none' = 'none',
-> extends Required<Options<B>> {
+  B extends readonly ConfiguredBuilder<string, {}, PipelineStage, string>[] | readonly [],
+> extends Options<readonly any[] | readonly []> {
+  [x: string]: any
   wrapperClasses: string
   frontmatterDefaults: FmValueCallback | Record<string, FmAllowedValue>
   frontmatterOverrides: FmValueCallback | Record<string, FmAllowedValue>
@@ -496,7 +543,10 @@ export interface ResolvedOptions<
    * a utility which tests whether a given builder is being used
    */
   usingBuilder: (name: string) => boolean
-
+  /**
+   * The Builder APIs being used with `vite-plugin-md`
+   */
+  builders: B
 }
 
 export interface ViteConfigPassthrough {
