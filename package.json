@@ -1,6 +1,6 @@
 {
   "name": "vite-plugin-md",
-  "version": "0.22.5",
+  "version": "0.23.0",
   "description": "Markdown for Vite",
   "type": "module",
   "packageManager": "pnpm@7.5.2",
