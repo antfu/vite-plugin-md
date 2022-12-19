@@ -8,7 +8,6 @@ import type { ExistingRawSourceMap } from 'rollup'
 import type { AfterFirst, First, Narrowable, Suggest } from 'inferred-types'
 import type {
   Frontmatter,
-  GenericBuilder,
   MetaProperty,
   ResolvedOptions,
 } from './core'
@@ -347,7 +346,7 @@ export type Pipeline<
  */
 export type PipeEither<
   S extends PipelineStage,
-  B extends readonly GenericBuilder[],
+  B extends readonly any[],
 > = Either<string, Pipeline<S, B>>
 
 /**
@@ -365,7 +364,7 @@ export type PipeTask<
  */
 export type PipelinePayload<
   S extends PipelineStage,
-  B extends readonly GenericBuilder[],
+  B extends readonly any[],
 > = PipeTask<S, B> | PipeEither<S, B>
 
 /**
@@ -377,7 +376,7 @@ export type PipelinePayload<
 export type SyncPipelineTransformer<
   F extends PipelineStage,
   T extends PipelineStage,
-  B extends readonly GenericBuilder[],
+  B extends readonly any[],
 > = (payload: PipeTask<F, B>) => PipeTask<T, B>
 
 /**
@@ -389,7 +388,7 @@ export type SyncPipelineTransformer<
 export type AsyncPipelineTransformer<
   F extends PipelineStage,
   T extends PipelineStage,
-  B extends readonly GenericBuilder[],
+  B extends readonly any[],
 > = (payload: PipeTask<F, B>) => PipeTask<T, B>
 
 export type Contains<T extends Narrowable, A extends readonly any[]> = First<A> extends T

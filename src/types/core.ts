@@ -245,15 +245,6 @@ export type BuilderFrom<
         ? Exclude<T['builders'], undefined>
         : never
 
-export type EnsureBuilder<
-  E,
-  R extends readonly GenericBuilder[] | [],
-> = E extends ConfiguredBuilder<any, any, any, any>
-  ? E extends ConfiguredBuilder<infer Name, infer Options, infer Stage, infer Desc>
-    ? readonly [...R, ConfiguredBuilder<Name, Options, Stage, Desc>]
-    : never
-  : readonly [...R, E]
-
 export interface Options<
   B extends readonly any[] | readonly [] = readonly [],
 > {
@@ -486,7 +477,7 @@ export interface Options<
    * Hooks into the finalized output of each file. No opportunity to mutate the
    * pipeline but does provide a means to track progress.
    */
-  getFinalizedReport: (<B extends readonly GenericBuilder[]>(cb: Pipeline<'closeout', B>) => void) | null
+  getFinalizedReport: (<B extends readonly any[]>(cb: Pipeline<'closeout', B>) => void) | null
 
   /**
    * **mutateParsed**
@@ -494,7 +485,7 @@ export interface Options<
    * Allows someone to quickly mutate the pipeline at the 'parsed' stage. This will
    * be run after all builder-api's at that stage have run.
    */
-  mutateParsed: (<B extends readonly GenericBuilder[]>(cb: Pipeline<'parsed', B>) => Pipeline<'parsed', B>) | null
+  mutateParsed: (<B extends readonly any[]>(cb: Pipeline<'parsed', B>) => Pipeline<'parsed', B>) | null
 
   /**
    * **mutateSfcBlocks**
@@ -502,7 +493,7 @@ export interface Options<
    * Allows someone to quickly mutate the pipeline at the 'sfcBlocksExtracted' stage. This will
    * be run after all builder-api's at that stage have run.
    */
-  mutateSfcBlocks: (<B extends readonly GenericBuilder[]>(cb: Pipeline<'sfcBlocksExtracted', B>) => Pipeline<'sfcBlocksExtracted', B>) | null
+  mutateSfcBlocks: (<B extends readonly any[]>(cb: Pipeline<'sfcBlocksExtracted', B>) => Pipeline<'sfcBlocksExtracted', B>) | null
 
   /**
    * **include**

@@ -1,7 +1,6 @@
-import type { GenericBuilder } from '../types'
 import { transformer } from '../utils'
 
-export const prepHeadProps = <B extends readonly GenericBuilder[]>() => transformer<B>()(
+export const prepHeadProps = <B extends readonly any[]>() => transformer<B>()(
   'metaExtracted',
   p => ({
     ...p,

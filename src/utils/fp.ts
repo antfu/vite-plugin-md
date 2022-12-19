@@ -2,7 +2,7 @@ import * as E from 'fp-ts/lib/Either.js'
 import { flatten, map, tryCatch } from 'fp-ts/lib/TaskEither.js'
 import { pipe } from 'fp-ts/lib/function.js'
 
-import type { GenericBuilder, PipeEither, PipeTask, Pipeline, PipelineStage } from '../types'
+import type { PipeEither, PipeTask, Pipeline, PipelineStage } from '../types'
 
 /**
  * Allows a synchronous function to be lifted up to becoming a task
@@ -10,7 +10,7 @@ import type { GenericBuilder, PipeEither, PipeTask, Pipeline, PipelineStage } fr
  * allow moving through stages of the pipeline
  */
 export const transformer = <
-B extends readonly GenericBuilder[]>() => <F extends PipelineStage, T extends PipelineStage>(
+B extends readonly any[]>() => <F extends PipelineStage, T extends PipelineStage>(
     from: F,
     fn: (p: Pipeline<F, B>) => Pipeline<T, B>,
   ) =>
@@ -32,7 +32,7 @@ B extends readonly GenericBuilder[]>() => <F extends PipelineStage, T extends Pi
 
 export function isPipeTask<
   S extends PipelineStage,
-  B extends readonly GenericBuilder[],
+  B extends readonly any[],
 
 >(payload: PipeTask<S, B> | PipeEither<S, B>): payload is PipeTask<S, B> {
   return typeof payload === 'function'
@@ -43,7 +43,7 @@ export function isPipeTask<
  */
 export const liftToAsync = <
   S extends PipelineStage,
-  B extends readonly GenericBuilder[],
+  B extends readonly any[],
 >(payload: PipeTask<S, B > | PipeEither<S, B>): PipeTask<S, B> => {
   return isPipeTask(payload)
     ? payload

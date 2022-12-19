@@ -1,10 +1,9 @@
-import type { GenericBuilder } from '../types'
 import { transformer } from '../utils'
 
 /**
  * Call's the transformer function provided in `options.before`
  */
-export const transformsBefore = <B extends readonly GenericBuilder[]>() => transformer<B>()(
+export const transformsBefore = <B extends readonly any[]>() => transformer<B>()(
   'initialize',
   (p) => {
     const { content, fileName, options: { transforms: { before } } } = p

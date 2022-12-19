@@ -3,7 +3,6 @@ import type { IElement } from '@yankeeinlondon/happy-wrapper'
 import { pipe } from 'fp-ts/lib/function.js'
 import { isVue2, transformer, wrap } from '../utils'
 import type {
-  GenericBuilder,
   Pipeline,
   ResolvedOptions,
 } from '../types'
@@ -76,7 +75,7 @@ function extractScriptBlocks<
  * blocks.
  */
 function extractCustomBlocks<
-  B extends readonly GenericBuilder[],
+  B extends readonly any[],
   P extends Pipeline<'dom', B>,
 >(p: P, options: ResolvedOptions<B>) {
   const styleBlocks = [

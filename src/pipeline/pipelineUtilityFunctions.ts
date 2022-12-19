@@ -2,7 +2,7 @@ import type { MaybeRef } from '@vueuse/core'
 import type { IElement } from '@yankeeinlondon/happy-wrapper'
 import { createElement, isElement } from '@yankeeinlondon/happy-wrapper'
 import { isRef, ref } from 'vue'
-import type { GenericBuilder, LinkProperty, MetaProperty, Pipeline, PipelineStage, PipelineUtilityFunctions, ScriptProperty, StyleProperty } from '../types'
+import type { LinkProperty, MetaProperty, Pipeline, PipelineStage, PipelineUtilityFunctions, ScriptProperty, StyleProperty } from '../types'
 
 const add = (p: MaybeRef<any[]>, v: any) => isRef(p) ? p.value.push(v) : p.push(v)
 const set = (p: MaybeRef<any>, v: any) => isRef(p) ? p.value = v : p = v
@@ -17,7 +17,7 @@ const convertToDictionary = (link: IElement): Record<string, any> => {
 }
 
 export const pipelineUtilityFunctions = <
-  P extends Pipeline<PipelineStage, readonly GenericBuilder[]>,
+  P extends Pipeline<PipelineStage, readonly any[]>,
 >(
     ctx: P,
   ): PipelineUtilityFunctions => ({
