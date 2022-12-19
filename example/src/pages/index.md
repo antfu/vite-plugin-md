@@ -66,6 +66,7 @@ Whenever you need more than what Markdown provides, simply drop a VueJS componen
 The base functionality of this plugin may be all you need -- or maybe your comfortable with using **markdown it** plugins to extend the base functionality for your needs -- but for those who want to reach into some useful "power ups" you can use a _builder_ to add functionality in powerful ways:
 
 - [Meta](./meta-builder) - manage metadata like a pro
+  > this is now included as part of the main plugin ... see the `meta` section under options to configure it)
 - [Link](./link-builder) - take control over your links
 - [Code](./code-builder) - add code highlighting to your pages
 

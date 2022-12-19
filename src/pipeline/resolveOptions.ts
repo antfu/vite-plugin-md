@@ -1,9 +1,7 @@
 import { toArray } from '@antfu/utils'
 import meta from '@yankeeinlondon/meta-builder'
-
-// import meta from '@yankeeinlondon/meta-builder'
 import type { BuilderFrom, GenericBuilder, Options, ResolvedOptions, ToBuilder } from '../types'
-import { getVueVersion, warn } from '../utils'
+import { getVueVersion, omit, warn } from '../utils'
 import { replaceBuilderOption } from '../utils/replaceBuilder'
 
 /**
@@ -20,8 +18,12 @@ export function resolveOptions<
 
   const defaultOptions: Options<Builder> = {
     meta: {
-      metaProps: [],
-      routeMetaProps: [],
+      metaProps: ['title', 'description', 'image', 'url', 'image_width', 'image_height'],
+      routeMetaProps: ['layout', 'requiredAuth'],
+      routeNameProp: 'routeName',
+      titleProp: 'title',
+      queryParameters: false,
+      ...userOptions.meta,
     },
     style: {
       baseStyle: userOptions?.style?.baseStyle || 'none',
@@ -54,7 +56,7 @@ export function resolveOptions<
 
   const options: ResolvedOptions<Builder> = {
     ...defaultOptions,
-    ...userOptions,
+    ...omit(userOptions, 'meta'),
     wrapperClasses: toArray(userOptions?.wrapperClasses || 'markdown-body')
       .filter((i?: string) => i)
       .join(' '),

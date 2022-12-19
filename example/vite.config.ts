@@ -5,9 +5,8 @@ import Components from 'unplugin-vue-components/vite'
 import Inspect from 'vite-plugin-inspect'
 import Layouts from 'vite-plugin-vue-layouts'
 import Markdown from 'vite-plugin-md'
-// import code from '@yankeeinlondon/code-builder'
-// import link from '@yankeeinlondon/link-builder'
-// import meta from '@yankeeinlondon/meta-builder'
+import code from '@yankeeinlondon/code-builder'
+import link from '@yankeeinlondon/link-builder'
 import Pages from 'vite-plugin-pages'
 import Unocss from 'unocss/vite'
 import Vue from '@vitejs/plugin-vue'
@@ -60,11 +59,10 @@ const config = defineConfig({
         baseStyle: 'github',
       },
       builders: [
-        // meta(),
-        // link(),
-        // code({
-        //   theme: 'base',
-        // }),
+        link(),
+        code({
+          theme: 'base',
+        }),
       ],
     }),
 

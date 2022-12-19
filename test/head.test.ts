@@ -36,6 +36,7 @@ describe('using HEAD variables', () => {
 
   it('when the headEnabled property is set to `true`, all interaction with useHead is enabled', async () => {
     const { scriptSetup } = await composeSfcBlocks('wrapper.md', md, { headEnabled: true })
+
     expect(titleDefined.test(scriptSetup)).toBeTruthy()
     expect(descDefined.test(scriptSetup)).toBeTruthy()
     expect(metaDefined.test(scriptSetup)).toBeTruthy()

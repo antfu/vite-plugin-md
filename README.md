@@ -20,8 +20,6 @@ Installation can be done in a few simple steps. From the root of your repo do th
    npm i vite-plugin-md -D # yarn add vite-plugin-md -D
    ```
 
-   > Please note that this plugin _does_ have some peer dependencies; this is by design is intended to provide better control to end users but as NPM has fairly recently changed how they handle peer dependencies these will no longer be automatically be installed for you. You can either add `auto-install-peers=true` to your `.npmrc` file to go back to the old process or install peer deps when told about them.
-
 2. **Vite Configuration**
 
    Add the following to your `vite.config.js` / `vite.config.ts` file:
@@ -231,7 +229,7 @@ That means you can:
 
       and examples of builders can be found here:
 
-     - [Meta Builder](https://github.com/yankeeinlondon/meta-builder)
+     - [Meta Builder](https://github.com/yankeeinlondon/meta-builder) - now included as part of the core plugin
      - [Link Builder](https://github.com/yankeeinlondon/link-builder)
      - [Code Builder](https://github.com/yankeeinlondon/code-builder)
 
@@ -241,11 +239,11 @@ That means you can:
       import Markdown from 'vite-plugin-md'
       // note: all of these plugins are available as part of an aggregation
       // repo for Builder APIs (but you can import directly if you prefer)
-      import { code, link, meta } from 'md-powerpack'
+      import { code, link } from 'md-powerpack'
       export default {
         plugins: [
           Markdown({
-            builders: [link(), meta(), code()],
+            builders: [link(), code()],
           }),
         ],
       }

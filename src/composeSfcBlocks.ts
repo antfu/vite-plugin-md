@@ -1,6 +1,7 @@
 import { flow, pipe } from 'fp-ts/lib/function.js'
 import { isRight } from 'fp-ts/lib/Either.js'
 
+import { ref } from 'vue'
 import { resolveOptions } from './pipeline/resolveOptions'
 import type {
   BuilderFrom,
@@ -53,7 +54,11 @@ export async function composeSfcBlocks<
     stage: 'initialize',
     fileName: id,
     content: raw.trimStart(),
-    head: {},
+    head: {
+      title: ref(''),
+      meta: ref([]),
+      link: ref([]),
+    },
     frontmatter: undefined,
     routeMeta: undefined,
     viteConfig: config,
@@ -77,7 +82,6 @@ export async function composeSfcBlocks<
   const metaExtracted = flow(
     extractFrontmatter<Builder>(),
     baseStyling<Builder>(),
-    // meta-builder
     handlers('metaExtracted'),
   )
 
