@@ -21,7 +21,7 @@ function VitePluginMarkdown<
 
   /** filter out files which aren't Markdown files */
   const filter = createFilter(
-    userOptions?.include || /\.md$/,
+    userOptions?.include || /\.md(\?.+)$/,
     userOptions?.exclude || null,
   )
 
