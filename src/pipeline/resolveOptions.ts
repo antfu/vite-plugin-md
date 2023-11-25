@@ -23,7 +23,7 @@ export function resolveOptions<
       routeNameProp: 'routeName',
       titleProp: 'title',
       queryParameters: false,
-      ...userOptions.meta,
+      ...(userOptions?.meta ? userOptions.meta || {} : {}),
     },
     style: {
       baseStyle: userOptions?.style?.baseStyle || 'none',
@@ -56,7 +56,7 @@ export function resolveOptions<
 
   const options: ResolvedOptions<Builder> = {
     ...defaultOptions,
-    ...omit(userOptions, 'meta'),
+    ...omit(userOptions || {}, 'meta'),
     wrapperClasses: toArray(userOptions?.wrapperClasses || 'markdown-body')
       .filter((i?: string) => i)
       .join(' '),

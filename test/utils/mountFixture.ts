@@ -26,7 +26,12 @@ export const mountFixture = async (fixture: string) => {
   try {
     // const sfc = await composeFixture(fixture)
     const assets = await importFixture(fixture)
-    const wrapper = mount(assets.component, { global: { plugins: [] } })
+    
+    const wrapper = mount(assets.component, { 
+      exposeExcerpt: true,
+      excerpt: true, 
+      global: { plugins: [] } 
+    })
     return {
       ...assets,
       wrapper,

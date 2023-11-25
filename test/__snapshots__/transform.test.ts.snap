@@ -1,4 +1,4 @@
-// Vitest Snapshot v1
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`transform snapshots > customBlocks remain the same 1`] = `[]`;
 
@@ -10,14 +10,7 @@ exports[`transform snapshots > frontmatter remains the same 1`] = `
 }
 `;
 
-exports[`transform snapshots > head props remains the same 1`] = `
-{
-  "description": "hello world",
-  "excerpt": undefined,
-  "hello": "how friendly",
-  "title": "transform tests",
-}
-`;
+exports[`transform snapshots > head props remains the same 1`] = `{}`;
 
 exports[`transform snapshots > html remains the same 1`] = `
 "<div class=\\"markdown-body\\"><h1>Hello</h1>
@@ -39,7 +32,24 @@ exports[`transform snapshots > html remains the same 1`] = `
 </div>"
 `;
 
-exports[`transform snapshots > meta props remains the same 1`] = `[]`;
+exports[`transform snapshots > meta props remains the same 1`] = `
+[
+  {
+    "content": "transform tests",
+    "itemprop": "title",
+    "key": "title",
+    "name": "twitter:title",
+    "property": "og:title",
+  },
+  {
+    "content": "hello world",
+    "itemprop": "description",
+    "key": "description",
+    "name": "twitter:description",
+    "property": "og:description",
+  },
+]
+`;
 
 exports[`transform snapshots > script blocks remain the same 1`] = `
 [

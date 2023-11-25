@@ -30,4 +30,3 @@ By contrast, the below code fence will take on the opposite behavior:
 ```!ts
 const theValue = {{ hello }};
 ```
-
