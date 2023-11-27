@@ -133,6 +133,23 @@ That means you can:
 
    In most cases, however, use of the `unplugin-vue-components` just makes life simpler. :)
 
+   Markdown content can be fed into slots of Vue components, as the following example demonstrates. Note that for the markdown to be parsed properly, there must be an empty line between the opening tag of the component and the first line of the markdown content.
+
+   ```markdown
+   <component-wrapper>
+
+     Some markdown content __here__. This is the default slot.
+     This can be parsed correctly. 
+   </component-wrapper>
+   ```
+
+   ```markdown
+   <component-wrapper>
+     Some markdown content __here__. This is the default slot.
+     This will remain as plain text.
+   </component-wrapper>
+   ```
+
 3. **Frontmatter**
 
    Frontmatter is a meta-data standard used with most of the static content frameworks and allows you to put name/value pairs at the top of your Markdown files and then use this content within the page. For example:
